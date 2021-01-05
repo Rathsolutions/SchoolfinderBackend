@@ -35,26 +35,21 @@ public class OsmCityTestHelper {
 
     private OsmCityTestHelper() {
         testObjects = new ArrayList<>();
-        testObjects.add(new OsmPOIEntity("Ettlingen", "Ettlingen", 48.9397149, 8.40427));
-        testObjects
-                .add(new OsmPOIEntity("Oberdischingen", "Oberdischingen", 48.3025238, 9.8329152));
-        testObjects.add(
-            new OsmPOIEntity("Oberndorf am Neckar", "Oberndorf am Neckar", 48.2908613, 8.5711222));
-        testObjects
-                .add(new OsmPOIEntity("Langenenslingen", "Langenenslingen", 48.1480101, 9.3770185));
-        testObjects.add(new OsmPOIEntity("Baienfurt", "Baienfurt", 47.8289442, 9.6534108));
-        testObjects.add(new OsmPOIEntity("Iggingen", "Iggingen", 48.8327373, 9.8772074));
-        testObjects.add(new OsmPOIEntity("Böbingen an der Rems", "Böbingen an der Rems", 48.8222298,
-                9.9178237));
-        testObjects.add(new OsmPOIEntity("Schonach im Schwarzwald", "Schonach im Schwarzwald",
-                48.1427148, 8.1974937));
-        testObjects.add(new OsmPOIEntity("Pfaffenweiler", "Pfaffenweiler", 48.0336388, 8.4195787));
-        testObjects.add(new OsmPOIEntity("Oberriexingen", "Oberriexingen", 48.9274282, 9.0292153));
-        testObjects.add(new OsmPOIEntity("Triberg", "Triberg", 48.133228, 8.2331937));
-        testObjects.add(new OsmPOIEntity("Walheim", "Walheim", 49.0126104, 9.1519563));
-        testObjects.add(new OsmPOIEntity("Gerlingen", "Gerlingen", 48.7983947, 9.0624386));
-        testObjects.add(new OsmPOIEntity("Dielheim", "Dielheim", 49.2824981, 8.7351709));
-        testObjects.add(new OsmPOIEntity("Brombach", "Brombach", 47.6347472, 7.6929302));
+        testObjects.add(new OsmPOIEntity("Ettlingen", null, 48.9397149, 8.40427));
+        testObjects.add(new OsmPOIEntity("Oberdischingen", null, 48.3025238, 9.8329152));
+        testObjects.add(new OsmPOIEntity("Oberndorf am Neckar", null, 48.2908613, 8.5711222));
+        testObjects.add(new OsmPOIEntity("Langenenslingen", null, 48.1480101, 9.3770185));
+        testObjects.add(new OsmPOIEntity("Baienfurt", null, 47.8289442, 9.6534108));
+        testObjects.add(new OsmPOIEntity("Iggingen", null, 48.8327373, 9.8772074));
+        testObjects.add(new OsmPOIEntity("Böbingen an der Rems", null, 48.8222298, 9.9178237));
+        testObjects.add(new OsmPOIEntity("Schonach im Schwarzwald", null, 48.1427148, 8.1974937));
+        testObjects.add(new OsmPOIEntity("Pfaffenweiler", "Villingen-Schwenningen", 48.0336388, 8.4195787));
+        testObjects.add(new OsmPOIEntity("Oberriexingen", null, 48.9274282, 9.0292153));
+        testObjects.add(new OsmPOIEntity("Triberg", null, 48.133228, 8.2331937));
+        testObjects.add(new OsmPOIEntity("Walheim", null, 49.0126104, 9.1519563));
+        testObjects.add(new OsmPOIEntity("Gerlingen", null, 48.7983947, 9.0624386));
+        testObjects.add(new OsmPOIEntity("Dielheim", null, 49.2824981, 8.7351709));
+        testObjects.add(new OsmPOIEntity("Brombach", null, 47.6347472, 7.6929302));
     }
 
     public List<OsmPOIEntity> getTestEntites() {

@@ -25,6 +25,8 @@ import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 import de.rathsolutions.jpa.entity.OsmPOIEntity;
 
@@ -39,10 +41,11 @@ public abstract class AbstractOsmPOIParser extends AbstractOsmPOIHandler {
         if (resultList.isEmpty()) {
             return null;
         }
-        String fullName = this.queryValue + (this.city != null ? this.city : "");
+        String string = this.city != null ? this.city : "";
+        String fullName = this.queryValue + string;
         fullName = fullName.replaceAll("-", "").replaceAll("\\s+", "").toLowerCase();
-        List<OsmPOIEntity> nearest
-                = levenstheinDistanceUtil.computeLevenstheinDistance(fullName, resultList, amount);
+        List<OsmPOIEntity> nearest = levenstheinDistanceUtil.computeLevenstheinDistance(fullName,
+            resultList, amount, this.city != null && !this.city.isEmpty());
         log.debug("Final entity: " + nearest.toString());
         return nearest;
     }
@@ -58,18 +61,32 @@ public abstract class AbstractOsmPOIParser extends AbstractOsmPOIHandler {
      * Handles the current found entry.
      */
     @Override
-    protected OsmPOIEntity handleKeyFound(Element nodeItem, Element nameTag, Element cityTag,
-            Element overallItem) {
+    protected OsmPOIEntity handleKeyFound(Element nodeItem, Element nameTag, Element overallItem) {
         if (nameTag == null) {
             return null;
         }
         String name = nameTag.getAttributes().getNamedItem("v").getTextContent();
-        String city = getCityForKeyFound(nameTag, cityTag);
+        String city = getSecondInformationForEntity(overallItem);
         return new OsmPOIEntity(name, city, Double.valueOf(nodeItem.getAttribute("lat")),
                 Double.valueOf(nodeItem.getAttribute("lon")));
     }
 
-    protected abstract String getCityForKeyFound(Element nameTag, Element cityTag);
+    protected abstract String getSecondInformationCriteriaAsString(Node currentNode);
+
+    private String getSecondInformationForEntity(Element currentNodeElement) {
+        NodeList childNodes = currentNodeElement.getChildNodes();
+        for (int i = 0; i < childNodes.getLength(); i++) {
+            Node tagNode = childNodes.item(i);
+            if (tagNode != null && tagNode.getAttributes() != null
+                    && tagNode.getAttributes().getNamedItem("k") != null) {
+                String ret = getSecondInformationCriteriaAsString(tagNode);
+                if (!ret.isBlank()) {
+                    return ret;
+                }
+            }
+        }
+        return "";
+    }
 
     /**
      * Stub with nothing to do in this implementation

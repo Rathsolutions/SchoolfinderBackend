@@ -74,10 +74,7 @@ public class SchoolController {
     private CriteriaRepo criteriaRepo;
 
     @Autowired
-    private OsmPOISchoolParser osmPoiParser;
-
-    @Autowired
-    private OsmPOICityOnlyParser osmCityOnlyParser;
+    private OsmPOISchoolParser osmSchoolParser;
 
     @Autowired
     private PersonSchoolMappingRepo personSchoolMappingRepo;
@@ -91,11 +88,7 @@ public class SchoolController {
         try {
             List<OsmPOIEntity> resultsByName;
             System.out.println(name);
-            if (name.isBlank()) {
-                resultsByName = osmCityOnlyParser.processOsmFile(city, amount);
-            } else {
-                resultsByName = osmPoiParser.processOsmFile(name, city, amount);
-            }
+            resultsByName = osmSchoolParser.processOsmFile(name, city, amount);
             return ResponseEntity.ok()
                     .header("Copyright", "This list was generated using Open Street Maps Data")
                     .body(resultsByName);

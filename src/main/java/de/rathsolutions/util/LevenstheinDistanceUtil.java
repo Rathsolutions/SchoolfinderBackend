@@ -40,32 +40,39 @@ public class LevenstheinDistanceUtil {
      * distance. If there is one perfect matching element (distance equal to 0),
      * only this single element will be returned
      * 
-     * @param requestString the request string which should be used while computing
-     *                      the distance
-     * @param resultList    the filtered list containing all possible osm entities
-     *                      from which you want to find the closest
-     * @param amount        the amount of how many elements should be returned
+     * @param requestString             the request string which should be used
+     *                                  while computing the distance
+     * @param resultList                the filtered list containing all possible
+     *                                  osm entities from which you want to find the
+     *                                  closest
+     * @param amount                    the amount of how many elements should be
+     *                                  returned
+     * @param computeWithSecondaryValue should the secondary value be used while
+     *                                  calculation?
      * @return a list containing all elements
      */
     public List<OsmPOIEntity> computeLevenstheinDistance(String requestString,
-            List<OsmPOIEntity> resultList, int amount) {
-        return computeLevenstheinDistanceInternal(requestString, resultList, amount);
+            List<OsmPOIEntity> resultList, int amount, boolean computeWithSecondaryValue) {
+        return computeLevenstheinDistanceInternal(requestString, resultList, amount,
+            computeWithSecondaryValue);
     }
 
     private List<OsmPOIEntity> computeLevenstheinDistanceInternal(String requestString,
-            List<OsmPOIEntity> resultList, int amount) {
+            List<OsmPOIEntity> resultList, int amount, boolean computeWithSecondaryValue) {
         HashMap<OsmPOIEntity, Integer> entityDistanceMapping = new HashMap<>();
         resultList.forEach(e -> {
-            entityDistanceMapping.put(e, getLevenstheinDistance(requestString.toLowerCase(),
-                e.getSchoolName().toLowerCase()));
+            entityDistanceMapping.put(e,
+                getLevenstheinDistance(requestString.toLowerCase(),
+                    e.getPrimaryValue().toLowerCase()
+                            + (computeWithSecondaryValue ? e.getSecondaryValue() : "")));
         });
         Set<Entry<OsmPOIEntity, Integer>> collect = entityDistanceMapping.entrySet().stream()
                 .sorted((e, f) -> e.getValue().compareTo(f.getValue())).limit(amount)
                 .collect(Collectors.toSet());
-        Optional<Entry<OsmPOIEntity, Integer>> perfectMatch
-                = collect.stream().filter(e -> e.getValue() == 0).findAny();
-        if (perfectMatch.isPresent()) {
-            return Arrays.asList(perfectMatch.get().getKey());
+        List<Entry<OsmPOIEntity, Integer>> perfectMatch
+                = collect.stream().filter(e -> e.getValue() == 0).collect(Collectors.toList());
+        if (!perfectMatch.isEmpty() && perfectMatch.size() == 1) {
+            return Arrays.asList(perfectMatch.get(0).getKey());
         } else {
             return collect.stream().sorted((e, f) -> e.getValue().compareTo(f.getValue()))
                     .map(e -> e.getKey()).collect(Collectors.toList());
@@ -73,9 +80,6 @@ public class LevenstheinDistanceUtil {
     }
 
     private int getLevenstheinDistance(String requestString, String entityTwo) {
-        if (entityTwo.equalsIgnoreCase("friedberg")) {
-            System.out.println("test");
-        }
         requestString = " " + requestString;
         entityTwo = " " + entityTwo;
         int[][] levenstheinMatrix = new int[requestString.length()][entityTwo.length()];

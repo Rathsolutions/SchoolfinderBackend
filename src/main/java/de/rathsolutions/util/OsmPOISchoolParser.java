@@ -27,6 +27,8 @@ import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.stereotype.Service;
 import org.springframework.web.context.WebApplicationContext;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 import de.rathsolutions.jpa.entity.OsmPOIEntity;
 
@@ -40,13 +42,10 @@ public class OsmPOISchoolParser extends AbstractOsmPOIParser {
         return "filteredSchools.xml";
     }
 
-    @Override
-    protected String getCityForKeyFound(Element nameTag, Element cityTag) {
-        String city = null;
-        if (cityTag != null) {
-            city = cityTag.getAttributes().getNamedItem("v").getTextContent();
-        }
-        return city;
+    protected String getSecondInformationCriteriaAsString(Node currentNode) {
+        return OsmTags.CITY.getValue()
+                .equals(currentNode.getAttributes().getNamedItem("k").getTextContent())
+                        ? currentNode.getAttributes().getNamedItem("v").getTextContent()
+                        : "";
     }
-
 }

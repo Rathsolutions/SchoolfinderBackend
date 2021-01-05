@@ -27,6 +27,8 @@ import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.stereotype.Service;
 import org.springframework.web.context.WebApplicationContext;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 import de.rathsolutions.jpa.entity.OsmPOIEntity;
 
@@ -55,11 +57,22 @@ public class OsmPOICityOnlyParser extends AbstractOsmPOIParser {
     protected void init() {
     }
 
-    /**
-     * Stub with nothing to do in this implementation
-     */
     @Override
-    protected String getCityForKeyFound(Element nameTag, Element cityTag) {
+    protected String getSecondInformationCriteriaAsString(Node currentNode) {
+        String key = currentNode.getAttributes().getNamedItem("k").getTextContent();
+        String val = currentNode.getAttributes().getNamedItem("v").getTextContent();
+        if (OsmTags.IS_IN.getValue().equals(key)) {
+            // Removing not needed information after second ','
+            String[] splittedVal = val.split(",");
+            if (splittedVal.length >= 2) {
+                return splittedVal[0] + " - " + splittedVal[1];
+            } else {
+                return val;
+            }
+        } else if (OsmTags.WIKIPEDIA.getValue().equals(key)) {
+            // Removing ':de'
+            return val.substring(3);
+        }
         return "";
     }
 }

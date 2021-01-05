@@ -57,7 +57,7 @@ class OsmPOISchoolParserTest {
             TransformerException, InterruptedException, ExecutionException {
         List<OsmPOIEntity> testObjects = OsmSchoolTestHelper.getInstance().getTestEntites();
         for (OsmPOIEntity e : testObjects) {
-            List<OsmPOIEntity> schoolByName = cut.processOsmFile(e.getSchoolName(), "",1);
+            List<OsmPOIEntity> schoolByName = cut.processOsmFile(e.getPrimaryValue(), e.getSecondaryValue(),1);
             OsmTestHelper.assertOsmPoiEqual(e, schoolByName.get(0));
         }
     }

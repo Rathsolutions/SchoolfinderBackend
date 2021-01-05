@@ -25,7 +25,10 @@ import de.rathsolutions.SpringBootMain;
 import de.rathsolutions.jpa.entity.OsmPOIEntity;
 import de.rathsolutions.util.OsmPOICityOnlyParser;
 
+import static org.junit.Assert.assertEquals;
+
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import javassist.NotFoundException;
@@ -52,8 +55,26 @@ class OsmPOICityOnlyParserTest {
             TransformerException, InterruptedException, ExecutionException {
         List<OsmPOIEntity> testObjects = OsmCityTestHelper.getInstance().getTestEntites();
         for (OsmPOIEntity e : testObjects) {
-            List<OsmPOIEntity> schoolByName = cut.processOsmFile(e.getCity(),1);
+            List<OsmPOIEntity> schoolByName = cut.processOsmFile(e.getPrimaryValue(), 1);
             OsmTestHelper.assertOsmPoiEqual(e, schoolByName.get(0));
+        }
+    }
+
+    @Test
+    void testFindOnPerfectMatchMoreThanOneElement()
+            throws ParserConfigurationException, SAXException, IOException, NotFoundException,
+            TransformerException, InterruptedException, ExecutionException {
+        List<OsmPOIEntity> testObjects = new ArrayList<>();
+        String city = "Steinbach";
+        testObjects.add(new OsmPOIEntity(city, city, 48.7288702, 8.1607982));
+        testObjects.add(new OsmPOIEntity(city, city, 48.9575768, 9.4738062));
+        for (OsmPOIEntity e : testObjects) {
+            List<OsmPOIEntity> schoolByName = cut.processOsmFile(e.getPrimaryValue(), 10);
+            long exactElementCount = schoolByName.stream()
+                    .filter(f -> f.getPrimaryValue().equals(e.getPrimaryValue())
+                            && e.getLatVal() == f.getLatVal() && e.getLongVal() == f.getLongVal())
+                    .count();
+            assertEquals(1, exactElementCount);
         }
     }
 

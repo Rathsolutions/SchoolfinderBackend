@@ -29,7 +29,7 @@ public class OsmTestHelper {
     public static void assertOsmPoiEqual(OsmPOIEntity e, OsmPOIEntity schoolByName) {
         assertEquals(e.getLatVal(), schoolByName.getLatVal());
         assertEquals(e.getLongVal(), schoolByName.getLongVal());
-        assertEquals(e.getSchoolName(), schoolByName.getSchoolName());
-        System.out.println(schoolByName.getSchoolName());
+        assertEquals(e.getPrimaryValue(), schoolByName.getPrimaryValue());
+        System.out.println(schoolByName.getPrimaryValue());
     }
 }

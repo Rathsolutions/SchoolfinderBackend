@@ -113,7 +113,6 @@ public abstract class AbstractOsmPOIHandler {
             Element nodeItem = (Element) e;
             NodeList childNodes = nodeItem.getChildNodes();
             Element centerTag = null;
-            Element cityTag = null;
             Element nameTag = null;
             for (int j = 0; j < childNodes.getLength(); j++) {
                 Node tagNode = childNodes.item(j);
@@ -132,11 +131,6 @@ public abstract class AbstractOsmPOIHandler {
                         if ("name".equals(
                             tagNode.getAttributes().getNamedItem("k").getTextContent())) {
                             nameTag = (Element) tagNode;
-                        } else if ("addr:city".equals(
-                            tagNode.getAttributes().getNamedItem("k").getTextContent())) {
-                            cityTag = (Element) tagNode;
-                        } else {
-                            nodeItem.removeChild(tagNode);
                         }
                         break;
                     default:
@@ -144,8 +138,8 @@ public abstract class AbstractOsmPOIHandler {
                         break;
                 }
             }
-            OsmPOIEntity foundEntity = handleKeyFound(centerTag != null ? centerTag : nodeItem,
-                nameTag, cityTag, nodeItem);
+            OsmPOIEntity foundEntity
+                    = handleKeyFound(centerTag != null ? centerTag : nodeItem, nameTag, nodeItem);
             if (foundEntity != null) {
                 entitiesToCheck.add(foundEntity);
             }
@@ -156,7 +150,7 @@ public abstract class AbstractOsmPOIHandler {
     protected abstract void init();
 
     protected abstract OsmPOIEntity handleKeyFound(Element nodeItem, Element tagNode,
-            Element cityNode, Element overallNodeItem);
+            Element overallNodeItem);
 
     protected abstract void cleanup();
 

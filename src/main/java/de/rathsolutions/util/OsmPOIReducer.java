@@ -37,6 +37,8 @@ import javax.xml.transform.stream.StreamResult;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 import de.rathsolutions.jpa.entity.OsmPOIEntity;
 
@@ -48,10 +50,19 @@ public class OsmPOIReducer extends AbstractOsmPOIHandler {
     private Transformer transformer;
 
     @Override
-    protected OsmPOIEntity handleKeyFound(Element nodeItem, Element nameTag, Element cityTag,
-            Element overallItem) {
+    protected OsmPOIEntity handleKeyFound(Element nodeItem, Element nameTag, Element overallItem) {
         if (nameTag == null) {
             return null;
+        }
+        String name = nameTag.getAttributes().getNamedItem("v").getTextContent();
+        String city = name;
+        NodeList childNodes = overallItem.getChildNodes();
+        for (int i = 0; i < childNodes.getLength(); i++) {
+            Node tagNode = childNodes.item(i);
+            if (tagNode != null && tagNode.getAttributes() != null && !OsmTags
+                    .isValidTag(tagNode.getAttributes().getNamedItem("k").getTextContent())) {
+                overallItem.removeChild(tagNode);
+            }
         }
         DOMSource source = new DOMSource(overallItem);
         StreamResult result = new StreamResult(new StringWriter());
@@ -65,11 +76,6 @@ public class OsmPOIReducer extends AbstractOsmPOIHandler {
             writer.write(strObject);
         } catch (IOException e) {
             e.printStackTrace();
-        }
-        String name = nameTag.getAttributes().getNamedItem("v").getTextContent();
-        String city = name;
-        if (cityTag != null) {
-            city = cityTag.getAttributes().getNamedItem("v").getTextContent();
         }
         return new OsmPOIEntity(name, city, Double.valueOf(nodeItem.getAttribute("lat")),
                 Double.valueOf(nodeItem.getAttribute("lon")));

@@ -1,8 +1,8 @@
 /*-
  * #%L
- * SchuglemapsBackend
+ * SchoolfinderBackend
  * %%
- * Copyright (C) 2020 Rathsolutions. <info@rathsolutions.de>
+ * Copyright (C) 2020 - 2021 Rathsolutions. <info@rathsolutions.de>
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
@@ -19,18 +19,27 @@
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
  * #L%
  */
-package de.rathsolutions.jpa.entity;
+package de.rathsolutions.util;
 
-import lombok.Data;
+import lombok.Getter;
 
-@Data
-public class OsmPOIEntity {
+public enum OsmTags {
 
-    private final String primaryValue;
+    NAME("name"), CITY("addr:city"), IS_IN("is_in"), WIKIPEDIA("wikipedia");
 
-    private final String secondaryValue;
+    @Getter
+    private String value;
 
-    private final double latVal;
+    private OsmTags(String value) {
+        this.value = value;
+    }
 
-    private final double longVal;
+    public static boolean isValidTag(String tagName) {
+        for (OsmTags e : OsmTags.values()) {
+            if (e.getValue().equals(tagName)) {
+                return true;
+            }
+        }
+        return false;
+    }
 }

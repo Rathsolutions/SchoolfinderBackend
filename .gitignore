@@ -3,3 +3,6 @@
 .project
 target/
 test.*
+docker-compose.yml
+Dockerfile-database
+db/

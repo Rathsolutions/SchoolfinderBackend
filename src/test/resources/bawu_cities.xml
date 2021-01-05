@@ -1,5 +1,5 @@
-<!-- Copyright Open Street Maps-->
 <?xml version='1.0' encoding='UTF-8'?>
+<!-- Copyright Open Street Maps-->
 <osm version="0.6" generator="Osmosis 0.48.3">
   <bounds minlon="7.37222" minlat="47.18741" maxlon="10.51495" maxlat="49.79456" origin="0.48.3"/>
   <node id="289645" version="7" timestamp="2010-08-09T18:52:48Z" uid="0" user="" lat="48.9475008" lon="10.3844452">
