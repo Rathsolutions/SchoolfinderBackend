@@ -22,6 +22,8 @@
 package de.rathsolutions.util;
 
 import lombok.extern.slf4j.Slf4j;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.stereotype.Service;
@@ -31,11 +33,16 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import de.rathsolutions.jpa.entity.OsmPOIEntity;
+import de.rathsolutions.util.structure.OsmEntries;
+import de.rathsolutions.util.structure.OsmSchoolEntries;
 
 @Service
 @Scope(value = WebApplicationContext.SCOPE_REQUEST, proxyMode = ScopedProxyMode.TARGET_CLASS)
 @Slf4j
 public class OsmPOISchoolParser extends AbstractOsmPOIParser {
+
+    @Autowired
+    private OsmSchoolEntries osmSchoolEntries;
 
     @Override
     protected String getOsmFileName() {
@@ -47,5 +54,10 @@ public class OsmPOISchoolParser extends AbstractOsmPOIParser {
                 .equals(currentNode.getAttributes().getNamedItem("k").getTextContent())
                         ? currentNode.getAttributes().getNamedItem("v").getTextContent()
                         : "";
+    }
+
+    @Override
+    protected OsmEntries getCachedEntries() {
+        return osmSchoolEntries;
     }
 }

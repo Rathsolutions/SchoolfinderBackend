@@ -37,15 +37,16 @@ public abstract class AbstractOsmPOIParser extends AbstractOsmPOIHandler {
     private LevenstheinDistanceUtil levenstheinDistanceUtil;
 
     @Override
-    protected List<OsmPOIEntity> generateResult(List<OsmPOIEntity> resultList) {
+    protected List<OsmPOIEntity> generateResult(List<OsmPOIEntity> resultList, String primaryValue,
+            String secondaryValue, int amount) {
         if (resultList.isEmpty()) {
             return null;
         }
-        String string = this.city != null ? this.city : "";
-        String fullName = this.queryValue + string;
+        String cityOrEmpty = secondaryValue != null ? secondaryValue : "";
+        String fullName = primaryValue + cityOrEmpty;
         fullName = fullName.replaceAll("-", "").replaceAll("\\s+", "").toLowerCase();
         List<OsmPOIEntity> nearest = levenstheinDistanceUtil.computeLevenstheinDistance(fullName,
-            resultList, amount, this.city != null && !this.city.isEmpty());
+            resultList, amount, secondaryValue != null && !secondaryValue.isEmpty());
         log.debug("Final entity: " + nearest.toString());
         return nearest;
     }

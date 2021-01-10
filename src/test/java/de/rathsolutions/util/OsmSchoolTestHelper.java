@@ -39,7 +39,7 @@ public class OsmSchoolTestHelper {
                 .add(new OsmPOIEntity("Berufliches Bildungszentrum", null, 48.9408981, 8.3967966));
         testObjects.add(new OsmPOIEntity("Max-Planck-Gymnasium", "Böblingen", 48.6796386, 9.0251714));
         testObjects.add(
-            new OsmPOIEntity("Grund- und Hauptschule Gemmrigheim", null, 49.0281808, 9.1589319));
+            new OsmPOIEntity("Grund- und Hauptschule Gemmrigheim", "Gemmrigheim", 49.0286584, 9.1596199));
         testObjects
                 .add(new OsmPOIEntity("Franz-Oberthür-Schule Städtisches Berufsbildungszentrum I",
                         null, 49.7860555, 9.9543711));

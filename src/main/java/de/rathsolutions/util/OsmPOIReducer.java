@@ -26,6 +26,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.StringWriter;
+import java.util.ArrayList;
 import java.util.List;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
@@ -41,6 +42,8 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import de.rathsolutions.jpa.entity.OsmPOIEntity;
+import de.rathsolutions.util.structure.OsmCityEntries;
+import de.rathsolutions.util.structure.OsmEntries;
 
 @Service
 @Scope("prototype")
@@ -59,8 +62,9 @@ public class OsmPOIReducer extends AbstractOsmPOIHandler {
         NodeList childNodes = overallItem.getChildNodes();
         for (int i = 0; i < childNodes.getLength(); i++) {
             Node tagNode = childNodes.item(i);
-            if (tagNode != null && tagNode.getAttributes() != null && !OsmTags
-                    .isValidTag(tagNode.getAttributes().getNamedItem("k").getTextContent())) {
+            if (tagNode != null && tagNode.getAttributes() != null
+                    && tagNode.getAttributes().getNamedItem("k") != null && !OsmTags.isValidTag(
+                        tagNode.getAttributes().getNamedItem("k").getTextContent())) {
                 overallItem.removeChild(tagNode);
             }
         }
@@ -72,6 +76,8 @@ public class OsmPOIReducer extends AbstractOsmPOIHandler {
             e.printStackTrace();
         }
         String strObject = result.getWriter().toString();
+        strObject.trim();
+        strObject.replaceAll("(?m)^[ \\t]*\\r?\\n\"", "");
         try {
             writer.write(strObject);
         } catch (IOException e) {
@@ -113,13 +119,22 @@ public class OsmPOIReducer extends AbstractOsmPOIHandler {
      * Not needed in this implementation
      */
     @Override
-    protected List<OsmPOIEntity> generateResult(List<OsmPOIEntity> resultList) {
+    protected List<OsmPOIEntity> generateResult(List<OsmPOIEntity> resultList, String primaryValue,
+            String secondaryValue, int amount) {
         return null;
     }
 
     @Override
     protected String getOsmFileName() {
-        return "bawu_cities.xml";
+        return "allSchools.xml";
+    }
+
+    @Override
+    protected OsmEntries getCachedEntries() {
+        return new OsmEntries() {
+
+            private static final long serialVersionUID = -9117143845874310922L;
+        };
     }
 
 }

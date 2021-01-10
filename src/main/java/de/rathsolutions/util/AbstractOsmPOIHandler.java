@@ -42,6 +42,7 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import de.rathsolutions.jpa.entity.OsmPOIEntity;
+import de.rathsolutions.util.structure.OsmEntries;
 
 public abstract class AbstractOsmPOIHandler {
 
@@ -50,51 +51,47 @@ public abstract class AbstractOsmPOIHandler {
     @Autowired
     private DocumentParser documentParser;
 
-    protected String queryValue;
-    protected String city;
-
-    protected int amount;
-
-    public List<OsmPOIEntity> processOsmFile(String name, String city, int amount)
+    public List<OsmPOIEntity> processOsmFile(String primaryValue, String secondaryValue, int amount)
             throws ParserConfigurationException, SAXException, IOException, NotFoundException,
             TransformerException, InterruptedException, ExecutionException {
-        if (name == null) {
+        if (primaryValue == null) {
             throw new IllegalArgumentException(QUERYNAME_MUST_NOT_BE_NULL);
         }
-        this.queryValue = name;
-        this.city = city;
-        this.amount = amount;
-        return processOsmFileInternal();
+        return processOsmFileInternal(primaryValue, secondaryValue, amount);
     }
 
-    public List<OsmPOIEntity> processOsmFile(String name, int amount)
+    public List<OsmPOIEntity> processOsmFile(String primaryValue, int amount)
             throws ParserConfigurationException, SAXException, IOException, NotFoundException,
             TransformerException, InterruptedException, ExecutionException {
-        if (name == null) {
+        if (primaryValue == null) {
             throw new IllegalArgumentException(QUERYNAME_MUST_NOT_BE_NULL);
         }
-        this.queryValue = name;
-        this.city = null;
-        this.amount = amount;
-        return processOsmFileInternal();
+        return processOsmFileInternal(primaryValue, null, amount);
     }
 
-    private List<OsmPOIEntity> processOsmFileInternal()
-            throws ParserConfigurationException, SAXException, IOException, NotFoundException,
-            TransformerException, InterruptedException, ExecutionException {
+    private List<OsmPOIEntity> processOsmFileInternal(String primaryValue, String secondaryValue,
+            int amount) throws ParserConfigurationException, SAXException, IOException,
+            NotFoundException, TransformerException, InterruptedException, ExecutionException {
         init();
         Document parsedXml = documentParser.readDocument(getOsmFileName());
         NodeList listOfAllNodes = parsedXml.getElementsByTagName("node");
-        CompletableFuture<List<OsmPOIEntity>> resultNodeList
-                = traverseXmlFileByNodeList(listOfAllNodes);
-        parsedXml = documentParser.readDocument(getOsmFileName());
-        listOfAllNodes = parsedXml.getElementsByTagName("way");
-        CompletableFuture<List<OsmPOIEntity>> resultWayList
-                = traverseXmlFileByNodeList(listOfAllNodes);
-        cleanup();
-        List<OsmPOIEntity> resultList = resultNodeList.get();
-        resultList.addAll(resultWayList.get());
-        List<OsmPOIEntity> osmPoiInNodes = generateResult(resultList);
+        List<OsmPOIEntity> resultList;
+        if (getCachedEntries() == null || getCachedEntries().isEmpty()) {
+            CompletableFuture<List<OsmPOIEntity>> resultNodeList
+                    = traverseXmlFileByNodeList(listOfAllNodes);
+            parsedXml = documentParser.readDocument(getOsmFileName());
+            listOfAllNodes = parsedXml.getElementsByTagName("way");
+            CompletableFuture<List<OsmPOIEntity>> resultWayList
+                    = traverseXmlFileByNodeList(listOfAllNodes);
+            cleanup();
+            resultList = resultNodeList.get();
+            resultList.addAll(resultWayList.get());
+            getCachedEntries().addAll(resultList);
+        } else {
+            resultList = getCachedEntries();
+        }
+        List<OsmPOIEntity> osmPoiInNodes
+                = generateResult(resultList, primaryValue, secondaryValue, amount);
         if (!Objects.isNull(osmPoiInNodes)) {
             return osmPoiInNodes;
         }
@@ -103,7 +100,8 @@ public abstract class AbstractOsmPOIHandler {
 
     protected abstract String getOsmFileName();
 
-    protected abstract List<OsmPOIEntity> generateResult(List<OsmPOIEntity> resultList);
+    protected abstract List<OsmPOIEntity> generateResult(List<OsmPOIEntity> resultList,
+            String primaryValue, String secondaryValue, int amount);
 
     @Async
     private CompletableFuture<List<OsmPOIEntity>> traverseXmlFileByNodeList(NodeList nodeList) {
@@ -153,5 +151,7 @@ public abstract class AbstractOsmPOIHandler {
             Element overallNodeItem);
 
     protected abstract void cleanup();
+
+    protected abstract List<OsmPOIEntity> getCachedEntries();
 
 }

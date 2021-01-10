@@ -21,22 +21,25 @@
  */
 package de.rathsolutions.util;
 
-import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.stereotype.Service;
 import org.springframework.web.context.WebApplicationContext;
-import org.w3c.dom.Element;
 import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
-import de.rathsolutions.jpa.entity.OsmPOIEntity;
+import de.rathsolutions.util.structure.OsmCityEntries;
+import de.rathsolutions.util.structure.OsmEntries;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
 @Scope(value = WebApplicationContext.SCOPE_REQUEST, proxyMode = ScopedProxyMode.TARGET_CLASS)
 @Slf4j
 public class OsmPOICityOnlyParser extends AbstractOsmPOIParser {
 
+    @Autowired
+    private OsmCityEntries osmCityEntries;
+    
     @Override
     protected String getOsmFileName() {
         return "filteredCities.xml";
@@ -74,5 +77,10 @@ public class OsmPOICityOnlyParser extends AbstractOsmPOIParser {
             return val.substring(3);
         }
         return "";
+    }
+
+    @Override
+    protected OsmEntries getCachedEntries() {
+        return this.osmCityEntries;
     }
 }
