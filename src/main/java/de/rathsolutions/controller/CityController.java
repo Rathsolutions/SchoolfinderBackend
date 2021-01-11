@@ -22,7 +22,8 @@
 package de.rathsolutions.controller;
 
 import de.rathsolutions.jpa.entity.OsmPOIEntity;
-import de.rathsolutions.util.OsmPOICityOnlyParser;
+import de.rathsolutions.util.osm.specific.OsmPOICityOnlyParser;
+import de.rathsolutions.util.osm.specific.OsmStreetParser;
 import io.swagger.v3.oas.annotations.Operation;
 import java.io.IOException;
 import java.util.List;
@@ -46,6 +47,9 @@ public class CityController {
     @Autowired
     private OsmPOICityOnlyParser osmCityParser;
 
+    @Autowired
+    private OsmStreetParser osmStreetParser;
+
     @Operation(summary = "searches cities by their names")
     @GetMapping("/search/findCityByName")
     public ResponseEntity<List<OsmPOIEntity>> findCityByName(
@@ -61,5 +65,17 @@ public class CityController {
             log.error(e.getMessage());
             return ResponseEntity.notFound().build();
         }
+    }
+
+    @Operation(summary = "searches for streets in cities by their names")
+    @GetMapping("/search/findCityStreetPositionByName")
+    public ResponseEntity<List<OsmPOIEntity>> findCityStreetPositionByName(
+            @RequestParam(defaultValue = "") String city,
+            @RequestParam(defaultValue = "") String street,
+            @RequestParam(required = false) String housenumber,
+            @RequestParam(defaultValue = "1") int amount) {
+        return ResponseEntity.ok()
+                .header("Copyright", "This list was generated using Open Street Maps Data")
+                .body(osmStreetParser.findStreetGeocodes(city, street, housenumber, amount));
     }
 }

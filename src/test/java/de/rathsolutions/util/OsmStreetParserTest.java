@@ -1,8 +1,8 @@
 /*-
  * #%L
- * SchuglemapsBackend
+ * SchoolfinderBackend
  * %%
- * Copyright (C) 2020 Rathsolutions. <info@rathsolutions.de>
+ * Copyright (C) 2020 - 2021 Rathsolutions. <info@rathsolutions.de>
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
@@ -23,44 +23,44 @@ package de.rathsolutions.util;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import java.io.IOException;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.TransformerException;
-
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ContextConfiguration;
-import org.xml.sax.SAXException;
 
 import de.rathsolutions.SpringBootMain;
 import de.rathsolutions.jpa.entity.OsmPOIEntity;
-import de.rathsolutions.util.osm.specific.OsmPOIReducer;
-import de.rathsolutions.util.osm.specific.OsmPOISchoolParser;
-import javassist.NotFoundException;
+import de.rathsolutions.util.osm.specific.OsmStreetParser;
 import lombok.extern.slf4j.Slf4j;
 
 @SpringBootTest
 @ContextConfiguration(classes = SpringBootMain.class)
 @Slf4j
-class OsmPOISchoolParserTest {
+class OsmStreetParserTest {
 
     @Autowired
-    private OsmPOISchoolParser cut;
+    private OsmStreetParser cut;
 
     @Test
-    void testFindCorrectElementsInXmlFileWithFullName()
-            throws ParserConfigurationException, SAXException, IOException, NotFoundException,
-            TransformerException, InterruptedException, ExecutionException {
-        List<OsmPOIEntity> testObjects = OsmSchoolTestHelper.getInstance().getTestEntites();
-        for (OsmPOIEntity e : testObjects) {
-            List<OsmPOIEntity> schoolByName = cut.processOsmFile(e.getPrimaryValue(), e.getSecondaryValue(),1);
-            OsmTestHelper.assertOsmPoiEqual(e, schoolByName.get(0));
-        }
+    void testCityStreetSearch() {
+        List<OsmPOIEntity> findStreetGeocodes
+                = cut.findStreetGeocodes("Rastatt", "Engelstraße", "21", 1);
+        findStreetGeocodes.stream().forEach(e -> {
+            assertEquals(48.859834600000006, e.getLatVal());
+            assertEquals(8.201058, e.getLongVal());
+            System.out.println(e.getPrimaryValue());
+            System.out.println(e.getSecondaryValue());
+        });
     }
-    
+
+    //Use this test to create the requried heap file for the city street search
+    @Disabled
+    @Test
+    void writeHeapFile() {
+        cut.createStreetObjectsHeapFile();
+    }
 
 }

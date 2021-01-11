@@ -19,7 +19,7 @@
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
  * #L%
  */
-package de.rathsolutions.util;
+package de.rathsolutions.util.osm.specific;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -42,6 +42,8 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import de.rathsolutions.jpa.entity.OsmPOIEntity;
+import de.rathsolutions.util.osm.generic.AbstractOsmPOIHandler;
+import de.rathsolutions.util.osm.generic.OsmTags;
 import de.rathsolutions.util.structure.OsmCityEntries;
 import de.rathsolutions.util.structure.OsmEntries;
 

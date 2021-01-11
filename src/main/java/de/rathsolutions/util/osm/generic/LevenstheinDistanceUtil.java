@@ -19,7 +19,7 @@
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
  * #L%
  */
-package de.rathsolutions.util;
+package de.rathsolutions.util.osm.generic;
 
 import java.util.Arrays;
 import java.util.HashMap;

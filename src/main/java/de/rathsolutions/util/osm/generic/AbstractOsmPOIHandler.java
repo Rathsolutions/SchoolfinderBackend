@@ -19,7 +19,7 @@
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
  * #L%
  */
-package de.rathsolutions.util;
+package de.rathsolutions.util.osm.generic;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -92,6 +92,7 @@ public abstract class AbstractOsmPOIHandler {
         }
         List<OsmPOIEntity> osmPoiInNodes
                 = generateResult(resultList, primaryValue, secondaryValue, amount);
+        
         if (!Objects.isNull(osmPoiInNodes)) {
             return osmPoiInNodes;
         }

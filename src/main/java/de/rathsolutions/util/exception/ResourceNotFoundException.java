@@ -19,18 +19,19 @@
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
  * #L%
  */
-package de.rathsolutions.util;
+package de.rathsolutions.util.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
-@ResponseStatus(value = HttpStatus.CONFLICT)
-public class ResourceAlreadyExistingException extends RuntimeException{
+@ResponseStatus(value = HttpStatus.NOT_FOUND)
+public class ResourceNotFoundException extends RuntimeException {
 
-    private static final long serialVersionUID = -1705401927002247109L;
-    
-    public <T> ResourceAlreadyExistingException(T resource) {
-        super("This resource already exists! See: " + resource.toString());
+    private static final long serialVersionUID = -1875593873849626167L;
+
+    public <T> ResourceNotFoundException(T resource, String resourceRepresentationName) {
+        super("The requested " + resourceRepresentationName + " resource could not be found! "
+                + resource.toString());
     }
 
 }

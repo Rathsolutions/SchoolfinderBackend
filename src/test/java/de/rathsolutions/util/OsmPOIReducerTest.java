@@ -34,7 +34,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.xml.sax.SAXException;
 
 import de.rathsolutions.SpringBootMain;
-import de.rathsolutions.util.OsmPOIReducer;
+import de.rathsolutions.util.osm.specific.OsmPOIReducer;
 
 @SpringBootTest
 @ContextConfiguration(classes = SpringBootMain.class)

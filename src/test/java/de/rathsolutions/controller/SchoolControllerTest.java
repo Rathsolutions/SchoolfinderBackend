@@ -42,10 +42,10 @@ import de.rathsolutions.jpa.entity.Person;
 import de.rathsolutions.jpa.entity.School;
 import de.rathsolutions.jpa.repo.CriteriaRepo;
 import de.rathsolutions.jpa.repo.SchoolRepo;
-import de.rathsolutions.util.BadArgumentsException;
-import de.rathsolutions.util.OsmPOISchoolParser;
-import de.rathsolutions.util.ResourceAlreadyExistingException;
-import de.rathsolutions.util.ResourceNotFoundException;
+import de.rathsolutions.util.exception.BadArgumentsException;
+import de.rathsolutions.util.exception.ResourceAlreadyExistingException;
+import de.rathsolutions.util.exception.ResourceNotFoundException;
+import de.rathsolutions.util.osm.specific.OsmPOISchoolParser;
 
 import java.io.IOException;
 import java.util.ArrayList;

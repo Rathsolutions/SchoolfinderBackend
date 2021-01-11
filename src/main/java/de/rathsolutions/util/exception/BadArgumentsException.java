@@ -1,8 +1,8 @@
 /*-
  * #%L
- * SchoolfinderBackend
+ * SchuglemapsBackend
  * %%
- * Copyright (C) 2020 - 2021 Rathsolutions. <info@rathsolutions.de>
+ * Copyright (C) 2020 Rathsolutions. <info@rathsolutions.de>
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
@@ -19,27 +19,17 @@
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
  * #L%
  */
-package de.rathsolutions.util;
+package de.rathsolutions.util.exception;
 
-import lombok.Getter;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
-public enum OsmTags {
+@ResponseStatus(value = HttpStatus.BAD_REQUEST)
+public class BadArgumentsException extends RuntimeException {
 
-    NAME("name"), CITY("addr:city"), IS_IN("is_in"), WIKIPEDIA("wikipedia");
+    private static final long serialVersionUID = 4488077041376360086L;
 
-    @Getter
-    private String value;
-
-    private OsmTags(String value) {
-        this.value = value;
-    }
-
-    public static boolean isValidTag(String tagName) {
-        for (OsmTags e : OsmTags.values()) {
-            if (e.getValue().equals(tagName)) {
-                return true;
-            }
-        }
-        return false;
+    public <T> BadArgumentsException(T resource) {
+        super("This resource cannot be created like this! Your resource: " + resource.toString());
     }
 }

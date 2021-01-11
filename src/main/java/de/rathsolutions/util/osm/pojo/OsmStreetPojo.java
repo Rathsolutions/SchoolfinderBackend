@@ -1,8 +1,8 @@
 /*-
  * #%L
- * SchuglemapsBackend
+ * SchoolfinderBackend
  * %%
- * Copyright (C) 2020 Rathsolutions. <info@rathsolutions.de>
+ * Copyright (C) 2020 - 2021 Rathsolutions. <info@rathsolutions.de>
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
@@ -19,19 +19,26 @@
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
  * #L%
  */
-package de.rathsolutions.util;
+package de.rathsolutions.util.osm.pojo;
 
-import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.ResponseStatus;
+import java.io.Serializable;
 
-@ResponseStatus(value = HttpStatus.NOT_FOUND)
-public class ResourceNotFoundException extends RuntimeException {
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 
-    private static final long serialVersionUID = -1875593873849626167L;
+@Getter
+@AllArgsConstructor
+public class OsmStreetPojo implements Serializable{
 
-    public <T> ResourceNotFoundException(T resource, String resourceRepresentationName) {
-        super("The requested " + resourceRepresentationName + " resource could not be found! "
-                + resource.toString());
-    }
+    private static final long serialVersionUID = 5207600399100490835L;
 
+    private String city;
+    
+    private String street;
+    
+    private String housenumber;
+    
+    private double latitude;
+    
+    private double longitude;
 }

@@ -37,7 +37,7 @@ import org.springframework.web.bind.annotation.RestController;
 import de.rathsolutions.controller.postbody.AddNewPersonPostbody;
 import de.rathsolutions.jpa.entity.Person;
 import de.rathsolutions.jpa.repo.PersonRepo;
-import de.rathsolutions.util.ResourceNotFoundException;
+import de.rathsolutions.util.exception.ResourceNotFoundException;
 import io.swagger.v3.oas.annotations.Operation;
 
 @RestController
