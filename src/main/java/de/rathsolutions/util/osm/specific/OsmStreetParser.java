@@ -94,7 +94,6 @@ public class OsmStreetParser extends OsmPOICityOnlyParser {
     public List<OsmPOIEntity> findStreetGeocodes(String city, String streetname, String houseNumber,
             int amount) {
         init();
-        System.out.println(getCachedEntries().size());
         List<OsmPOIEntity> entitiesToTraverse = new ArrayList<>();
         List<OsmPOIEntity> nearestEntityToUserCityInput = levenstheinDistanceUtil
                 .computeLevenstheinDistance(city, osmCityEntries, 1, false);
