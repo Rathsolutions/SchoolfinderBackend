@@ -37,7 +37,6 @@ import de.rathsolutions.controller.postbody.AlterSchoolPostbody;
 import de.rathsolutions.controller.postbody.PersonFunctionalityEntity;
 import de.rathsolutions.controller.postbody.PersonFunctionalityEntity.PersonFunctionality;
 import de.rathsolutions.jpa.entity.Criteria;
-import de.rathsolutions.jpa.entity.OsmPOIEntity;
 import de.rathsolutions.jpa.entity.Person;
 import de.rathsolutions.jpa.entity.School;
 import de.rathsolutions.jpa.repo.CriteriaRepo;
@@ -45,6 +44,7 @@ import de.rathsolutions.jpa.repo.SchoolRepo;
 import de.rathsolutions.util.exception.BadArgumentsException;
 import de.rathsolutions.util.exception.ResourceAlreadyExistingException;
 import de.rathsolutions.util.exception.ResourceNotFoundException;
+import de.rathsolutions.util.osm.pojo.OsmPOIEntity;
 import de.rathsolutions.util.osm.specific.OsmPOISchoolParser;
 
 import java.io.IOException;

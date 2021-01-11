@@ -30,7 +30,7 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
-import de.rathsolutions.jpa.entity.OsmPOIEntity;
+import de.rathsolutions.util.osm.pojo.OsmPOIEntity;
 
 @Service
 public class LevenstheinDistanceUtil {

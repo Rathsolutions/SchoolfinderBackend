@@ -23,7 +23,7 @@ package de.rathsolutions.util;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import de.rathsolutions.jpa.entity.OsmPOIEntity;
+import de.rathsolutions.util.osm.pojo.OsmPOIEntity;
 
 public class OsmTestHelper {
     public static void assertOsmPoiEqual(OsmPOIEntity e, OsmPOIEntity schoolByName) {

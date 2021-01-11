@@ -22,45 +22,45 @@
 package de.rathsolutions.util.osm.specific;
 
 import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
-import javax.annotation.PostConstruct;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
+import org.springframework.web.context.WebApplicationContext;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
-import de.rathsolutions.jpa.entity.OsmPOIEntity;
 import de.rathsolutions.util.osm.generic.DocumentParser;
 import de.rathsolutions.util.osm.generic.LevenstheinDistanceUtil;
+import de.rathsolutions.util.osm.pojo.OsmPOIEntity;
 import de.rathsolutions.util.osm.pojo.OsmStreetPojo;
+import de.rathsolutions.util.structure.OsmCityEntries;
 
 @Service
-public class OsmStreetParser {
+@Scope(value = WebApplicationContext.SCOPE_REQUEST, proxyMode = ScopedProxyMode.TARGET_CLASS)
+public class OsmStreetParser extends OsmPOICityOnlyParser {
     @Autowired
     private DocumentParser documentParser;
 
     @Autowired
     private LevenstheinDistanceUtil levenstheinDistanceUtil;
+
+    @Autowired
+    private OsmCityEntries osmCityEntries;
 
     private List<OsmStreetPojo> allWayPojos;
 
@@ -93,13 +93,18 @@ public class OsmStreetParser {
 
     public List<OsmPOIEntity> findStreetGeocodes(String city, String streetname, String houseNumber,
             int amount) {
+        init();
+        System.out.println(getCachedEntries().size());
         List<OsmPOIEntity> entitiesToTraverse = new ArrayList<>();
+        List<OsmPOIEntity> nearestEntityToUserCityInput = levenstheinDistanceUtil
+                .computeLevenstheinDistance(city, osmCityEntries, 1, false);
         try (ObjectInputStream in = new ObjectInputStream(new BufferedInputStream(
                 new ClassPathResource("streetObjects.smaps").getInputStream()))) {
             int size = in.readInt();
             for (int i = 0; i < size; i++) {
                 OsmStreetPojo current = (OsmStreetPojo) in.readObject();
-                if (current.getCity().equalsIgnoreCase(city)) {
+                if (current.getCity()
+                        .equalsIgnoreCase(nearestEntityToUserCityInput.get(0).getPrimaryValue())) {
                     entitiesToTraverse
                             .add(new OsmPOIEntity(current.getStreet(), current.getHousenumber(),
                                     current.getLatitude(), current.getLongitude()));
@@ -148,4 +153,5 @@ public class OsmStreetParser {
         }
         return returnList;
     }
+
 }

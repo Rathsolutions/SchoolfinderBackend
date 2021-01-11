@@ -21,7 +21,7 @@
  */
 package de.rathsolutions.controller;
 
-import de.rathsolutions.jpa.entity.OsmPOIEntity;
+import de.rathsolutions.util.osm.pojo.OsmPOIEntity;
 import de.rathsolutions.util.osm.specific.OsmPOICityOnlyParser;
 import de.rathsolutions.util.osm.specific.OsmStreetParser;
 import io.swagger.v3.oas.annotations.Operation;

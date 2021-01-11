@@ -30,6 +30,8 @@ import java.util.concurrent.ExecutionException;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 import javassist.NotFoundException;
+
+import javax.annotation.PostConstruct;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,7 +43,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
-import de.rathsolutions.jpa.entity.OsmPOIEntity;
+import de.rathsolutions.util.osm.pojo.OsmPOIEntity;
 import de.rathsolutions.util.structure.OsmEntries;
 
 public abstract class AbstractOsmPOIHandler {
@@ -73,30 +75,37 @@ public abstract class AbstractOsmPOIHandler {
             int amount) throws ParserConfigurationException, SAXException, IOException,
             NotFoundException, TransformerException, InterruptedException, ExecutionException {
         init();
-        Document parsedXml = documentParser.readDocument(getOsmFileName());
-        NodeList listOfAllNodes = parsedXml.getElementsByTagName("node");
         List<OsmPOIEntity> resultList;
         if (getCachedEntries() == null || getCachedEntries().isEmpty()) {
-            CompletableFuture<List<OsmPOIEntity>> resultNodeList
-                    = traverseXmlFileByNodeList(listOfAllNodes);
-            parsedXml = documentParser.readDocument(getOsmFileName());
-            listOfAllNodes = parsedXml.getElementsByTagName("way");
-            CompletableFuture<List<OsmPOIEntity>> resultWayList
-                    = traverseXmlFileByNodeList(listOfAllNodes);
-            cleanup();
-            resultList = resultNodeList.get();
-            resultList.addAll(resultWayList.get());
-            getCachedEntries().addAll(resultList);
+            resultList = buildNodeCache();
         } else {
             resultList = getCachedEntries();
         }
         List<OsmPOIEntity> osmPoiInNodes
                 = generateResult(resultList, primaryValue, secondaryValue, amount);
-        
+
         if (!Objects.isNull(osmPoiInNodes)) {
             return osmPoiInNodes;
         }
         throw new NotFoundException("The element is not present!");
+    }
+
+    public List<OsmPOIEntity> buildNodeCache() throws ParserConfigurationException, SAXException,
+            IOException, InterruptedException, ExecutionException {
+        List<OsmPOIEntity> resultList;
+        Document parsedXml = documentParser.readDocument(getOsmFileName());
+        NodeList listOfAllNodes = parsedXml.getElementsByTagName("node");
+        CompletableFuture<List<OsmPOIEntity>> resultNodeList
+                = traverseXmlFileByNodeList(listOfAllNodes);
+        parsedXml = documentParser.readDocument(getOsmFileName());
+        listOfAllNodes = parsedXml.getElementsByTagName("way");
+        CompletableFuture<List<OsmPOIEntity>> resultWayList
+                = traverseXmlFileByNodeList(listOfAllNodes);
+        cleanup();
+        resultList = resultNodeList.get();
+        resultList.addAll(resultWayList.get());
+        getCachedEntries().addAll(resultList);
+        return resultList;
     }
 
     protected abstract String getOsmFileName();

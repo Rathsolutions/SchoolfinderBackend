@@ -32,7 +32,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ContextConfiguration;
 
 import de.rathsolutions.SpringBootMain;
-import de.rathsolutions.jpa.entity.OsmPOIEntity;
+import de.rathsolutions.util.osm.pojo.OsmPOIEntity;
 import de.rathsolutions.util.osm.specific.OsmStreetParser;
 import lombok.extern.slf4j.Slf4j;
 

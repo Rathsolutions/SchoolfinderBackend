@@ -21,14 +21,20 @@
  */
 package de.rathsolutions.util.osm.generic;
 
+import java.io.IOException;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
+
+import javax.xml.parsers.ParserConfigurationException;
+
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
 
-import de.rathsolutions.jpa.entity.OsmPOIEntity;
+import de.rathsolutions.util.osm.pojo.OsmPOIEntity;
 
 @Slf4j
 public abstract class AbstractOsmPOIParser extends AbstractOsmPOIHandler {
@@ -97,10 +103,15 @@ public abstract class AbstractOsmPOIParser extends AbstractOsmPOIHandler {
 
     }
 
-    /**
-     * Stub with nothing to do in this implementation
-     */
     @Override
     protected void init() {
+        try {
+            if (getCachedEntries().isEmpty()) {
+                buildNodeCache();
+            }
+        } catch (ParserConfigurationException | SAXException | IOException | InterruptedException
+                | ExecutionException e) {
+            e.printStackTrace();
+        }
     }
 }

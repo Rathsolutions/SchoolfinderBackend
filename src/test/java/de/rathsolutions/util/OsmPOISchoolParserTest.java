@@ -37,7 +37,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.xml.sax.SAXException;
 
 import de.rathsolutions.SpringBootMain;
-import de.rathsolutions.jpa.entity.OsmPOIEntity;
+import de.rathsolutions.util.osm.pojo.OsmPOIEntity;
 import de.rathsolutions.util.osm.specific.OsmPOIReducer;
 import de.rathsolutions.util.osm.specific.OsmPOISchoolParser;
 import javassist.NotFoundException;

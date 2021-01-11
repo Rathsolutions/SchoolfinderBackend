@@ -23,7 +23,7 @@ package de.rathsolutions.util.structure;
 
 import java.util.ArrayList;
 
-import de.rathsolutions.jpa.entity.OsmPOIEntity;
+import de.rathsolutions.util.osm.pojo.OsmPOIEntity;
 
 public abstract class OsmEntries extends ArrayList<OsmPOIEntity> {
 

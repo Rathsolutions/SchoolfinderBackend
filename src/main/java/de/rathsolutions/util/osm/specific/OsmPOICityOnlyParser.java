@@ -22,6 +22,7 @@
 package de.rathsolutions.util.osm.specific;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Scope;
 import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.stereotype.Service;
@@ -37,11 +38,12 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 @Scope(value = WebApplicationContext.SCOPE_REQUEST, proxyMode = ScopedProxyMode.TARGET_CLASS)
 @Slf4j
+@Primary
 public class OsmPOICityOnlyParser extends AbstractOsmPOIParser {
 
     @Autowired
     private OsmCityEntries osmCityEntries;
-    
+
     @Override
     protected String getOsmFileName() {
         return "filteredCities.xml";
@@ -53,13 +55,6 @@ public class OsmPOICityOnlyParser extends AbstractOsmPOIParser {
     @Override
     protected void cleanup() {
 
-    }
-
-    /**
-     * Stub with nothing to do in this implementation
-     */
-    @Override
-    protected void init() {
     }
 
     @Override

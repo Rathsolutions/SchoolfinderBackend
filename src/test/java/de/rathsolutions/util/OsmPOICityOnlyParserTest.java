@@ -22,7 +22,7 @@
 package de.rathsolutions.util;
 
 import de.rathsolutions.SpringBootMain;
-import de.rathsolutions.jpa.entity.OsmPOIEntity;
+import de.rathsolutions.util.osm.pojo.OsmPOIEntity;
 import de.rathsolutions.util.osm.specific.OsmPOICityOnlyParser;
 
 import static org.junit.Assert.assertEquals;
