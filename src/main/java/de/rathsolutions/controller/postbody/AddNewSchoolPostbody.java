@@ -40,6 +40,8 @@ public class AddNewSchoolPostbody {
     protected double latitude;
 
     protected double longitude;
+    
+    protected String color;
 
     protected String schoolPicture;
     

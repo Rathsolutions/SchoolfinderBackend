@@ -58,6 +58,9 @@ public class School {
     private Double latitude;
     @NonNull
     private Double longitude;
+    
+    private String color;
+    
     private String arContent;
     @Lob
     private String schoolPicture;

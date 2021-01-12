@@ -45,6 +45,7 @@ import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 import javassist.NotFoundException;
+
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -63,6 +64,8 @@ import org.xml.sax.SAXException;
 @RestController
 @RequestMapping("/api/v1/schools")
 public class SchoolController {
+
+    private static final String COLOR_CODE_REGEX = "^[0-9A-Fa-f]{6}$";
 
     @Autowired
     private SchoolRepo schoolRepo;
@@ -164,6 +167,9 @@ public class SchoolController {
         if (alreadyExistingSchool.isPresent()) {
             throw new ResourceAlreadyExistingException(alreadyExistingSchool.get());
         }
+        if (isSchoolPostbodyNotValid(addNewSchoolPostbody)) {
+            throw new BadArgumentsException(addNewSchoolPostbody);
+        }
         List<Criteria> allMatchingSchoolCriterias
                 = generateMatchingSchoolCriteriasAndPersistIfNotExisting(addNewSchoolPostbody);
         School school = new School(addNewSchoolPostbody.getSchoolName(),
@@ -171,10 +177,7 @@ public class SchoolController {
                 allMatchingSchoolCriterias);
         school.setSchoolPicture(addNewSchoolPostbody.getSchoolPicture());
         school.setArContent(addNewSchoolPostbody.getArContent());
-        if (addNewSchoolPostbody.getPersonSchoolMapping() == null
-                || addNewSchoolPostbody.getPersonSchoolMapping().isEmpty()) {
-            throw new BadArgumentsException(addNewSchoolPostbody);
-        }
+        school.setColor(addNewSchoolPostbody.getColor());
         fillPersonSchoolMappingOfSchool(addNewSchoolPostbody, school);
         return ResponseEntity.ok(schoolRepo.save(school));
     }
@@ -191,8 +194,7 @@ public class SchoolController {
         School matchingSchool = alreadyExistingSchool.get();
         List<Criteria> allMatchingSchoolCriterias
                 = generateMatchingSchoolCriteriasAndPersistIfNotExisting(alterSchoolPostbody);
-        if (alterSchoolPostbody.getPersonSchoolMapping() == null
-                || alterSchoolPostbody.getPersonSchoolMapping().isEmpty()) {
+        if (isSchoolPostbodyNotValid(alterSchoolPostbody)) {
             throw new BadArgumentsException(alterSchoolPostbody);
         }
         matchingSchool.setSchoolName(alterSchoolPostbody.getSchoolName());
@@ -201,6 +203,7 @@ public class SchoolController {
         matchingSchool.setMatchingCriterias(allMatchingSchoolCriterias);
         matchingSchool.setSchoolPicture(alterSchoolPostbody.getSchoolPicture());
         matchingSchool.setArContent(alterSchoolPostbody.getArContent());
+        matchingSchool.setColor(alterSchoolPostbody.getColor());
         matchingSchool.getPersonSchoolMapping().clear();
         fillPersonSchoolMappingOfSchool(alterSchoolPostbody, matchingSchool);
         return ResponseEntity.ok(schoolRepo.save(matchingSchool));
@@ -267,5 +270,13 @@ public class SchoolController {
             });
         }
         return allMatchingSchoolCriterias;
+    }
+
+    private boolean isSchoolPostbodyNotValid(AddNewSchoolPostbody addNewSchoolPostbody) {
+        return addNewSchoolPostbody.getPersonSchoolMapping() == null
+                || addNewSchoolPostbody.getPersonSchoolMapping().isEmpty()
+                || addNewSchoolPostbody.getColor() == null
+                || addNewSchoolPostbody.getColor().isEmpty()
+                || !addNewSchoolPostbody.getColor().matches(COLOR_CODE_REGEX);
     }
 }

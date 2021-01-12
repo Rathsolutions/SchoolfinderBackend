@@ -35,9 +35,9 @@ public class AlterSchoolPostbody extends AddNewSchoolPostbody {
     private long id;
 
     public AlterSchoolPostbody(long id, String schoolName, double latitude, double longitude,
-            String schoolPicture, String arContent,
+            String schoolPicture, String arContent, String color,
             List<PersonFunctionalityEntity> personSchoolMapping, List<Criteria> criteriaNames) {
-        super(schoolName, latitude, longitude, schoolPicture, arContent, personSchoolMapping,
+        super(schoolName, latitude, longitude, color, schoolPicture, arContent, personSchoolMapping,
                 criteriaNames);
         this.id = id;
     }
