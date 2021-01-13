@@ -22,6 +22,7 @@
 package de.rathsolutions.util;
 
 import de.rathsolutions.SpringBootMain;
+import de.rathsolutions.util.osm.pojo.CitySearchEntity;
 import de.rathsolutions.util.osm.pojo.OsmPOIEntity;
 import de.rathsolutions.util.osm.specific.OsmPOICityOnlyParser;
 
@@ -32,6 +33,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import javassist.NotFoundException;
+
+import javax.naming.OperationNotSupportedException;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 import lombok.extern.slf4j.Slf4j;
@@ -50,13 +53,13 @@ class OsmPOICityOnlyParserTest {
     private OsmPOICityOnlyParser cut;
 
     @Test
-    void testFindCorrectCitiesWithFullName()
-            throws ParserConfigurationException, SAXException, IOException, NotFoundException,
-            TransformerException, InterruptedException, ExecutionException {
+    void testFindCorrectCitiesWithFullName() throws ParserConfigurationException, SAXException,
+            IOException, NotFoundException, TransformerException, InterruptedException,
+            ExecutionException, OperationNotSupportedException {
         List<OsmPOIEntity> testObjects = OsmCityTestHelper.getInstance().getTestEntites();
         for (OsmPOIEntity e : testObjects) {
             List<OsmPOIEntity> schoolByName
-                    = cut.processOsmFile(e.getPrimaryValue(), e.getSecondaryValue(), 1);
+                    = cut.processOsmFile(new CitySearchEntity(e.getPrimaryValue(), e.getSecondaryValue()), 1);
             OsmTestHelper.assertOsmPoiEqual(e, schoolByName.get(0));
         }
     }
@@ -64,13 +67,13 @@ class OsmPOICityOnlyParserTest {
     @Test
     void testFindOnPerfectMatchMoreThanOneElement()
             throws ParserConfigurationException, SAXException, IOException, NotFoundException,
-            TransformerException, InterruptedException, ExecutionException {
+            TransformerException, InterruptedException, ExecutionException, OperationNotSupportedException {
         List<OsmPOIEntity> testObjects = new ArrayList<>();
         String city = "Steinbach";
         testObjects.add(new OsmPOIEntity(city, city, 48.7288702, 8.1607982));
         testObjects.add(new OsmPOIEntity(city, city, 48.9575768, 9.4738062));
         for (OsmPOIEntity e : testObjects) {
-            List<OsmPOIEntity> schoolByName = cut.processOsmFile(e.getPrimaryValue(), 10);
+            List<OsmPOIEntity> schoolByName = cut.processOsmFile(new CitySearchEntity(e.getPrimaryValue()), 10);
             long exactElementCount = schoolByName.stream()
                     .filter(f -> f.getPrimaryValue().equals(e.getPrimaryValue())
                             && e.getLatVal() == f.getLatVal() && e.getLongVal() == f.getLongVal())

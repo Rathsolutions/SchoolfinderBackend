@@ -28,6 +28,7 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.util.List;
 
+import javax.naming.OperationNotSupportedException;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerConfigurationException;
@@ -44,6 +45,7 @@ import org.w3c.dom.NodeList;
 
 import de.rathsolutions.util.osm.generic.AbstractOsmPOIHandler;
 import de.rathsolutions.util.osm.generic.OsmTags;
+import de.rathsolutions.util.osm.pojo.AbstractSearchEntity;
 import de.rathsolutions.util.osm.pojo.OsmPOIEntity;
 import de.rathsolutions.util.structure.OsmEntries;
 
@@ -121,8 +123,8 @@ public class OsmPOIReducer extends AbstractOsmPOIHandler {
      * Not needed in this implementation
      */
     @Override
-    protected List<OsmPOIEntity> generateResult(List<OsmPOIEntity> resultList, String primaryValue,
-            String secondaryValue, int amount) {
+    protected List<OsmPOIEntity> generateResult(List<OsmPOIEntity> resultList,
+            AbstractSearchEntity searchEntity, int amount) throws OperationNotSupportedException {
         return null;
     }
 

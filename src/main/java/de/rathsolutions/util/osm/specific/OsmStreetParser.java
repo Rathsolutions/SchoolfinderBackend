@@ -30,6 +30,7 @@ import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.naming.OperationNotSupportedException;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,6 +47,7 @@ import org.xml.sax.SAXException;
 
 import de.rathsolutions.util.osm.generic.DocumentParser;
 import de.rathsolutions.util.osm.generic.LevenstheinDistanceUtil;
+import de.rathsolutions.util.osm.pojo.AbstractSearchEntity;
 import de.rathsolutions.util.osm.pojo.OsmPOIEntity;
 import de.rathsolutions.util.osm.pojo.OsmStreetPojo;
 import de.rathsolutions.util.structure.OsmCityEntries;
@@ -91,7 +93,14 @@ public class OsmStreetParser extends OsmPOICityOnlyParser {
         }
     }
 
-    public List<OsmPOIEntity> findStreetGeocodes(String city, String streetname, String houseNumber,
+    @Override
+    protected List<OsmPOIEntity> generateResult(List<OsmPOIEntity> resultList,
+            AbstractSearchEntity searchEntity, int amount) throws OperationNotSupportedException {
+        return findStreetGeocodes(searchEntity.getCity(), searchEntity.getStreet(),
+            searchEntity.getHousenumber(), amount);
+    }
+
+    private List<OsmPOIEntity> findStreetGeocodes(String city, String streetname, String houseNumber,
             int amount) {
         init();
         List<OsmPOIEntity> entitiesToTraverse = new ArrayList<>();

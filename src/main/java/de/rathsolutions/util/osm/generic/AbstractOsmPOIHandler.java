@@ -32,6 +32,7 @@ import java.util.stream.Stream;
 import javassist.NotFoundException;
 
 import javax.annotation.PostConstruct;
+import javax.naming.OperationNotSupportedException;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,6 +44,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
+import de.rathsolutions.util.osm.pojo.AbstractSearchEntity;
 import de.rathsolutions.util.osm.pojo.OsmPOIEntity;
 import de.rathsolutions.util.structure.OsmEntries;
 
@@ -53,36 +55,28 @@ public abstract class AbstractOsmPOIHandler {
     @Autowired
     private DocumentParser documentParser;
 
-    public List<OsmPOIEntity> processOsmFile(String primaryValue, String secondaryValue, int amount)
+    public List<OsmPOIEntity> processOsmFile(AbstractSearchEntity primaryValue, int amount)
             throws ParserConfigurationException, SAXException, IOException, NotFoundException,
-            TransformerException, InterruptedException, ExecutionException {
+            TransformerException, InterruptedException, ExecutionException,
+            OperationNotSupportedException {
         if (primaryValue == null) {
             throw new IllegalArgumentException(QUERYNAME_MUST_NOT_BE_NULL);
         }
-        return processOsmFileInternal(primaryValue, secondaryValue, amount);
+        return processOsmFileInternal(primaryValue, amount);
     }
 
-    public List<OsmPOIEntity> processOsmFile(String primaryValue, int amount)
+    private List<OsmPOIEntity> processOsmFileInternal(AbstractSearchEntity searchEntity, int amount)
             throws ParserConfigurationException, SAXException, IOException, NotFoundException,
-            TransformerException, InterruptedException, ExecutionException {
-        if (primaryValue == null) {
-            throw new IllegalArgumentException(QUERYNAME_MUST_NOT_BE_NULL);
-        }
-        return processOsmFileInternal(primaryValue, null, amount);
-    }
-
-    private List<OsmPOIEntity> processOsmFileInternal(String primaryValue, String secondaryValue,
-            int amount) throws ParserConfigurationException, SAXException, IOException,
-            NotFoundException, TransformerException, InterruptedException, ExecutionException {
+            TransformerException, InterruptedException, ExecutionException,
+            OperationNotSupportedException {
         init();
         List<OsmPOIEntity> resultList;
         if (getCachedEntries() == null || getCachedEntries().isEmpty()) {
-            resultList = buildNodeCache();
+            resultList = buildWayCache();
         } else {
             resultList = getCachedEntries();
         }
-        List<OsmPOIEntity> osmPoiInNodes
-                = generateResult(resultList, primaryValue, secondaryValue, amount);
+        List<OsmPOIEntity> osmPoiInNodes = generateResult(resultList, searchEntity, amount);
 
         if (!Objects.isNull(osmPoiInNodes)) {
             return osmPoiInNodes;
@@ -90,7 +84,7 @@ public abstract class AbstractOsmPOIHandler {
         throw new NotFoundException("The element is not present!");
     }
 
-    public List<OsmPOIEntity> buildNodeCache() throws ParserConfigurationException, SAXException,
+    public List<OsmPOIEntity> buildWayCache() throws ParserConfigurationException, SAXException,
             IOException, InterruptedException, ExecutionException {
         List<OsmPOIEntity> resultList;
         Document parsedXml = documentParser.readDocument(getOsmFileName());
@@ -111,7 +105,7 @@ public abstract class AbstractOsmPOIHandler {
     protected abstract String getOsmFileName();
 
     protected abstract List<OsmPOIEntity> generateResult(List<OsmPOIEntity> resultList,
-            String primaryValue, String secondaryValue, int amount);
+            AbstractSearchEntity searchEntity, int amount) throws OperationNotSupportedException;
 
     @Async
     private CompletableFuture<List<OsmPOIEntity>> traverseXmlFileByNodeList(NodeList nodeList) {

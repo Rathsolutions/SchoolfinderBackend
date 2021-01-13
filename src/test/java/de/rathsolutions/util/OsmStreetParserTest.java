@@ -23,17 +23,26 @@ package de.rathsolutions.util;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.io.IOException;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
+
+import javax.naming.OperationNotSupportedException;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerException;
 
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ContextConfiguration;
+import org.xml.sax.SAXException;
 
 import de.rathsolutions.SpringBootMain;
 import de.rathsolutions.util.osm.pojo.OsmPOIEntity;
+import de.rathsolutions.util.osm.pojo.StreetCitySearchEntity;
 import de.rathsolutions.util.osm.specific.OsmStreetParser;
+import javassist.NotFoundException;
 import lombok.extern.slf4j.Slf4j;
 
 @SpringBootTest
@@ -45,9 +54,9 @@ class OsmStreetParserTest {
     private OsmStreetParser cut;
 
     @Test
-    void testCityStreetSearch() {
+    void testCityStreetSearch() throws OperationNotSupportedException, ParserConfigurationException, SAXException, IOException, NotFoundException, TransformerException, InterruptedException, ExecutionException {
         List<OsmPOIEntity> findStreetGeocodes
-                = cut.findStreetGeocodes("Rastatt", "Engelstraße", "21", 1);
+                = cut.processOsmFile(new StreetCitySearchEntity("Rastatt", "Engelstraße", "21"), 1);
         findStreetGeocodes.stream().forEach(e -> {
             assertEquals(48.859834600000006, e.getLatVal());
             assertEquals(8.201058, e.getLongVal());
@@ -56,7 +65,7 @@ class OsmStreetParserTest {
         });
     }
 
-    //Use this test to create the requried heap file for the city street search
+    // Use this test to create the requried heap file for the city street search
     @Disabled
     @Test
     void writeHeapFile() {

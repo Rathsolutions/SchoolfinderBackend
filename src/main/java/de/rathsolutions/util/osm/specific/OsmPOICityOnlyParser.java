@@ -21,6 +21,10 @@
  */
 package de.rathsolutions.util.osm.specific;
 
+import java.util.List;
+
+import javax.naming.OperationNotSupportedException;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Scope;
@@ -30,7 +34,11 @@ import org.springframework.web.context.WebApplicationContext;
 import org.w3c.dom.Node;
 
 import de.rathsolutions.util.osm.generic.AbstractOsmPOIParser;
+import de.rathsolutions.util.osm.generic.LevenstheinDistanceUtil;
 import de.rathsolutions.util.osm.generic.OsmTags;
+import de.rathsolutions.util.osm.pojo.AbstractSearchEntity;
+import de.rathsolutions.util.osm.pojo.CitySearchEntity;
+import de.rathsolutions.util.osm.pojo.OsmPOIEntity;
 import de.rathsolutions.util.structure.OsmCityEntries;
 import de.rathsolutions.util.structure.OsmEntries;
 import lombok.extern.slf4j.Slf4j;
@@ -43,6 +51,24 @@ public class OsmPOICityOnlyParser extends AbstractOsmPOIParser {
 
     @Autowired
     private OsmCityEntries osmCityEntries;
+
+    @Autowired
+    private LevenstheinDistanceUtil levenstheinDistanceUtil;
+
+    @Override
+    protected List<OsmPOIEntity> generateResult(List<OsmPOIEntity> resultList,
+            AbstractSearchEntity searchEntity, int amount) throws OperationNotSupportedException {
+        if (resultList.isEmpty()) {
+            return null;
+        }
+        String city
+                = searchEntity.getCity().replaceAll("-", "").replaceAll("\\s+", "").toLowerCase()
+                        + (searchEntity.getDistrict() != null ? searchEntity.getDistrict() : "");
+        List<OsmPOIEntity> nearest = levenstheinDistanceUtil.computeLevenstheinDistance(city,
+            resultList, amount, searchEntity.getDistrict() != null);
+        log.debug("Final entity: " + nearest.toString());
+        return nearest;
+    }
 
     @Override
     protected String getOsmFileName() {

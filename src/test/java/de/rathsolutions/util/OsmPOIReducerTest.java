@@ -24,6 +24,8 @@ package de.rathsolutions.util;
 import java.io.IOException;
 import java.util.concurrent.ExecutionException;
 import javassist.NotFoundException;
+
+import javax.naming.OperationNotSupportedException;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 import org.junit.jupiter.api.Disabled;
@@ -34,6 +36,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.xml.sax.SAXException;
 
 import de.rathsolutions.SpringBootMain;
+import de.rathsolutions.util.osm.pojo.AbstractSearchEntity;
 import de.rathsolutions.util.osm.specific.OsmPOIReducer;
 
 @SpringBootTest
@@ -46,7 +49,9 @@ public class OsmPOIReducerTest {
 
     @Test
     void testReducing() throws ParserConfigurationException, SAXException, IOException,
-            NotFoundException, TransformerException, InterruptedException, ExecutionException {
-        cut.processOsmFile("", "", 1);
+            NotFoundException, TransformerException, InterruptedException, ExecutionException,
+            OperationNotSupportedException {
+        cut.processOsmFile(new AbstractSearchEntity() {
+        }, 1);
     }
 }

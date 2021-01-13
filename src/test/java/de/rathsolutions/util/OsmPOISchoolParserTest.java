@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
+import javax.naming.OperationNotSupportedException;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 
@@ -38,6 +39,7 @@ import org.xml.sax.SAXException;
 
 import de.rathsolutions.SpringBootMain;
 import de.rathsolutions.util.osm.pojo.OsmPOIEntity;
+import de.rathsolutions.util.osm.pojo.SchoolSearchEntity;
 import de.rathsolutions.util.osm.specific.OsmPOIReducer;
 import de.rathsolutions.util.osm.specific.OsmPOISchoolParser;
 import javassist.NotFoundException;
@@ -52,15 +54,15 @@ class OsmPOISchoolParserTest {
     private OsmPOISchoolParser cut;
 
     @Test
-    void testFindCorrectElementsInXmlFileWithFullName()
-            throws ParserConfigurationException, SAXException, IOException, NotFoundException,
-            TransformerException, InterruptedException, ExecutionException {
+    void testFindCorrectElementsInXmlFileWithFullName() throws ParserConfigurationException,
+            SAXException, IOException, NotFoundException, TransformerException,
+            InterruptedException, ExecutionException, OperationNotSupportedException {
         List<OsmPOIEntity> testObjects = OsmSchoolTestHelper.getInstance().getTestEntites();
         for (OsmPOIEntity e : testObjects) {
-            List<OsmPOIEntity> schoolByName = cut.processOsmFile(e.getPrimaryValue(), e.getSecondaryValue(),1);
+            List<OsmPOIEntity> schoolByName = cut.processOsmFile(
+                new SchoolSearchEntity(e.getPrimaryValue(), e.getSecondaryValue()), 1);
             OsmTestHelper.assertOsmPoiEqual(e, schoolByName.get(0));
         }
     }
-    
 
 }

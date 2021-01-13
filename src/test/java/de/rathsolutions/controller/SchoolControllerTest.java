@@ -45,6 +45,7 @@ import de.rathsolutions.util.exception.BadArgumentsException;
 import de.rathsolutions.util.exception.ResourceAlreadyExistingException;
 import de.rathsolutions.util.exception.ResourceNotFoundException;
 import de.rathsolutions.util.osm.pojo.OsmPOIEntity;
+import de.rathsolutions.util.osm.pojo.SchoolSearchEntity;
 import de.rathsolutions.util.osm.specific.OsmPOISchoolParser;
 
 import java.io.IOException;
@@ -53,9 +54,12 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Stream;
 import javassist.NotFoundException;
+
+import javax.naming.OperationNotSupportedException;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -84,10 +88,10 @@ public class SchoolControllerTest {
     @Test
     void testFindNotRegisteredSchoolsByNameAdminWithValidName()
             throws ParserConfigurationException, SAXException, IOException, NotFoundException,
-            TransformerException, InterruptedException, ExecutionException {
+            TransformerException, InterruptedException, ExecutionException, OperationNotSupportedException {
         List<OsmPOIEntity> expectedReturnObject = new ArrayList<>();
         expectedReturnObject.add(new OsmPOIEntity("test", null, 1, 2));
-        when(osmParserMock.processOsmFile(anyString(), anyString(), anyInt()))
+        when(osmParserMock.processOsmFile(Mockito.any(SchoolSearchEntity.class), anyInt()))
                 .thenReturn(expectedReturnObject);
         ResponseEntity<List<OsmPOIEntity>> notRegisteredSchoolsByName
                 = cut.findNotRegisteredSchoolsByNameAdmin("testSchool", "", 1);
@@ -97,8 +101,9 @@ public class SchoolControllerTest {
     @Test
     void testFindNotRegisteredSchoolsByNameAdminWithNotValidName()
             throws ParserConfigurationException, SAXException, IOException, NotFoundException,
-            TransformerException, InterruptedException, ExecutionException {
-        when(osmParserMock.processOsmFile(anyString(), anyString(), anyInt()))
+            TransformerException, InterruptedException, ExecutionException,
+            OperationNotSupportedException {
+        when(osmParserMock.processOsmFile(Mockito.any(SchoolSearchEntity.class), anyInt()))
                 .thenThrow(NotFoundException.class);
         ResponseEntity<List<OsmPOIEntity>> notRegisteredSchoolsByName
                 = cut.findNotRegisteredSchoolsByNameAdmin("testSchool", "", 1);

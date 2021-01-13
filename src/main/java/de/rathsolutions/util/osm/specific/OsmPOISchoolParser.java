@@ -21,6 +21,10 @@
  */
 package de.rathsolutions.util.osm.specific;
 
+import java.util.List;
+
+import javax.naming.OperationNotSupportedException;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.context.annotation.ScopedProxyMode;
@@ -29,7 +33,10 @@ import org.springframework.web.context.WebApplicationContext;
 import org.w3c.dom.Node;
 
 import de.rathsolutions.util.osm.generic.AbstractOsmPOIParser;
+import de.rathsolutions.util.osm.generic.LevenstheinDistanceUtil;
 import de.rathsolutions.util.osm.generic.OsmTags;
+import de.rathsolutions.util.osm.pojo.AbstractSearchEntity;
+import de.rathsolutions.util.osm.pojo.OsmPOIEntity;
 import de.rathsolutions.util.structure.OsmEntries;
 import de.rathsolutions.util.structure.OsmSchoolEntries;
 import lombok.extern.slf4j.Slf4j;
@@ -42,6 +49,9 @@ public class OsmPOISchoolParser extends AbstractOsmPOIParser {
 
     @Autowired
     private OsmSchoolEntries osmSchoolEntries;
+
+    @Autowired
+    private LevenstheinDistanceUtil levenstheinDistanceUtil;
 
     @Override
     protected String getOsmFileName() {
@@ -58,6 +68,21 @@ public class OsmPOISchoolParser extends AbstractOsmPOIParser {
     @Override
     protected OsmEntries getCachedEntries() {
         return osmSchoolEntries;
+    }
+
+    @Override
+    protected List<OsmPOIEntity> generateResult(List<OsmPOIEntity> resultList,
+            AbstractSearchEntity searchEntity, int amount) throws OperationNotSupportedException {
+        if (resultList.isEmpty()) {
+            return null;
+        }
+        String cityOrEmpty = searchEntity.getCity() != null ? searchEntity.getCity() : "";
+        String fullName = searchEntity.getName() + cityOrEmpty;
+        fullName = fullName.replaceAll("-", "").replaceAll("\\s+", "").toLowerCase();
+        List<OsmPOIEntity> nearest = levenstheinDistanceUtil.computeLevenstheinDistance(fullName,
+            resultList, amount, !cityOrEmpty.isEmpty());
+        log.debug("Final entity: " + nearest.toString());
+        return nearest;
     }
 
 }

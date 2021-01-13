@@ -39,31 +39,6 @@ import de.rathsolutions.util.osm.pojo.OsmPOIEntity;
 @Slf4j
 public abstract class AbstractOsmPOIParser extends AbstractOsmPOIHandler {
 
-    @Autowired
-    private LevenstheinDistanceUtil levenstheinDistanceUtil;
-
-    @Override
-    protected List<OsmPOIEntity> generateResult(List<OsmPOIEntity> resultList, String primaryValue,
-            String secondaryValue, int amount) {
-        if (resultList.isEmpty()) {
-            return null;
-        }
-        String cityOrEmpty = secondaryValue != null ? secondaryValue : "";
-        String fullName = primaryValue + cityOrEmpty;
-        fullName = fullName.replaceAll("-", "").replaceAll("\\s+", "").toLowerCase();
-        List<OsmPOIEntity> nearest = levenstheinDistanceUtil.computeLevenstheinDistance(fullName,
-            resultList, amount, secondaryValue != null && !secondaryValue.isEmpty());
-        log.debug("Final entity: " + nearest.toString());
-        return nearest;
-    }
-
-    protected boolean valMatchCriteria(String val, String match) {
-        val = val.replaceAll("-", "").replaceAll("\\s+", "").toLowerCase();
-        match = match.replaceAll("-", "").replaceAll("\\s+", "").toLowerCase();
-        return val.equalsIgnoreCase(match) || val.trim().equalsIgnoreCase(match.trim())
-                || val.contains(match) || match.contains(val);
-    }
-
     /**
      * Handles the current found entry.
      */
@@ -107,7 +82,7 @@ public abstract class AbstractOsmPOIParser extends AbstractOsmPOIHandler {
     protected void init() {
         try {
             if (getCachedEntries().isEmpty()) {
-                buildNodeCache();
+                buildWayCache();
             }
         } catch (ParserConfigurationException | SAXException | IOException | InterruptedException
                 | ExecutionException e) {

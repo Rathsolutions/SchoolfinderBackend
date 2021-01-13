@@ -35,6 +35,7 @@ import de.rathsolutions.util.exception.BadArgumentsException;
 import de.rathsolutions.util.exception.ResourceAlreadyExistingException;
 import de.rathsolutions.util.exception.ResourceNotFoundException;
 import de.rathsolutions.util.osm.pojo.OsmPOIEntity;
+import de.rathsolutions.util.osm.pojo.SchoolSearchEntity;
 import de.rathsolutions.util.osm.specific.OsmPOICityOnlyParser;
 import de.rathsolutions.util.osm.specific.OsmPOISchoolParser;
 import io.swagger.v3.oas.annotations.Operation;
@@ -46,6 +47,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 import javassist.NotFoundException;
 
+import javax.naming.OperationNotSupportedException;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -91,12 +93,14 @@ public class SchoolController {
         try {
             List<OsmPOIEntity> resultsByName;
             System.out.println(name);
-            resultsByName = osmSchoolParser.processOsmFile(name, city, amount);
+            resultsByName
+                    = osmSchoolParser.processOsmFile(new SchoolSearchEntity(name, city), amount);
             return ResponseEntity.ok()
                     .header("Copyright", "This list was generated using Open Street Maps Data")
                     .body(resultsByName);
         } catch (ParserConfigurationException | SAXException | IOException | NotFoundException
-                | TransformerException | InterruptedException | ExecutionException e) {
+                | TransformerException | InterruptedException | ExecutionException
+                | OperationNotSupportedException e) {
             return ResponseEntity.notFound().build();
         }
     }
