@@ -38,6 +38,8 @@ public class OsmStreetPojo implements Serializable{
     
     private String housenumber;
     
+    private String suburb;
+    
     private double latitude;
     
     private double longitude;

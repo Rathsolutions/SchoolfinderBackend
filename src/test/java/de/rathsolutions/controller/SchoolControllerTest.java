@@ -496,8 +496,8 @@ public class SchoolControllerTest {
         assertEquals(PersonFunctionality.AR.toString(),
             schoolObject.getPersonSchoolMapping().get(0).getFunctionality());
         assertEquals(testschool, schoolObject.getSchoolName());
-        assertEquals(1, schoolObject.getLatitude().doubleValue(), 0.000001);
-        assertEquals(2, schoolObject.getLongitude().doubleValue(), 0.000001);
+        assertEquals(3.333, schoolObject.getLatitude().doubleValue(), 0.000001);
+        assertEquals(4.444, schoolObject.getLongitude().doubleValue(), 0.000001);
         assertEquals("1", schoolObject.getSchoolPicture());
     }
 
@@ -530,8 +530,8 @@ public class SchoolControllerTest {
         assertEquals(PersonFunctionality.AR.toString(),
             schoolObject.getPersonSchoolMapping().get(0).getFunctionality());
         assertEquals(testschool, schoolObject.getSchoolName());
-        assertEquals(1, schoolObject.getLatitude().doubleValue(), 0.000001);
-        assertEquals(2, schoolObject.getLongitude().doubleValue(), 0.000001);
+        assertEquals(3.333, schoolObject.getLatitude().doubleValue(), 0.000001);
+        assertEquals(4.444, schoolObject.getLongitude().doubleValue(), 0.000001);
         assertEquals("1", schoolObject.getSchoolPicture());
     }
 

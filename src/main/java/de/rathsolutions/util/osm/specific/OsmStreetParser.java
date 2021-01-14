@@ -100,8 +100,8 @@ public class OsmStreetParser extends OsmPOICityOnlyParser {
             searchEntity.getHousenumber(), amount);
     }
 
-    private List<OsmPOIEntity> findStreetGeocodes(String city, String streetname, String houseNumber,
-            int amount) {
+    private List<OsmPOIEntity> findStreetGeocodes(String city, String streetname,
+            String houseNumber, int amount) {
         init();
         List<OsmPOIEntity> entitiesToTraverse = new ArrayList<>();
         List<OsmPOIEntity> nearestEntityToUserCityInput = levenstheinDistanceUtil
@@ -111,8 +111,11 @@ public class OsmStreetParser extends OsmPOICityOnlyParser {
             int size = in.readInt();
             for (int i = 0; i < size; i++) {
                 OsmStreetPojo current = (OsmStreetPojo) in.readObject();
-                if (current.getCity()
-                        .equalsIgnoreCase(nearestEntityToUserCityInput.get(0).getPrimaryValue())) {
+                System.out.println(current.getSuburb());
+                if (nearestEntityToUserCityInput.get(0).getPrimaryValue()
+                        .equalsIgnoreCase(current.getCity())
+                        || nearestEntityToUserCityInput.get(0).getPrimaryValue()
+                                .equalsIgnoreCase(current.getSuburb())) {
                     entitiesToTraverse
                             .add(new OsmPOIEntity(current.getStreet(), current.getHousenumber(),
                                     current.getLatitude(), current.getLongitude()));
@@ -134,6 +137,7 @@ public class OsmStreetParser extends OsmPOICityOnlyParser {
             String currentCity = null;
             String currentStreet = null;
             String currentHousenumber = null;
+            String currentSuburb = null;
             double lat = Double
                     .parseDouble(currentItem.getAttributes().getNamedItem("lat").getTextContent());
             double lon = Double
@@ -152,12 +156,14 @@ public class OsmStreetParser extends OsmPOICityOnlyParser {
                     case "addr:housenumber":
                         currentHousenumber = textContent;
                         break;
+                    case "addr:suburb":
+                        currentSuburb = textContent;
                     default:
                         break;
                 }
             }
-            returnList.add(
-                new OsmStreetPojo(currentCity, currentStreet, currentHousenumber, lat, lon));
+            returnList.add(new OsmStreetPojo(currentCity, currentStreet, currentHousenumber,
+                    currentSuburb, lat, lon));
         }
         return returnList;
     }

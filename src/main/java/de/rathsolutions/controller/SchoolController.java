@@ -202,8 +202,8 @@ public class SchoolController {
             throw new BadArgumentsException(alterSchoolPostbody);
         }
         matchingSchool.setSchoolName(alterSchoolPostbody.getSchoolName());
-        matchingSchool.setLatitude(alterSchoolPostbody.getLatitude());
-        matchingSchool.setLongitude(alterSchoolPostbody.getLongitude());
+//        matchingSchool.setLatitude(alterSchoolPostbody.getLatitude());
+//        matchingSchool.setLongitude(alterSchoolPostbody.getLongitude());
         matchingSchool.setMatchingCriterias(allMatchingSchoolCriterias);
         matchingSchool.setSchoolPicture(alterSchoolPostbody.getSchoolPicture());
         matchingSchool.setArContent(alterSchoolPostbody.getArContent());
