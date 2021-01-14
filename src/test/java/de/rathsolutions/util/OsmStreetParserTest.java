@@ -66,7 +66,7 @@ class OsmStreetParserTest {
     }
 
     // Use this test to create the requried heap file for the city street search
-//    @Disabled
+    @Disabled
     @Test
     void writeHeapFile() {
         cut.createStreetObjectsHeapFile();
