@@ -111,7 +111,6 @@ public class OsmStreetParser extends OsmPOICityOnlyParser {
             int size = in.readInt();
             for (int i = 0; i < size; i++) {
                 OsmStreetPojo current = (OsmStreetPojo) in.readObject();
-                System.out.println(current.getSuburb());
                 if (nearestEntityToUserCityInput.get(0).getPrimaryValue()
                         .equalsIgnoreCase(current.getCity())
                         || nearestEntityToUserCityInput.get(0).getPrimaryValue()
