@@ -10,4 +10,5 @@ schuglemaps.tar.gz
 src/main/resources/filtered.xml
 src/main/resources/streetObjects.smaps
 src/test/resources/filtered.xml
+src/test/resources/allSchools.xml
 src/main/resources/application.yml

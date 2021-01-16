@@ -29,6 +29,7 @@ import java.io.StringWriter;
 import java.util.List;
 
 import javax.naming.OperationNotSupportedException;
+import javax.xml.XMLConstants;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerConfigurationException;
@@ -79,9 +80,7 @@ public class OsmPOIReducer extends AbstractOsmPOIHandler {
         } catch (TransformerException e) {
             e.printStackTrace();
         }
-        String strObject = result.getWriter().toString();
-        strObject.trim();
-        strObject.replaceAll("(?m)^[ \\t]*\\r?\\n\"", "");
+        String strObject = result.getWriter().toString().trim().replaceAll("(?m)^[ \\t]*\\r?\\n\"", "");
         try {
             writer.write(strObject);
         } catch (IOException e) {
@@ -108,13 +107,14 @@ public class OsmPOIReducer extends AbstractOsmPOIHandler {
             File file = new File("filteredCitiesNew.xml");
             file.createNewFile();
             TransformerFactory transformerFactory = TransformerFactory.newInstance();
+            transformerFactory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
+            transformerFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
+            transformerFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_STYLESHEET, "");
             transformer = transformerFactory.newTransformer();
             transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
             this.writer = new BufferedWriter(new FileWriter(file));
             this.writer.write("<osm>");
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (TransformerConfigurationException e) {
+        } catch (IOException | TransformerConfigurationException e) {
             e.printStackTrace();
         }
     }

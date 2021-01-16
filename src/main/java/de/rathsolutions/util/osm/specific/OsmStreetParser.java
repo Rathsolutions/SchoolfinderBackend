@@ -51,9 +51,11 @@ import de.rathsolutions.util.osm.pojo.AbstractSearchEntity;
 import de.rathsolutions.util.osm.pojo.OsmPOIEntity;
 import de.rathsolutions.util.osm.pojo.OsmStreetPojo;
 import de.rathsolutions.util.structure.OsmCityEntries;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
 @Scope(value = WebApplicationContext.SCOPE_REQUEST, proxyMode = ScopedProxyMode.TARGET_CLASS)
+@Slf4j
 public class OsmStreetParser extends OsmPOICityOnlyParser {
     @Autowired
     private DocumentParser documentParser;
@@ -72,24 +74,27 @@ public class OsmStreetParser extends OsmPOICityOnlyParser {
         Document document;
         try {
             streetObjects = new File("src/main/resources/streetObjects.smaps");
-            document = documentParser.readDocument("filtered.xml");
-            NodeList listOfAllWays = document.getElementsByTagName("way");
-            allWayPojos = convertWaysToPojos(listOfAllWays);
-            streetObjects.createNewFile();
-            ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(streetObjects));
-            out.writeInt(allWayPojos.size());
-            allWayPojos.forEach(e -> {
-                try {
-                    out.writeObject(e);
-                } catch (IOException e1) {
-                    e1.printStackTrace();
-                }
+            try (ObjectOutputStream out
+                    = new ObjectOutputStream(new FileOutputStream(streetObjects))) {
+                document = documentParser.readDocument("filtered.xml");
+                NodeList listOfAllWays = document.getElementsByTagName("way");
+                allWayPojos = convertWaysToPojos(listOfAllWays);
+                streetObjects.createNewFile();
+                out.writeInt(allWayPojos.size());
+                allWayPojos.forEach(e -> {
+                    try {
+                        out.writeObject(e);
+                    } catch (IOException e1) {
+                        e1.printStackTrace();
+                    }
 
-            });
-            out.flush();
-            out.close();
-        } catch (ParserConfigurationException | SAXException | IOException e) {
-            e.printStackTrace();
+                });
+                out.flush();
+            } catch (IOException e2) {
+                log.error(e2.getMessage());
+            }
+        } catch (ParserConfigurationException | SAXException e) {
+            log.error(e.getMessage());
         }
     }
 
