@@ -27,6 +27,7 @@ import de.rathsolutions.util.osm.pojo.OsmPOIEntity;
 
 public class NearestNodesComparator implements Comparator<OsmPOIEntity> {
 
+    private static final double COMPARISON_DELTA = 0.00001;
     private OsmPOIEntity nodeToCompare;
 
     public NearestNodesComparator(OsmPOIEntity n) {
@@ -39,9 +40,9 @@ public class NearestNodesComparator implements Comparator<OsmPOIEntity> {
             nodeToCompare.getLongVal(), o1.getLatVal(), o1.getLongVal());
         double secondDistance = HaversineUtils.calculateHaversine(nodeToCompare.getLatVal(),
             nodeToCompare.getLongVal(), o2.getLatVal(), o2.getLongVal());
-        if (firstDistance - secondDistance > 0.1) {
+        if (firstDistance - secondDistance > COMPARISON_DELTA) {
             return 1;
-        } else if (firstDistance - secondDistance < 0.1) {
+        } else if (firstDistance - secondDistance < COMPARISON_DELTA) {
             return -1;
         } else {
             return 0;
