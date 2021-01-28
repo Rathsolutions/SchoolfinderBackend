@@ -77,7 +77,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/api/v1/cities/search/**", "/api/v1/schools/search/**",
                     "/api/v1/criterias/search/getAllAvailableCriterias/**")
                 .permitAll().antMatchers("/actuator/**").authenticated().antMatchers("/**")
-                .authenticated().and().httpBasic().and().csrf().csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()).and().cors();
+                .authenticated().and().httpBasic().and().csrf().disable().cors();
         http.headers().frameOptions().sameOrigin();
 
     }

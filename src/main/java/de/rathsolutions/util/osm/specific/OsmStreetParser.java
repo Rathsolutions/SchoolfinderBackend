@@ -28,7 +28,9 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.PriorityQueue;
 
 import javax.naming.OperationNotSupportedException;
 import javax.xml.parsers.ParserConfigurationException;
@@ -46,7 +48,9 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import de.rathsolutions.util.osm.generic.DocumentParser;
+import de.rathsolutions.util.osm.generic.HaversineUtils;
 import de.rathsolutions.util.osm.generic.LevenstheinDistanceUtil;
+import de.rathsolutions.util.osm.generic.NearestNodesComparator;
 import de.rathsolutions.util.osm.pojo.AbstractSearchEntity;
 import de.rathsolutions.util.osm.pojo.OsmPOIEntity;
 import de.rathsolutions.util.osm.pojo.OsmStreetPojo;
@@ -108,21 +112,39 @@ public class OsmStreetParser extends OsmPOICityOnlyParser {
     private List<OsmPOIEntity> findStreetGeocodes(String city, String streetname,
             String houseNumber, int amount) {
         init();
-        List<OsmPOIEntity> entitiesToTraverse = new ArrayList<>();
         List<OsmPOIEntity> nearestEntityToUserCityInput = levenstheinDistanceUtil
-                .computeLevenstheinDistance(city, osmCityEntries, 1, false);
+                .computeLevenstheinDistance(city, osmCityEntries, 3, false);
+        List<OsmPOIEntity> entitiesToTraverse = new ArrayList<>();
+        List<OsmPOIEntity> waysWithoutMappedCity = new ArrayList<>();
         try (ObjectInputStream in = new ObjectInputStream(new BufferedInputStream(
                 new ClassPathResource("streetObjects.smaps").getInputStream()))) {
             int size = in.readInt();
-            for (int i = 0; i < size; i++) {
-                OsmStreetPojo current = (OsmStreetPojo) in.readObject();
-                if (nearestEntityToUserCityInput.get(0).getPrimaryValue()
-                        .equalsIgnoreCase(current.getCity())
-                        || nearestEntityToUserCityInput.get(0).getPrimaryValue()
-                                .equalsIgnoreCase(current.getSuburb())) {
-                    entitiesToTraverse
-                            .add(new OsmPOIEntity(current.getStreet(), current.getHousenumber(),
-                                    current.getLatitude(), current.getLongitude()));
+            for (int j = 0; j < 1; j++) {
+                waysWithoutMappedCity.clear();
+                for (int i = 0; i < size; i++) {
+                    OsmStreetPojo current = (OsmStreetPojo) in.readObject();
+                    if (current.getCity().isEmpty() || current.getCity() == null) {
+                        waysWithoutMappedCity
+                                .add(new OsmPOIEntity(current.getStreet(), current.getHousenumber(),
+                                        current.getLatitude(), current.getLongitude()));
+                    } else if (nearestEntityToUserCityInput.get(j).getPrimaryValue()
+                            .equalsIgnoreCase(current.getCity())
+                            || nearestEntityToUserCityInput.get(j).getPrimaryValue()
+                                    .equalsIgnoreCase(current.getSuburb())) {
+                        entitiesToTraverse
+                                .add(new OsmPOIEntity(current.getStreet(), current.getHousenumber(),
+                                        current.getLatitude(), current.getLongitude()));
+                    }
+                }
+                Collections.sort(waysWithoutMappedCity,
+                    new NearestNodesComparator(nearestEntityToUserCityInput.get(j)));
+                int i = 0;
+                for (i = 0; i < waysWithoutMappedCity.size() && HaversineUtils.calculateHaversine(
+                    nearestEntityToUserCityInput.get(j).getLatVal(),
+                    nearestEntityToUserCityInput.get(j).getLongVal(),
+                    waysWithoutMappedCity.get(i).getLatVal(),
+                    waysWithoutMappedCity.get(i).getLongVal()) < 5000; i++) {
+                    entitiesToTraverse.add(waysWithoutMappedCity.get(i));
                 }
             }
         } catch (IOException | ClassNotFoundException e1) {

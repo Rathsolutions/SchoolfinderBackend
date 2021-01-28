@@ -22,6 +22,7 @@
 package de.rathsolutions.util.osm.generic;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
@@ -51,13 +52,13 @@ public class LevenstheinDistanceUtil {
      * @return a list containing all elements
      */
     public List<OsmPOIEntity> computeLevenstheinDistance(String requestString,
-            List<OsmPOIEntity> resultList, int amount, boolean computeWithSecondaryValue) {
+            Collection<OsmPOIEntity> resultList, int amount, boolean computeWithSecondaryValue) {
         return computeLevenstheinDistanceInternal(requestString, resultList, amount,
             computeWithSecondaryValue);
     }
 
     private List<OsmPOIEntity> computeLevenstheinDistanceInternal(String requestString,
-            List<OsmPOIEntity> resultList, int amount, boolean computeWithSecondaryValue) {
+            Collection<OsmPOIEntity> resultList, int amount, boolean computeWithSecondaryValue) {
         HashMap<OsmPOIEntity, Integer> entityDistanceMapping = new HashMap<>();
         resultList.forEach(e -> {
             entityDistanceMapping.put(e,
