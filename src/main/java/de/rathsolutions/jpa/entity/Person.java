@@ -54,8 +54,15 @@ public class Person {
     private String lastname;
     @NonNull
     private String email;
-    @NonNull
+
     private String phoneNumber;
+    
+    public Person(String prename, String lastname, String email, String phoneNumber) {
+        this.prename = prename;
+        this.lastname = lastname;
+        this.email = email;
+        this.phoneNumber = phoneNumber;
+    }
 
     @OneToMany(cascade = { CascadeType.PERSIST,
             CascadeType.MERGE }, fetch = FetchType.LAZY, mappedBy = "person")
