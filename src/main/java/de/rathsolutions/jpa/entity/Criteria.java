@@ -21,15 +21,19 @@
  */
 package de.rathsolutions.jpa.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.ArrayList;
 import java.util.List;
+
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
+import javax.validation.constraints.NotBlank;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
@@ -48,7 +52,9 @@ public class Criteria {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     @NonNull
+    @NotBlank(message = "Der Criteriumsname darf nicht leer sein!")
     private String criteriaName;
     @JsonIgnore
     @ManyToMany(mappedBy = "matchingCriterias", fetch = FetchType.LAZY)

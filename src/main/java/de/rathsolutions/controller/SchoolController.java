@@ -268,6 +268,7 @@ public class SchoolController {
             alterSchoolPostbody.getMatchingCriterias().forEach(e -> {
                 if (!listForStream.stream()
                         .anyMatch(f -> f.getCriteriaName().equalsIgnoreCase(e.getCriteriaName()))) {
+                    System.out.println(e.getCriteriaName().length());
                     Criteria savedCrit = criteriaRepo.save(new Criteria(e.getCriteriaName()));
                     listForStream.add(savedCrit);
                 }

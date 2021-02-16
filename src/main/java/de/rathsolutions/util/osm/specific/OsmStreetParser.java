@@ -119,7 +119,7 @@ public class OsmStreetParser extends OsmPOICityOnlyParser {
         try (ObjectInputStream in = new ObjectInputStream(new BufferedInputStream(
                 new ClassPathResource("streetObjects.smaps").getInputStream()))) {
             int size = in.readInt();
-            for (int j = 0; j < 1; j++) {
+            for (int j = 0; j < nearestEntityToUserCityInput.size(); j++) {
                 waysWithoutMappedCity.clear();
                 for (int i = 0; i < size; i++) {
                     OsmStreetPojo current = (OsmStreetPojo) in.readObject();
