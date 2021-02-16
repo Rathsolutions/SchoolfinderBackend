@@ -46,6 +46,8 @@ public class AddNewSchoolPostbody {
     protected String schoolPicture;
     
     protected String arContent;
+    
+    protected String makerspaceContent;
 
     protected List<PersonFunctionalityEntity> personSchoolMapping;
 

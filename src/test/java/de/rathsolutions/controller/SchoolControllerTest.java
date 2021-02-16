@@ -86,9 +86,9 @@ public class SchoolControllerTest {
     private OsmPOISchoolParser osmParserMock;
 
     @Test
-    void testFindNotRegisteredSchoolsByNameAdminWithValidName()
-            throws ParserConfigurationException, SAXException, IOException, NotFoundException,
-            TransformerException, InterruptedException, ExecutionException, OperationNotSupportedException {
+    void testFindNotRegisteredSchoolsByNameAdminWithValidName() throws ParserConfigurationException,
+            SAXException, IOException, NotFoundException, TransformerException,
+            InterruptedException, ExecutionException, OperationNotSupportedException {
         List<OsmPOIEntity> expectedReturnObject = new ArrayList<>();
         expectedReturnObject.add(new OsmPOIEntity("test", null, 1, 2));
         when(osmParserMock.processOsmFile(Mockito.any(SchoolSearchEntity.class), anyInt()))
@@ -275,7 +275,7 @@ public class SchoolControllerTest {
     @Transactional
     void testAddNewSchoolAlreadyExisting() {
         AddNewSchoolPostbody newSchool
-                = new AddNewSchoolPostbody("testschool", 21, 12, "ff0000", "", "", null, null);
+                = new AddNewSchoolPostbody("testschool", 21, 12, "ff0000", "", "", "", null, null);
         assertThrows(ResourceAlreadyExistingException.class, () -> {
             cut.addNewSchool(newSchool);
         });
@@ -285,8 +285,8 @@ public class SchoolControllerTest {
     @Test
     @Transactional
     void testAlterSchoolNotExisting() {
-        AlterSchoolPostbody newSchool
-                = new AlterSchoolPostbody(4, "testschool5", 21, 12, "", "", "ff0000", null, null);
+        AlterSchoolPostbody newSchool = new AlterSchoolPostbody(4, "testschool5", 21, 12, "", "",
+                "", "ff0000", null, null);
         assertThrows(ResourceNotFoundException.class, () -> {
             cut.alterSchool(newSchool);
         });
@@ -296,7 +296,7 @@ public class SchoolControllerTest {
     @Test
     void testAddNewSchoolNullPersonsNullCriterias() {
         AddNewSchoolPostbody newSchool
-                = new AddNewSchoolPostbody("testschool5", 21, 12, "ff0000", "", "", null, null);
+                = new AddNewSchoolPostbody("testschool5", 21, 12, "ff0000", "", "", "", null, null);
         assertThrows(BadArgumentsException.class, () -> {
             cut.addNewSchool(newSchool);
         });
@@ -304,8 +304,8 @@ public class SchoolControllerTest {
 
     @Test
     void testAlterSchoolNullPersonsNullCriterias() {
-        AlterSchoolPostbody newSchool
-                = new AlterSchoolPostbody(1, "testschool5", 21, 12, "", "", "ff0000", null, null);
+        AlterSchoolPostbody newSchool = new AlterSchoolPostbody(1, "testschool5", 21, 12, "", "",
+                "", "ff0000", null, null);
         assertThrows(BadArgumentsException.class, () -> {
             cut.alterSchool(newSchool);
         });
@@ -314,7 +314,7 @@ public class SchoolControllerTest {
     @Test
     void testAddNewSchoolNullColor() {
         AddNewSchoolPostbody newSchool
-                = new AddNewSchoolPostbody("testschool5", 21, 12, null, "", "", null, null);
+                = new AddNewSchoolPostbody("testschool5", 21, 12, null, "", "", "", null, null);
         assertThrows(BadArgumentsException.class, () -> {
             cut.addNewSchool(newSchool);
         });
@@ -323,7 +323,7 @@ public class SchoolControllerTest {
     @Test
     void testAlterSchoolNullColor() {
         AlterSchoolPostbody newSchool
-                = new AlterSchoolPostbody(1, "testschool5", 21, 12, "", "", null, null, null);
+                = new AlterSchoolPostbody(1, "testschool5", 21, 12, "", "", "", null, null, null);
         assertThrows(BadArgumentsException.class, () -> {
             cut.alterSchool(newSchool);
         });
@@ -332,7 +332,7 @@ public class SchoolControllerTest {
     @Test
     void testAddNewSchoolEmptyColor() {
         AddNewSchoolPostbody newSchool
-                = new AddNewSchoolPostbody("testschool5", 21, 12, "", "", "", null, null);
+                = new AddNewSchoolPostbody("testschool5", 21, 12, "", "", "", "", null, null);
         assertThrows(BadArgumentsException.class, () -> {
             cut.addNewSchool(newSchool);
         });
@@ -341,34 +341,37 @@ public class SchoolControllerTest {
     @Test
     void testAlterSchoolEmptyColor() {
         AlterSchoolPostbody newSchool
-                = new AlterSchoolPostbody(1, "testschool5", 21, 12, "", "", "", null, null);
+                = new AlterSchoolPostbody(1, "testschool5", 21, 12, "", "", "", "", null, null);
         assertThrows(BadArgumentsException.class, () -> {
             cut.alterSchool(newSchool);
         });
     }
+
     @Test
     void testAddNewSchoolColorNotMatchingRegex() {
-        AddNewSchoolPostbody newSchool
-                = new AddNewSchoolPostbody("testschool5", 21, 12, "", "", "schoolfinder", null, null);
+        AddNewSchoolPostbody newSchool = new AddNewSchoolPostbody("testschool5", 21, 12, "", "", "",
+                "schoolfinder", null, null);
         assertThrows(BadArgumentsException.class, () -> {
             cut.addNewSchool(newSchool);
         });
     }
+
     @Test
     void testAlterSchoolColorNotMatchingHexRegex() {
-        AlterSchoolPostbody newSchool
-                = new AlterSchoolPostbody(1, "testschool5", 21, 12, "", "", "schoolfinder", null, null);
+        AlterSchoolPostbody newSchool = new AlterSchoolPostbody(1, "testschool5", 21, 12, "", "",
+                "", "schoolfinder", null, null);
         assertThrows(BadArgumentsException.class, () -> {
             cut.alterSchool(newSchool);
         });
     }
+
     @Test
     void testAddNewSchoolNullPersonsNotNullCriterias() {
         List<Criteria> criterias = new ArrayList<>();
         String testcriteria = "test5";
         criterias.add(new Criteria(testcriteria));
-        AddNewSchoolPostbody newSchool
-                = new AddNewSchoolPostbody("testschool5", 21, 12, "ff0000", "", "", null, criterias);
+        AddNewSchoolPostbody newSchool = new AddNewSchoolPostbody("testschool5", 21, 12, "ff0000",
+                "", "", "", null, criterias);
         assertThrows(BadArgumentsException.class, () -> {
             cut.addNewSchool(newSchool);
         });
@@ -381,8 +384,8 @@ public class SchoolControllerTest {
         List<Criteria> criterias = new ArrayList<>();
         String testcriteria = "test5";
         criterias.add(new Criteria(testcriteria));
-        AlterSchoolPostbody newSchool
-                = new AlterSchoolPostbody(1, "testschool", 21, 12, "", "", "ff0000", null, criterias);
+        AlterSchoolPostbody newSchool = new AlterSchoolPostbody(1, "testschool", 21, 12, "", "", "",
+                "ff0000", null, criterias);
         assertThrows(BadArgumentsException.class, () -> {
             cut.alterSchool(newSchool);
         });
@@ -402,8 +405,8 @@ public class SchoolControllerTest {
         person.setId(5L);
         personFunctionalityEntity.setPerson(person);
         personFuncList.add(personFunctionalityEntity);
-        AddNewSchoolPostbody newSchool = new AddNewSchoolPostbody(testschool, 21, 12, "ff0000", "", "",
-                personFuncList, criterias);
+        AddNewSchoolPostbody newSchool = new AddNewSchoolPostbody(testschool, 21, 12, "ff0000", "",
+                "", "", personFuncList, criterias);
         assertThrows(ResourceNotFoundException.class, () -> {
             cut.addNewSchool(newSchool);
         });
@@ -425,7 +428,7 @@ public class SchoolControllerTest {
         person.setId(5L);
         personFunctionalityEntity.setPerson(person);
         personFuncList.add(personFunctionalityEntity);
-        AlterSchoolPostbody newSchool = new AlterSchoolPostbody(1, testschool, 21, 12, "", "",
+        AlterSchoolPostbody newSchool = new AlterSchoolPostbody(1, testschool, 21, 12, "", "", "",
                 "ff0000", personFuncList, criterias);
         assertThrows(ResourceNotFoundException.class, () -> {
             cut.alterSchool(newSchool);
@@ -450,8 +453,8 @@ public class SchoolControllerTest {
         personFunctionalityEntity.setPerson(person);
         personFunctionalityEntity.setFunctionality(PersonFunctionality.XR);
         personFuncList.add(personFunctionalityEntity);
-        AddNewSchoolPostbody newSchool = new AddNewSchoolPostbody(testschool, 21, 12, "ff0000", "", "",
-                personFuncList, criterias);
+        AddNewSchoolPostbody newSchool = new AddNewSchoolPostbody(testschool, 21, 12, "ff0000", "",
+                "", "", personFuncList, criterias);
         ResponseEntity<School> responseEntity = cut.addNewSchool(newSchool);
         List<Criteria> allCriterias = criteriaRepo.findAll();
         List<School> allSchools = schoolRepo.findAll();
@@ -481,8 +484,8 @@ public class SchoolControllerTest {
         personFunctionalityEntity.setPerson(person);
         personFunctionalityEntity.setFunctionality(PersonFunctionality.XR);
         personFuncList.add(personFunctionalityEntity);
-        AlterSchoolPostbody newSchool = new AlterSchoolPostbody(2, testschool, 1, 2, "1", "", "ff0000",
-                personFuncList, criterias);
+        AlterSchoolPostbody newSchool = new AlterSchoolPostbody(2, testschool, 1, 2, "1", "", "",
+                "ff0000", personFuncList, criterias);
         ResponseEntity<School> responseEntity = cut.alterSchool(newSchool);
         List<Criteria> allCriterias = criteriaRepo.findAll();
         List<School> allSchools = schoolRepo.findAll();
@@ -515,8 +518,8 @@ public class SchoolControllerTest {
         personFunctionalityEntity.setPerson(person);
         personFunctionalityEntity.setFunctionality(PersonFunctionality.XR);
         personFuncList.add(personFunctionalityEntity);
-        AlterSchoolPostbody newSchool = new AlterSchoolPostbody(2, testschool, 1, 2, "1", "", "ff0000",
-                personFuncList, criterias);
+        AlterSchoolPostbody newSchool = new AlterSchoolPostbody(2, testschool, 1, 2, "1", "", "",
+                "ff0000", personFuncList, criterias);
         ResponseEntity<School> responseEntity = cut.alterSchool(newSchool);
         List<Criteria> allCriterias = criteriaRepo.findAll();
         List<School> allSchools = schoolRepo.findAll();
@@ -547,8 +550,8 @@ public class SchoolControllerTest {
         person.setId(0L);
         personFunctionalityEntity.setPerson(person);
         personFuncList.add(personFunctionalityEntity);
-        AddNewSchoolPostbody newSchool = new AddNewSchoolPostbody(testschool, 21, 12, "", "", "ff0000",
-                personFuncList, criterias);
+        AddNewSchoolPostbody newSchool = new AddNewSchoolPostbody(testschool, 21, 12, "", "", "",
+                "ff0000", personFuncList, criterias);
         assertThrows(BadArgumentsException.class, () -> {
             cut.addNewSchool(newSchool);
         });
@@ -570,8 +573,8 @@ public class SchoolControllerTest {
         person.setId(0L);
         personFunctionalityEntity.setPerson(person);
         personFuncList.add(personFunctionalityEntity);
-        AlterSchoolPostbody newSchool = new AlterSchoolPostbody(2, testschool, 1, 2, "1", "", "ff0000",
-                personFuncList, criterias);
+        AlterSchoolPostbody newSchool = new AlterSchoolPostbody(2, testschool, 1, 2, "1", "", "",
+                "ff0000", personFuncList, criterias);
         assertThrows(BadArgumentsException.class, () -> {
             cut.alterSchool(newSchool);
         });

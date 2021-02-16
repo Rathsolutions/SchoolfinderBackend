@@ -182,6 +182,7 @@ public class SchoolController {
                 allMatchingSchoolCriterias);
         school.setSchoolPicture(addNewSchoolPostbody.getSchoolPicture());
         school.setArContent(addNewSchoolPostbody.getArContent());
+        school.setMakerspaceContent(addNewSchoolPostbody.getMakerspaceContent());
         school.setColor(addNewSchoolPostbody.getColor());
         fillPersonSchoolMappingOfSchool(addNewSchoolPostbody, school);
         return ResponseEntity.ok(schoolRepo.save(school));
@@ -208,6 +209,7 @@ public class SchoolController {
         matchingSchool.setMatchingCriterias(allMatchingSchoolCriterias);
         matchingSchool.setSchoolPicture(alterSchoolPostbody.getSchoolPicture());
         matchingSchool.setArContent(alterSchoolPostbody.getArContent());
+        matchingSchool.setMakerspaceContent(alterSchoolPostbody.getMakerspaceContent());
         matchingSchool.setColor(alterSchoolPostbody.getColor());
         matchingSchool.getPersonSchoolMapping().clear();
         fillPersonSchoolMappingOfSchool(alterSchoolPostbody, matchingSchool);

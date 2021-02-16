@@ -62,6 +62,8 @@ public class School {
     private String color;
     
     private String arContent;
+    
+    private String makerspaceContent;
     @Lob
     private String schoolPicture;
     @OneToMany(cascade = {
