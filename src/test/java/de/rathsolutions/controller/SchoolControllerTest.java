@@ -448,7 +448,7 @@ public class SchoolControllerTest {
         Person person = new Person();
         person.setId(0L);
         personFunctionalityEntity.setPerson(person);
-        personFunctionalityEntity.setFunctionality(PersonFunctionality.AR);
+        personFunctionalityEntity.setFunctionality(PersonFunctionality.XR);
         personFuncList.add(personFunctionalityEntity);
         AddNewSchoolPostbody newSchool = new AddNewSchoolPostbody(testschool, 21, 12, "ff0000", "", "",
                 personFuncList, criterias);
@@ -462,7 +462,7 @@ public class SchoolControllerTest {
         School schoolObject = schoolInDB.findFirst().get();
         assertEquals(0L,
             schoolObject.getPersonSchoolMapping().get(0).getPerson().getId().longValue());
-        assertEquals(PersonFunctionality.AR.toString(),
+        assertEquals(PersonFunctionality.XR,
             schoolObject.getPersonSchoolMapping().get(0).getFunctionality());
 
     }
@@ -479,7 +479,7 @@ public class SchoolControllerTest {
         Person person = new Person();
         person.setId(0L);
         personFunctionalityEntity.setPerson(person);
-        personFunctionalityEntity.setFunctionality(PersonFunctionality.AR);
+        personFunctionalityEntity.setFunctionality(PersonFunctionality.XR);
         personFuncList.add(personFunctionalityEntity);
         AlterSchoolPostbody newSchool = new AlterSchoolPostbody(2, testschool, 1, 2, "1", "", "ff0000",
                 personFuncList, criterias);
@@ -493,7 +493,7 @@ public class SchoolControllerTest {
         School schoolObject = schoolInDB.findFirst().get();
         assertEquals(0L,
             schoolObject.getPersonSchoolMapping().get(0).getPerson().getId().longValue());
-        assertEquals(PersonFunctionality.AR.toString(),
+        assertEquals(PersonFunctionality.XR,
             schoolObject.getPersonSchoolMapping().get(0).getFunctionality());
         assertEquals(testschool, schoolObject.getSchoolName());
         assertEquals(3.333, schoolObject.getLatitude().doubleValue(), 0.000001);
@@ -513,7 +513,7 @@ public class SchoolControllerTest {
         Person person = new Person();
         person.setId(1L);
         personFunctionalityEntity.setPerson(person);
-        personFunctionalityEntity.setFunctionality(PersonFunctionality.AR);
+        personFunctionalityEntity.setFunctionality(PersonFunctionality.XR);
         personFuncList.add(personFunctionalityEntity);
         AlterSchoolPostbody newSchool = new AlterSchoolPostbody(2, testschool, 1, 2, "1", "", "ff0000",
                 personFuncList, criterias);
@@ -527,7 +527,7 @@ public class SchoolControllerTest {
         School schoolObject = schoolInDB.findFirst().get();
         assertEquals(1L,
             schoolObject.getPersonSchoolMapping().get(0).getPerson().getId().longValue());
-        assertEquals(PersonFunctionality.AR.toString(),
+        assertEquals(PersonFunctionality.XR,
             schoolObject.getPersonSchoolMapping().get(0).getFunctionality());
         assertEquals(testschool, schoolObject.getSchoolName());
         assertEquals(3.333, schoolObject.getLatitude().doubleValue(), 0.000001);

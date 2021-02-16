@@ -21,6 +21,7 @@
  */
 package de.rathsolutions.controller.postbody;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import de.rathsolutions.jpa.entity.Person;
@@ -39,10 +40,13 @@ public class PersonFunctionalityEntity {
 
     private PersonFunctionality functionality;
 
+    @JsonFormat(with = JsonFormat.Feature.ACCEPT_CASE_INSENSITIVE_PROPERTIES)
     public enum PersonFunctionality {
-        @JsonProperty("AR")
-        AR("AR"), @JsonProperty("Makerspace")
-        MAKERSPACE("Makerspace");
+        @JsonProperty("XR")
+        @JsonFormat(with = JsonFormat.Feature.ACCEPT_CASE_INSENSITIVE_PROPERTIES)
+        XR("XR"), @JsonProperty("MAKERSPACE")
+        @JsonFormat(with = JsonFormat.Feature.ACCEPT_CASE_INSENSITIVE_PROPERTIES)
+        MAKERSPACE("MAKERSPACE");
 
         @Setter
         private String value;

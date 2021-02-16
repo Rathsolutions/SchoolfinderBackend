@@ -23,6 +23,7 @@ package de.rathsolutions.controller;
 
 import de.rathsolutions.controller.postbody.AddNewSchoolPostbody;
 import de.rathsolutions.controller.postbody.AlterSchoolPostbody;
+import de.rathsolutions.controller.postbody.PersonFunctionalityEntity.PersonFunctionality;
 import de.rathsolutions.jpa.entity.Criteria;
 import de.rathsolutions.jpa.entity.Person;
 import de.rathsolutions.jpa.entity.PersonSchoolMapping;
@@ -225,7 +226,7 @@ public class SchoolController {
         }
         Optional<PersonSchoolMapping> personSchoolMapping
                 = personSchoolMappingRepo.findOneBySchoolAndPersonAndFunctionality(school.get(),
-                    person.get(), functionality);
+                    person.get(), PersonFunctionality.valueOf(functionality.toUpperCase()));
         if (personSchoolMapping.isEmpty()) {
             throw new ResourceNotFoundException(person.toString(),
                     "The person has no mapping to school " + school.toString());
@@ -252,7 +253,7 @@ public class SchoolController {
                 throw new BadArgumentsException(e);
             }
             PersonSchoolMapping personSchoolMapping = new PersonSchoolMapping(personById.get(),
-                    matchingSchool, e.getFunctionality().toString());
+                    matchingSchool, e.getFunctionality());
             matchingSchool.getPersonSchoolMapping().add(personSchoolMapping);
         });
     }

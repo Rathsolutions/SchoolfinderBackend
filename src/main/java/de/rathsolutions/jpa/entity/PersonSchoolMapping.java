@@ -21,12 +21,15 @@
  */
 package de.rathsolutions.jpa.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import de.rathsolutions.controller.postbody.PersonFunctionalityEntity.PersonFunctionality;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
@@ -57,5 +60,5 @@ public class PersonSchoolMapping {
     @JsonIgnore
     private School school;
     @NonNull
-    private String functionality;
+    private PersonFunctionality functionality;
 }
