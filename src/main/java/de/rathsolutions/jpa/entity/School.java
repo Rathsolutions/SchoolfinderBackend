@@ -34,6 +34,9 @@ import javax.persistence.JoinTable;
 import javax.persistence.Lob;
 import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
+
+import org.hibernate.annotations.Type;
+
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
@@ -58,11 +61,11 @@ public class School {
     private Double latitude;
     @NonNull
     private Double longitude;
-    
+
     private String color;
-    
+    @Type(type = "text")
     private String arContent;
-    
+    @Type(type = "text")
     private String makerspaceContent;
     @Lob
     private String schoolPicture;
