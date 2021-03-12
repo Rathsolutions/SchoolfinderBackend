@@ -181,6 +181,7 @@ public class SchoolController {
                 addNewSchoolPostbody.getLatitude(), addNewSchoolPostbody.getLongitude(),
                 allMatchingSchoolCriterias);
         school.setSchoolPicture(addNewSchoolPostbody.getSchoolPicture());
+        school.setAlternativePictureText(addNewSchoolPostbody.getAlternativePictureText());
         school.setArContent(addNewSchoolPostbody.getArContent());
         school.setMakerspaceContent(addNewSchoolPostbody.getMakerspaceContent());
         school.setColor(addNewSchoolPostbody.getColor());
@@ -208,6 +209,7 @@ public class SchoolController {
 //        matchingSchool.setLongitude(alterSchoolPostbody.getLongitude());
         matchingSchool.setMatchingCriterias(allMatchingSchoolCriterias);
         matchingSchool.setSchoolPicture(alterSchoolPostbody.getSchoolPicture());
+        matchingSchool.setAlternativePictureText(alterSchoolPostbody.getAlternativePictureText());
         matchingSchool.setArContent(alterSchoolPostbody.getArContent());
         matchingSchool.setMakerspaceContent(alterSchoolPostbody.getMakerspaceContent());
         matchingSchool.setColor(alterSchoolPostbody.getColor());

@@ -45,6 +45,8 @@ public class AddNewSchoolPostbody {
 
     protected String schoolPicture;
     
+    protected String alternativePictureText;
+    
     protected String arContent;
     
     protected String makerspaceContent;

@@ -69,6 +69,8 @@ public class School {
     private String makerspaceContent;
     @Lob
     private String schoolPicture;
+    @Type(type = "text")
+    private String alternativePictureText;
     @OneToMany(cascade = {
             CascadeType.ALL }, fetch = FetchType.LAZY, mappedBy = "school", orphanRemoval = true)
     private List<PersonSchoolMapping> personSchoolMapping = new ArrayList<>();
