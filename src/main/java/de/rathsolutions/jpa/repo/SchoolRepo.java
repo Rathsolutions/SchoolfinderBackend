@@ -37,6 +37,8 @@ public interface SchoolRepo extends JpaRepository<School, Long> {
 
     public List<School> findAllByLatitudeBetweenAndLongitudeBetween(double leftLatBound,
             double rightLatBound, double topLongBound, double bottomLongBound);
+    
+    public List<School> findAllByOrderBySchoolName();
 
     public List<School> findDistinctByLatitudeBetweenAndLongitudeBetweenAndMatchingCriteriasIn(
             double leftLatBound, double rightLatBound, double topLongBound, double bottomLongBound,

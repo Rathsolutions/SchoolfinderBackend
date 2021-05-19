@@ -43,43 +43,44 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     private static final String CSRF_TOKEN = "X-XSRF-TOKEN";
-    
+
     private final UserDetailsService userDetailsService;
     private final PasswordEncoder passwordEncoder;
 
     public SecurityConfig(UserDetailsService userDetailsService, PasswordEncoder passwordEncoder) {
-        this.userDetailsService = userDetailsService;
-        this.passwordEncoder = passwordEncoder;
+	this.userDetailsService = userDetailsService;
+	this.passwordEncoder = passwordEncoder;
     }
 
     @Override
     public void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder);
+	auth.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder);
     }
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
-        final CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Collections.singletonList("*"));
-        configuration.setAllowedHeaders(Collections.singletonList("*"));
-        configuration.addExposedHeader("Authorization");
-        configuration.setAllowCredentials(true);
-        configuration.setAllowedMethods(
-            Arrays.asList("HEAD", "GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
-        final UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", configuration);
-        return source;
+	final CorsConfiguration configuration = new CorsConfiguration();
+
+	configuration
+		.setAllowedOrigins(Arrays.asList("https://schoolfinder.rathsolutions.de", "http://localhost:4200"));
+	configuration.setAllowedHeaders(Collections.singletonList("*"));
+	configuration.addExposedHeader("Authorization");
+	configuration.setAllowCredentials(true);
+	configuration.setAllowedMethods(Arrays.asList("HEAD", "GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
+	final UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+	source.registerCorsConfiguration("/**", configuration);
+	return source;
     }
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http.authorizeRequests()
-                .antMatchers("/api/v1/cities/search/**", "/api/v1/schools/search/**",
-                    "/api/v1/criterias/search/getAllAvailableCriterias/**")
-                .permitAll().antMatchers("/actuator/**").authenticated().antMatchers("/**")
-                .authenticated().and().httpBasic().and().csrf().disable().cors();
-        http.headers().frameOptions().sameOrigin();
+	http.authorizeRequests()
+		.antMatchers("/api/v1/cities/search/**", "/api/v1/schools/search/**", "/api/v1/schools",
+			"/api/v1/criterias/search/getAllAvailableCriterias/**")
+		.permitAll().antMatchers("/actuator/**").authenticated().antMatchers("/**").authenticated().and()
+		.httpBasic().and().csrf().disable().cors();
+	http.headers().frameOptions().sameOrigin();
 
     }
-    
+
 }

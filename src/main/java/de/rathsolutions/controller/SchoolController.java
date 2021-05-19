@@ -120,6 +120,12 @@ public class SchoolController {
     public List<School> findAllSchools() {
         return schoolRepo.findAll();
     }
+    
+    @Operation(summary = "searches all school resources ordered by their name")
+    @GetMapping("/search/findAllSchoolsOrderedByName")
+    public List<School> findAllSchoolsOrderByName() {
+        return schoolRepo.findAllByOrderBySchoolName();
+    }
 
     @Operation(summary = "searches all school resources within latlong boundaries")
     @GetMapping("/search/findAllSchoolsInBounds")
