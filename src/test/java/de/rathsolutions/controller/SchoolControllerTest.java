@@ -73,6 +73,14 @@ import org.xml.sax.SAXException;
 @ContextConfiguration(classes = SpringBootMain.class)
 public class SchoolControllerTest {
 
+    private static final String TESTSCHOOL5 = "testschool5";
+
+    private static final String SHORT_NOT_EXISTING = "shortNotExisting";
+
+    private static final String TESTSCHOOL = "testschool";
+
+    private static final String SHORT_TESTSCHOOL = "shortTestschool";
+
     @Autowired
     private SchoolController cut;
 
@@ -86,531 +94,538 @@ public class SchoolControllerTest {
     private OsmPOISchoolParser osmParserMock;
 
     @Test
-    void testFindNotRegisteredSchoolsByNameAdminWithValidName() throws ParserConfigurationException,
-            SAXException, IOException, NotFoundException, TransformerException,
-            InterruptedException, ExecutionException, OperationNotSupportedException {
-        List<OsmPOIEntity> expectedReturnObject = new ArrayList<>();
-        expectedReturnObject.add(new OsmPOIEntity("test", null, 1, 2));
-        when(osmParserMock.processOsmFile(Mockito.any(SchoolSearchEntity.class), anyInt()))
-                .thenReturn(expectedReturnObject);
-        ResponseEntity<List<OsmPOIEntity>> notRegisteredSchoolsByName
-                = cut.findNotRegisteredSchoolsByNameAdmin("testSchool", "", 1);
-        assertEquals(expectedReturnObject, notRegisteredSchoolsByName.getBody());
+    void testFindNotRegisteredSchoolsByNameAdminWithValidName()
+	    throws ParserConfigurationException, SAXException, IOException, NotFoundException, TransformerException,
+	    InterruptedException, ExecutionException, OperationNotSupportedException {
+	List<OsmPOIEntity> expectedReturnObject = new ArrayList<>();
+	expectedReturnObject.add(new OsmPOIEntity("test", null, 1, 2));
+	when(osmParserMock.processOsmFile(Mockito.any(SchoolSearchEntity.class), anyInt()))
+		.thenReturn(expectedReturnObject);
+	ResponseEntity<List<OsmPOIEntity>> notRegisteredSchoolsByName = cut
+		.findNotRegisteredSchoolsByNameAdmin("testSchool", "", 1);
+	assertEquals(expectedReturnObject, notRegisteredSchoolsByName.getBody());
     }
 
     @Test
     void testFindNotRegisteredSchoolsByNameAdminWithNotValidName()
-            throws ParserConfigurationException, SAXException, IOException, NotFoundException,
-            TransformerException, InterruptedException, ExecutionException,
-            OperationNotSupportedException {
-        when(osmParserMock.processOsmFile(Mockito.any(SchoolSearchEntity.class), anyInt()))
-                .thenThrow(NotFoundException.class);
-        ResponseEntity<List<OsmPOIEntity>> notRegisteredSchoolsByName
-                = cut.findNotRegisteredSchoolsByNameAdmin("testSchool", "", 1);
-        assertEquals(HttpStatus.NOT_FOUND, notRegisteredSchoolsByName.getStatusCode());
-        assertNull(notRegisteredSchoolsByName.getBody());
+	    throws ParserConfigurationException, SAXException, IOException, NotFoundException, TransformerException,
+	    InterruptedException, ExecutionException, OperationNotSupportedException {
+	when(osmParserMock.processOsmFile(Mockito.any(SchoolSearchEntity.class), anyInt()))
+		.thenThrow(NotFoundException.class);
+	ResponseEntity<List<OsmPOIEntity>> notRegisteredSchoolsByName = cut
+		.findNotRegisteredSchoolsByNameAdmin("testSchool", "", 1);
+	assertEquals(HttpStatus.NOT_FOUND, notRegisteredSchoolsByName.getStatusCode());
+	assertNull(notRegisteredSchoolsByName.getBody());
     }
 
     @Test
     void testFindSchoolsByCriteriaExisting() {
-        List<Criteria> criterias = new ArrayList<>();
-        criterias.add(new Criteria("test"));
-        List<School> schoolsByCriteria = cut.findSchoolsByCriteria(criterias);
-        assertEquals(2, schoolsByCriteria.size());
-        assertFirstSchool(schoolsByCriteria.get(0));
-        assertThirdSchool(schoolsByCriteria.get(1));
+	List<Criteria> criterias = new ArrayList<>();
+	criterias.add(new Criteria("test"));
+	List<School> schoolsByCriteria = cut.findSchoolsByCriteria(criterias);
+	assertEquals(2, schoolsByCriteria.size());
+	assertFirstSchool(schoolsByCriteria.get(0));
+	assertThirdSchool(schoolsByCriteria.get(1));
     }
 
     @Test
     void testFindSchoolsByCriteriaNotExisting() {
-        List<Criteria> criterias = new ArrayList<>();
-        criterias.add(new Criteria("test3"));
-        List<School> schoolsByCriteria = cut.findSchoolsByCriteria(criterias);
-        assertEquals(0, schoolsByCriteria.size());
+	List<Criteria> criterias = new ArrayList<>();
+	criterias.add(new Criteria("test3"));
+	List<School> schoolsByCriteria = cut.findSchoolsByCriteria(criterias);
+	assertEquals(0, schoolsByCriteria.size());
     }
 
     @Test
     void testFindSchoolsByMultipleCriteriasExisting() {
-        List<Criteria> criterias = new ArrayList<>();
-        criterias.add(new Criteria("test"));
-        criterias.add(new Criteria("test1"));
-        List<School> schoolsByCriteria = cut.findSchoolsByCriteria(criterias);
-        assertEquals(3, schoolsByCriteria.size());
-        assertFirstSchool(schoolsByCriteria.get(0));
-        assertSecondSchool(schoolsByCriteria.get(1));
-        assertThirdSchool(schoolsByCriteria.get(2));
+	List<Criteria> criterias = new ArrayList<>();
+	criterias.add(new Criteria("test"));
+	criterias.add(new Criteria("test1"));
+	List<School> schoolsByCriteria = cut.findSchoolsByCriteria(criterias);
+	assertEquals(3, schoolsByCriteria.size());
+	assertFirstSchool(schoolsByCriteria.get(0));
+	assertSecondSchool(schoolsByCriteria.get(1));
+	assertThirdSchool(schoolsByCriteria.get(2));
     }
 
     @Test
     void testFindSchoolsByMultipleCriteriasOnlyOneExisting() {
-        List<Criteria> criterias = new ArrayList<>();
-        criterias.add(new Criteria("test"));
-        criterias.add(new Criteria("test12"));
-        List<School> schoolsByCriteria = cut.findSchoolsByCriteria(criterias);
-        assertEquals(2, schoolsByCriteria.size());
-        assertFirstSchool(schoolsByCriteria.get(0));
-        assertThirdSchool(schoolsByCriteria.get(1));
+	List<Criteria> criterias = new ArrayList<>();
+	criterias.add(new Criteria("test"));
+	criterias.add(new Criteria("test12"));
+	List<School> schoolsByCriteria = cut.findSchoolsByCriteria(criterias);
+	assertEquals(2, schoolsByCriteria.size());
+	assertFirstSchool(schoolsByCriteria.get(0));
+	assertThirdSchool(schoolsByCriteria.get(1));
     }
 
     @Test
     void testFindAllSchools() {
-        List<School> allSchools = cut.findAllSchools();
-        assertEquals(3, allSchools.size());
+	List<School> allSchools = cut.findAllSchools();
+	assertEquals(3, allSchools.size());
     }
 
     @Test
     void testFindAllSchoolsByInBoundsWrongCriteriaRightBounds() {
-        List<Long> longCriterias = new ArrayList<>();
-        longCriterias.add(1L);
-        List<School> allSchoolsByInBounds = cut.findAllSchoolsByInBounds("1.110", "1.112", "2.221",
-            "2.223", longCriterias, false);
-        assertEquals(0, allSchoolsByInBounds.size());
+	List<Long> longCriterias = new ArrayList<>();
+	longCriterias.add(1L);
+	List<School> allSchoolsByInBounds = cut.findAllSchoolsByInBounds("1.110", "1.112", "2.221", "2.223",
+		longCriterias, false);
+	assertEquals(0, allSchoolsByInBounds.size());
     }
 
     @Test
     void testFindAllSchoolsByInBoundsRightCriteriaRightBounds() {
-        List<Long> longCriterias = new ArrayList<>();
-        longCriterias.add(0L);
-        List<School> allSchoolsByInBounds = cut.findAllSchoolsByInBounds("1.110", "1.112", "2.221",
-            "2.223", longCriterias, false);
-        assertEquals(1, allSchoolsByInBounds.size());
-        assertFirstSchool(allSchoolsByInBounds.get(0));
+	List<Long> longCriterias = new ArrayList<>();
+	longCriterias.add(0L);
+	List<School> allSchoolsByInBounds = cut.findAllSchoolsByInBounds("1.110", "1.112", "2.221", "2.223",
+		longCriterias, false);
+	assertEquals(1, allSchoolsByInBounds.size());
+	assertFirstSchool(allSchoolsByInBounds.get(0));
     }
 
     @Test
     void testFindAllSchoolsByInBoundsRightCriteriaWrongBounds() {
-        List<Long> longCriterias = new ArrayList<>();
-        longCriterias.add(0L);
-        List<School> allSchoolsByInBounds = cut.findAllSchoolsByInBounds("2.221", "2.223", "1.110",
-            "1.112", longCriterias, false);
-        assertEquals(0, allSchoolsByInBounds.size());
+	List<Long> longCriterias = new ArrayList<>();
+	longCriterias.add(0L);
+	List<School> allSchoolsByInBounds = cut.findAllSchoolsByInBounds("2.221", "2.223", "1.110", "1.112",
+		longCriterias, false);
+	assertEquals(0, allSchoolsByInBounds.size());
     }
 
     @Test
     void testFindAllSchoolsByInBoundsMultipleRightCriteriasOneRightBoundInclusive() {
-        List<Long> longCriterias = new ArrayList<>();
-        longCriterias.add(0L);
-        longCriterias.add(1L);
-        List<School> allSchoolsByInBounds = cut.findAllSchoolsByInBounds("1.110", "1.112", "2.221",
-            "2.223", longCriterias, false);
-        assertEquals(1, allSchoolsByInBounds.size());
-        assertFirstSchool(allSchoolsByInBounds.get(0));
+	List<Long> longCriterias = new ArrayList<>();
+	longCriterias.add(0L);
+	longCriterias.add(1L);
+	List<School> allSchoolsByInBounds = cut.findAllSchoolsByInBounds("1.110", "1.112", "2.221", "2.223",
+		longCriterias, false);
+	assertEquals(1, allSchoolsByInBounds.size());
+	assertFirstSchool(allSchoolsByInBounds.get(0));
     }
 
     @Test
     void testFindAllSchoolsByInBoundsMultipleRightCriteriasLargeRightBoundInclusive() {
-        List<Long> longCriterias = new ArrayList<>();
-        longCriterias.add(0L);
-        longCriterias.add(1L);
-        List<School> allSchoolsByInBounds
-                = cut.findAllSchoolsByInBounds("0", "3", "0", "3", longCriterias, false);
-        assertEquals(2, allSchoolsByInBounds.size());
-        assertFirstSchool(allSchoolsByInBounds.get(0));
-        assertSecondSchool(allSchoolsByInBounds.get(1));
+	List<Long> longCriterias = new ArrayList<>();
+	longCriterias.add(0L);
+	longCriterias.add(1L);
+	List<School> allSchoolsByInBounds = cut.findAllSchoolsByInBounds("0", "3", "0", "3", longCriterias, false);
+	assertEquals(2, allSchoolsByInBounds.size());
+	assertFirstSchool(allSchoolsByInBounds.get(0));
+	assertSecondSchool(allSchoolsByInBounds.get(1));
     }
 
     @Test
     void testFindAllSchoolsByInBoundsMultipleRightCriteriasOneRightBoundExclusive() {
-        List<Long> longCriterias = new ArrayList<>();
-        longCriterias.add(0L);
-        longCriterias.add(1L);
-        List<School> allSchoolsByInBounds = cut.findAllSchoolsByInBounds("3.332", "3.334", "4.443",
-            "4.445", longCriterias, true);
-        assertEquals(1, allSchoolsByInBounds.size());
-        assertThirdSchool(allSchoolsByInBounds.get(0));
+	List<Long> longCriterias = new ArrayList<>();
+	longCriterias.add(0L);
+	longCriterias.add(1L);
+	List<School> allSchoolsByInBounds = cut.findAllSchoolsByInBounds("3.332", "3.334", "4.443", "4.445",
+		longCriterias, true);
+	assertEquals(1, allSchoolsByInBounds.size());
+	assertThirdSchool(allSchoolsByInBounds.get(0));
     }
 
     @Test
     void testFindAllSchoolsByInBoundsMultipleRightCriteriasLargeRightBoundExclusive() {
-        List<Long> longCriterias = new ArrayList<>();
-        longCriterias.add(0L);
-        longCriterias.add(1L);
-        List<School> allSchoolsByInBounds
-                = cut.findAllSchoolsByInBounds("0", "5", "0", "5", longCriterias, true);
-        assertEquals(1, allSchoolsByInBounds.size());
-        assertThirdSchool(allSchoolsByInBounds.get(0));
+	List<Long> longCriterias = new ArrayList<>();
+	longCriterias.add(0L);
+	longCriterias.add(1L);
+	List<School> allSchoolsByInBounds = cut.findAllSchoolsByInBounds("0", "5", "0", "5", longCriterias, true);
+	assertEquals(1, allSchoolsByInBounds.size());
+	assertThirdSchool(allSchoolsByInBounds.get(0));
     }
 
     @Test
     void testFindAllSchoolsByInBoundsNullCriteriasLargeRightBound() {
-        List<School> allSchoolsByInBounds
-                = cut.findAllSchoolsByInBounds("0", "3", "0", "3", null, false);
-        assertEquals(2, allSchoolsByInBounds.size());
-        assertFirstSchool(allSchoolsByInBounds.get(0));
-        assertSecondSchool(allSchoolsByInBounds.get(1));
+	List<School> allSchoolsByInBounds = cut.findAllSchoolsByInBounds("0", "3", "0", "3", null, false);
+	assertEquals(2, allSchoolsByInBounds.size());
+	assertFirstSchool(allSchoolsByInBounds.get(0));
+	assertSecondSchool(allSchoolsByInBounds.get(1));
     }
 
     @Test
     void testFindAllSchoolsByInBoundsEmptyCriteriasLargeRightBound() {
-        List<Long> longCriterias = new ArrayList<>();
-        List<School> allSchoolsByInBounds
-                = cut.findAllSchoolsByInBounds("0", "3", "0", "3", longCriterias, false);
-        assertEquals(2, allSchoolsByInBounds.size());
-        assertFirstSchool(allSchoolsByInBounds.get(0));
-        assertSecondSchool(allSchoolsByInBounds.get(1));
+	List<Long> longCriterias = new ArrayList<>();
+	List<School> allSchoolsByInBounds = cut.findAllSchoolsByInBounds("0", "3", "0", "3", longCriterias, false);
+	assertEquals(2, allSchoolsByInBounds.size());
+	assertFirstSchool(allSchoolsByInBounds.get(0));
+	assertSecondSchool(allSchoolsByInBounds.get(1));
     }
 
     @Test
     void testFindAllSchoolsByInBoundsNullCriteriasRightBounds() {
-        List<School> allSchoolsByInBounds
-                = cut.findAllSchoolsByInBounds("1.110", "1.113", "2.221", "2.223", null, false);
-        assertEquals(1, allSchoolsByInBounds.size());
-        assertFirstSchool(allSchoolsByInBounds.get(0));
+	List<School> allSchoolsByInBounds = cut.findAllSchoolsByInBounds("1.110", "1.113", "2.221", "2.223", null,
+		false);
+	assertEquals(1, allSchoolsByInBounds.size());
+	assertFirstSchool(allSchoolsByInBounds.get(0));
     }
 
     @Test
     void testFindSchoolDetails() {
-        ResponseEntity<School> findFirstSchoolDetails = cut.findSchoolDetails(0);
-        assertFirstSchool(findFirstSchoolDetails.getBody());
+	ResponseEntity<School> findFirstSchoolDetails = cut.findSchoolDetails(0);
+	assertFirstSchool(findFirstSchoolDetails.getBody());
     }
 
     @Test
     void testFindSchoolDetailsNoSchoolFound() {
-        ResponseEntity<School> findFirstSchoolDetails = cut.findSchoolDetails(5);
-        assertEquals(HttpStatus.NOT_FOUND, findFirstSchoolDetails.getStatusCode());
-        assertNull(findFirstSchoolDetails.getBody());
+	ResponseEntity<School> findFirstSchoolDetails = cut.findSchoolDetails(5);
+	assertEquals(HttpStatus.NOT_FOUND, findFirstSchoolDetails.getStatusCode());
+	assertNull(findFirstSchoolDetails.getBody());
     }
 
     @Test
     @Transactional
     void testAddNewSchoolAlreadyExisting() {
-        AddNewSchoolPostbody newSchool = new AddNewSchoolPostbody("testschool", 21, 12, "ff0000",
-                "", "", "", "", null, null);
-        assertThrows(ResourceAlreadyExistingException.class, () -> {
-            cut.addNewSchool(newSchool);
-        });
-        assertFirstSchool(schoolRepo.getOne(0L));
+	AddNewSchoolPostbody newSchool = new AddNewSchoolPostbody(SHORT_TESTSCHOOL, TESTSCHOOL, 21, 12, "ff0000", "",
+		"", "", "", null, null);
+	assertThrows(ResourceAlreadyExistingException.class, () -> {
+	    cut.addNewSchool(newSchool);
+	});
+	assertFirstSchool(schoolRepo.getOne(0L));
     }
 
     @Test
     @Transactional
     void testAlterSchoolNotExisting() {
-        AlterSchoolPostbody newSchool = new AlterSchoolPostbody(4, "testschool5", 21, 12, "ff0000",
-                "", "", "", "", null, null);
-        assertThrows(ResourceNotFoundException.class, () -> {
-            cut.alterSchool(newSchool);
-        });
-        assertFirstSchool(schoolRepo.getOne(0L));
+	AlterSchoolPostbody newSchool = new AlterSchoolPostbody(4, SHORT_NOT_EXISTING, TESTSCHOOL5, 21, 12, "ff0000",
+		"", "", "", "", null, null);
+	assertThrows(ResourceNotFoundException.class, () -> {
+	    cut.alterSchool(newSchool);
+	});
+	assertFirstSchool(schoolRepo.getOne(0L));
     }
 
     @Test
     void testAddNewSchoolNullPersonsNullCriterias() {
-        AddNewSchoolPostbody newSchool = new AddNewSchoolPostbody("testschool5", 21, 12, "ff0000",
-                "", "", "", "", null, null);
-        assertThrows(BadArgumentsException.class, () -> {
-            cut.addNewSchool(newSchool);
-        });
+	AddNewSchoolPostbody newSchool = new AddNewSchoolPostbody(SHORT_NOT_EXISTING, TESTSCHOOL5, 21, 12, "ff0000", "",
+		"", "", "", null, null);
+	assertThrows(BadArgumentsException.class, () -> {
+	    cut.addNewSchool(newSchool);
+	});
     }
 
     @Test
     void testAlterSchoolNullPersonsNullCriterias() {
-        AlterSchoolPostbody newSchool = new AlterSchoolPostbody(1, "testschool5", 21, 12, "", "",
-                "", "", "ff0000", null, null);
-        assertThrows(BadArgumentsException.class, () -> {
-            cut.alterSchool(newSchool);
-        });
+	AlterSchoolPostbody newSchool = new AlterSchoolPostbody(1, SHORT_NOT_EXISTING, TESTSCHOOL5, 21, 12, "", "", "",
+		"", "ff0000", null, null);
+	assertThrows(BadArgumentsException.class, () -> {
+	    cut.alterSchool(newSchool);
+	});
     }
 
     @Test
     void testAddNewSchoolNullColor() {
-        AddNewSchoolPostbody newSchool
-                = new AddNewSchoolPostbody("testschool5", 21, 12, null, "", "", "", "", null, null);
-        assertThrows(BadArgumentsException.class, () -> {
-            cut.addNewSchool(newSchool);
-        });
+	AddNewSchoolPostbody newSchool = new AddNewSchoolPostbody(SHORT_NOT_EXISTING, TESTSCHOOL5, 21, 12, null, "", "",
+		"", "", null, null);
+	assertThrows(BadArgumentsException.class, () -> {
+	    cut.addNewSchool(newSchool);
+	});
     }
 
     @Test
     void testAlterSchoolNullColor() {
-        AlterSchoolPostbody newSchool = new AlterSchoolPostbody(1, "testschool5", 21, 12, "", "",
-                "", "", null, null, null);
-        assertThrows(BadArgumentsException.class, () -> {
-            cut.alterSchool(newSchool);
-        });
+	AlterSchoolPostbody newSchool = new AlterSchoolPostbody(1, SHORT_NOT_EXISTING, TESTSCHOOL5, 21, 12, "", "", "",
+		"", null, null, null);
+	assertThrows(BadArgumentsException.class, () -> {
+	    cut.alterSchool(newSchool);
+	});
     }
 
     @Test
     void testAddNewSchoolEmptyColor() {
-        AddNewSchoolPostbody newSchool
-                = new AddNewSchoolPostbody("testschool5", 21, 12, "", "", "", "", "", null, null);
-        assertThrows(BadArgumentsException.class, () -> {
-            cut.addNewSchool(newSchool);
-        });
+	AddNewSchoolPostbody newSchool = new AddNewSchoolPostbody(SHORT_NOT_EXISTING, TESTSCHOOL5, 21, 12, "", "", "",
+		"", "", null, null);
+	assertThrows(BadArgumentsException.class, () -> {
+	    cut.addNewSchool(newSchool);
+	});
     }
 
     @Test
     void testAlterSchoolEmptyColor() {
-        AlterSchoolPostbody newSchool
-                = new AlterSchoolPostbody(1, "testschool5", 21, 12, "", "", "", "", "", null, null);
-        assertThrows(BadArgumentsException.class, () -> {
-            cut.alterSchool(newSchool);
-        });
+	AlterSchoolPostbody newSchool = new AlterSchoolPostbody(1, SHORT_NOT_EXISTING, TESTSCHOOL5, 21, 12, "", "", "",
+		"", "", null, null);
+	assertThrows(BadArgumentsException.class, () -> {
+	    cut.alterSchool(newSchool);
+	});
     }
 
     @Test
     void testAddNewSchoolColorNotMatchingRegex() {
-        AddNewSchoolPostbody newSchool = new AddNewSchoolPostbody("testschool5", 21, 12, "", "", "",
-                "", "schoolfinder", null, null);
-        assertThrows(BadArgumentsException.class, () -> {
-            cut.addNewSchool(newSchool);
-        });
+	AddNewSchoolPostbody newSchool = new AddNewSchoolPostbody(SHORT_NOT_EXISTING, TESTSCHOOL5, 21, 12, "", "", "",
+		"", "schoolfinder", null, null);
+	assertThrows(BadArgumentsException.class, () -> {
+	    cut.addNewSchool(newSchool);
+	});
     }
 
     @Test
     void testAlterSchoolColorNotMatchingHexRegex() {
-        AlterSchoolPostbody newSchool = new AlterSchoolPostbody(1, "testschool5", 21, 12, "", "",
-                "", "", "schoolfinder", null, null);
-        assertThrows(BadArgumentsException.class, () -> {
-            cut.alterSchool(newSchool);
-        });
+	AlterSchoolPostbody newSchool = new AlterSchoolPostbody(1, SHORT_NOT_EXISTING, TESTSCHOOL5, 21, 12, "", "", "",
+		"", "schoolfinder", null, null);
+	assertThrows(BadArgumentsException.class, () -> {
+	    cut.alterSchool(newSchool);
+	});
     }
 
     @Test
     void testAddNewSchoolNullPersonsNotNullCriterias() {
-        List<Criteria> criterias = new ArrayList<>();
-        String testcriteria = "test5";
-        criterias.add(new Criteria(testcriteria));
-        AddNewSchoolPostbody newSchool = new AddNewSchoolPostbody("testschool5", 21, 12, "ff0000",
-                "", "", "", "", null, criterias);
-        assertThrows(BadArgumentsException.class, () -> {
-            cut.addNewSchool(newSchool);
-        });
-        List<Criteria> allCriterias = criteriaRepo.findAll();
-        assertFalse(allCriterias.stream().anyMatch(e -> e.getCriteriaName().equals(testcriteria)));
+	List<Criteria> criterias = new ArrayList<>();
+	String testcriteria = "test5";
+	criterias.add(new Criteria(testcriteria));
+	AddNewSchoolPostbody newSchool = new AddNewSchoolPostbody(SHORT_NOT_EXISTING, TESTSCHOOL5, 21, 12, "ff0000", "",
+		"", "", "", null, criterias);
+	assertThrows(BadArgumentsException.class, () -> {
+	    cut.addNewSchool(newSchool);
+	});
+	List<Criteria> allCriterias = criteriaRepo.findAll();
+	assertFalse(allCriterias.stream().anyMatch(e -> e.getCriteriaName().equals(testcriteria)));
     }
 
     @Test
     void testAlterSchoolNullPersonsNotNullCriterias() {
-        List<Criteria> criterias = new ArrayList<>();
-        String testcriteria = "test5";
-        criterias.add(new Criteria(testcriteria));
-        AlterSchoolPostbody newSchool = new AlterSchoolPostbody(1, "testschool", 21, 12, "", "", "",
-                "", "ff0000", null, criterias);
-        assertThrows(BadArgumentsException.class, () -> {
-            cut.alterSchool(newSchool);
-        });
-        List<Criteria> allCriterias = criteriaRepo.findAll();
-        assertFalse(allCriterias.stream().anyMatch(e -> e.getCriteriaName().equals(testcriteria)));
+	List<Criteria> criterias = new ArrayList<>();
+	String testcriteria = "test5";
+	criterias.add(new Criteria(testcriteria));
+	AlterSchoolPostbody newSchool = new AlterSchoolPostbody(1, SHORT_TESTSCHOOL, TESTSCHOOL, 21, 12, "", "", "", "",
+		"ff0000", null, criterias);
+	assertThrows(BadArgumentsException.class, () -> {
+	    cut.alterSchool(newSchool);
+	});
+	List<Criteria> allCriterias = criteriaRepo.findAll();
+	assertFalse(allCriterias.stream().anyMatch(e -> e.getCriteriaName().equals(testcriteria)));
     }
 
     @Test
     void testAddNewSchoolNotNullNotExistingPersonNotNullCriterias() {
-        List<PersonFunctionalityEntity> personFuncList = new ArrayList<>();
-        List<Criteria> criterias = new ArrayList<>();
-        String testcriteria = "test5";
-        criterias.add(new Criteria(testcriteria));
-        String testschool = "testschool5";
-        PersonFunctionalityEntity personFunctionalityEntity = new PersonFunctionalityEntity();
-        Person person = new Person();
-        person.setId(5L);
-        personFunctionalityEntity.setPerson(person);
-        personFuncList.add(personFunctionalityEntity);
-        AddNewSchoolPostbody newSchool = new AddNewSchoolPostbody(testschool, 21, 12, "ff0000", "",
-                "", "", "", personFuncList, criterias);
-        assertThrows(ResourceNotFoundException.class, () -> {
-            cut.addNewSchool(newSchool);
-        });
-        List<Criteria> allCriterias = criteriaRepo.findAll();
-        List<School> allSchools = schoolRepo.findAll();
-        assertFalse(allCriterias.stream().anyMatch(e -> e.getCriteriaName().equals(testcriteria)));
-        assertFalse(allSchools.stream().anyMatch(e -> e.getSchoolName().equals(testschool)));
+	List<PersonFunctionalityEntity> personFuncList = new ArrayList<>();
+	List<Criteria> criterias = new ArrayList<>();
+	String testcriteria = "test5";
+	criterias.add(new Criteria(testcriteria));
+	String testschool = TESTSCHOOL5;
+	PersonFunctionalityEntity personFunctionalityEntity = new PersonFunctionalityEntity();
+	Person person = new Person();
+	person.setId(5L);
+	personFunctionalityEntity.setPerson(person);
+	personFuncList.add(personFunctionalityEntity);
+	AddNewSchoolPostbody newSchool = new AddNewSchoolPostbody(SHORT_TESTSCHOOL, testschool, 21, 12, "ff0000", "",
+		"", "", "", personFuncList, criterias);
+	assertThrows(ResourceNotFoundException.class, () -> {
+	    cut.addNewSchool(newSchool);
+	});
+	List<Criteria> allCriterias = criteriaRepo.findAll();
+	List<School> allSchools = schoolRepo.findAll();
+	assertFalse(allCriterias.stream().anyMatch(e -> e.getCriteriaName().equals(testcriteria)));
+	assertFalse(allSchools.stream().anyMatch(e -> e.getSchoolName().equals(testschool)));
     }
 
     @Test
     void testAlterSchoolNotNullNotExistingPersonNotNullCriterias() {
-        List<PersonFunctionalityEntity> personFuncList = new ArrayList<>();
-        List<Criteria> criterias = new ArrayList<>();
-        String testcriteria = "test5";
-        criterias.add(new Criteria(testcriteria));
-        String testschool = "testschool5";
-        PersonFunctionalityEntity personFunctionalityEntity = new PersonFunctionalityEntity();
-        Person person = new Person();
-        person.setId(5L);
-        personFunctionalityEntity.setPerson(person);
-        personFuncList.add(personFunctionalityEntity);
-        AlterSchoolPostbody newSchool = new AlterSchoolPostbody(1, testschool, 21, 12, "", "", "",
-                "", "ff0000", personFuncList, criterias);
-        assertThrows(ResourceNotFoundException.class, () -> {
-            cut.alterSchool(newSchool);
-        });
-        List<Criteria> allCriterias = criteriaRepo.findAll();
-        List<School> allSchools = schoolRepo.findAll();
-        assertFalse(allCriterias.stream().anyMatch(e -> e.getCriteriaName().equals(testcriteria)));
-        assertFalse(allSchools.stream().anyMatch(e -> e.getSchoolName().equals(testschool)));
+	List<PersonFunctionalityEntity> personFuncList = new ArrayList<>();
+	List<Criteria> criterias = new ArrayList<>();
+	String testcriteria = "test5";
+	criterias.add(new Criteria(testcriteria));
+	String testschool = TESTSCHOOL5;
+	PersonFunctionalityEntity personFunctionalityEntity = new PersonFunctionalityEntity();
+	Person person = new Person();
+	person.setId(5L);
+	personFunctionalityEntity.setPerson(person);
+	personFuncList.add(personFunctionalityEntity);
+	AlterSchoolPostbody newSchool = new AlterSchoolPostbody(1, SHORT_TESTSCHOOL, testschool, 21, 12, "", "", "", "",
+		"ff0000", personFuncList, criterias);
+	assertThrows(ResourceNotFoundException.class, () -> {
+	    cut.alterSchool(newSchool);
+	});
+	List<Criteria> allCriterias = criteriaRepo.findAll();
+	List<School> allSchools = schoolRepo.findAll();
+	assertFalse(allCriterias.stream().anyMatch(e -> e.getCriteriaName().equals(testcriteria)));
+	assertFalse(allSchools.stream().anyMatch(e -> e.getSchoolName().equals(testschool)));
     }
 
     @Test
     @Transactional
     void testAddNewSchoolNotNullExistingPersonNotEmptyFunctionalityNotNullCriterias() {
-        List<PersonFunctionalityEntity> personFuncList = new ArrayList<>();
-        List<Criteria> criterias = new ArrayList<>();
-        String testcriteria = "test5";
-        criterias.add(new Criteria(testcriteria));
-        String testschool = "testschool5";
-        PersonFunctionalityEntity personFunctionalityEntity = new PersonFunctionalityEntity();
-        Person person = new Person();
-        person.setId(0L);
-        personFunctionalityEntity.setPerson(person);
-        personFunctionalityEntity.setFunctionality(PersonFunctionality.XR);
-        personFuncList.add(personFunctionalityEntity);
-        AddNewSchoolPostbody newSchool = new AddNewSchoolPostbody(testschool, 21, 12, "ff0000", "",
-                "", "", "", personFuncList, criterias);
-        ResponseEntity<School> responseEntity = cut.addNewSchool(newSchool);
-        List<Criteria> allCriterias = criteriaRepo.findAll();
-        List<School> allSchools = schoolRepo.findAll();
-        assertTrue(allCriterias.stream().anyMatch(e -> e.getCriteriaName().equals(testcriteria)));
-        Stream<School> schoolInDB = findMatchingSchool(testschool, allSchools);
-        assertEquals(1, schoolInDB.count());
-        schoolInDB = findMatchingSchool(testschool, allSchools);
-        School schoolObject = schoolInDB.findFirst().get();
-        assertEquals(0L,
-            schoolObject.getPersonSchoolMapping().get(0).getPerson().getId().longValue());
-        assertEquals(PersonFunctionality.XR,
-            schoolObject.getPersonSchoolMapping().get(0).getFunctionality());
+	List<PersonFunctionalityEntity> personFuncList = new ArrayList<>();
+	List<Criteria> criterias = new ArrayList<>();
+	String testcriteria = "test5";
+	criterias.add(new Criteria(testcriteria));
+	String testschool = TESTSCHOOL5;
+	PersonFunctionalityEntity personFunctionalityEntity = new PersonFunctionalityEntity();
+	Person person = new Person();
+	person.setId(0L);
+	personFunctionalityEntity.setPerson(person);
+	personFunctionalityEntity.setFunctionality(PersonFunctionality.XR);
+	personFuncList.add(personFunctionalityEntity);
+	AddNewSchoolPostbody newSchool = new AddNewSchoolPostbody(SHORT_TESTSCHOOL, testschool, 21, 12, "ff0000", "",
+		"", "", "", personFuncList, criterias);
+	ResponseEntity<School> responseEntity = cut.addNewSchool(newSchool);
+	List<Criteria> allCriterias = criteriaRepo.findAll();
+	List<School> allSchools = schoolRepo.findAll();
+	assertTrue(allCriterias.stream().anyMatch(e -> e.getCriteriaName().equals(testcriteria)));
+	Stream<School> schoolInDB = findMatchingSchool(testschool, allSchools);
+	assertEquals(1, schoolInDB.count());
+	schoolInDB = findMatchingSchool(testschool, allSchools);
+	School schoolObject = schoolInDB.findFirst().get();
+	assertEquals(0L, schoolObject.getPersonSchoolMapping().get(0).getPerson().getId().longValue());
+	assertEquals(PersonFunctionality.XR, schoolObject.getPersonSchoolMapping().get(0).getFunctionality());
+	assertSchoolEquals(responseEntity.getBody(), newSchool);
 
     }
 
     @Test
     @Transactional
     void testAlterSchoolNotNullExistingPersonAndAlreadyAddedPersonNotEmptyFunctionalityNotNullCriterias() {
-        List<PersonFunctionalityEntity> personFuncList = new ArrayList<>();
-        List<Criteria> criterias = new ArrayList<>();
-        String testcriteria = "test5";
-        criterias.add(new Criteria(testcriteria));
-        String testschool = "testschool5";
-        PersonFunctionalityEntity personFunctionalityEntity = new PersonFunctionalityEntity();
-        Person person = new Person();
-        person.setId(0L);
-        personFunctionalityEntity.setPerson(person);
-        personFunctionalityEntity.setFunctionality(PersonFunctionality.XR);
-        personFuncList.add(personFunctionalityEntity);
-        AlterSchoolPostbody newSchool = new AlterSchoolPostbody(2, testschool, 1, 2, "1", "", "",
-                "", "ff0000", personFuncList, criterias);
-        ResponseEntity<School> responseEntity = cut.alterSchool(newSchool);
-        List<Criteria> allCriterias = criteriaRepo.findAll();
-        List<School> allSchools = schoolRepo.findAll();
-        assertTrue(allCriterias.stream().anyMatch(e -> e.getCriteriaName().equals(testcriteria)));
-        Stream<School> schoolInDB = findMatchingSchool(testschool, allSchools);
-        assertEquals(1, schoolInDB.count());
-        schoolInDB = findMatchingSchool(testschool, allSchools);
-        School schoolObject = schoolInDB.findFirst().get();
-        assertEquals(0L,
-            schoolObject.getPersonSchoolMapping().get(0).getPerson().getId().longValue());
-        assertEquals(PersonFunctionality.XR,
-            schoolObject.getPersonSchoolMapping().get(0).getFunctionality());
-        assertEquals(testschool, schoolObject.getSchoolName());
-        assertEquals(3.333, schoolObject.getLatitude().doubleValue(), 0.000001);
-        assertEquals(4.444, schoolObject.getLongitude().doubleValue(), 0.000001);
-        assertEquals("1", schoolObject.getSchoolPicture());
+	List<PersonFunctionalityEntity> personFuncList = new ArrayList<>();
+	List<Criteria> criterias = new ArrayList<>();
+	String testcriteria = "test5";
+	criterias.add(new Criteria(testcriteria));
+	String testschool = TESTSCHOOL5;
+	PersonFunctionalityEntity personFunctionalityEntity = new PersonFunctionalityEntity();
+	Person person = new Person();
+	person.setId(0L);
+	personFunctionalityEntity.setPerson(person);
+	personFunctionalityEntity.setFunctionality(PersonFunctionality.XR);
+	personFuncList.add(personFunctionalityEntity);
+	AlterSchoolPostbody newSchool = new AlterSchoolPostbody(2, SHORT_TESTSCHOOL, testschool, 1, 2, "1", "", "", "",
+		"ff0000", personFuncList, criterias);
+	ResponseEntity<School> responseEntity = cut.alterSchool(newSchool);
+	List<Criteria> allCriterias = criteriaRepo.findAll();
+	List<School> allSchools = schoolRepo.findAll();
+	assertTrue(allCriterias.stream().anyMatch(e -> e.getCriteriaName().equals(testcriteria)));
+	Stream<School> schoolInDB = findMatchingSchool(testschool, allSchools);
+	assertEquals(1, schoolInDB.count());
+	schoolInDB = findMatchingSchool(testschool, allSchools);
+	School schoolObject = schoolInDB.findFirst().get();
+	assertEquals(0L, schoolObject.getPersonSchoolMapping().get(0).getPerson().getId().longValue());
+	assertEquals(PersonFunctionality.XR, schoolObject.getPersonSchoolMapping().get(0).getFunctionality());
+	assertEquals(testschool, schoolObject.getSchoolName());
+	assertEquals(3.333, schoolObject.getLatitude().doubleValue(), 0.000001);
+	assertEquals(4.444, schoolObject.getLongitude().doubleValue(), 0.000001);
+	assertEquals("1", schoolObject.getSchoolPicture());
+	assertEquals(SHORT_TESTSCHOOL, schoolObject.getShortSchoolName());
     }
 
     @Test
     @Transactional
     void testAlterSchoolNotNullExistingPersonNotEmptyFunctionalityNotNullCriterias() {
-        List<PersonFunctionalityEntity> personFuncList = new ArrayList<>();
-        List<Criteria> criterias = new ArrayList<>();
-        String testcriteria = "test5";
-        criterias.add(new Criteria(testcriteria));
-        String testschool = "testschool5";
-        PersonFunctionalityEntity personFunctionalityEntity = new PersonFunctionalityEntity();
-        Person person = new Person();
-        person.setId(1L);
-        personFunctionalityEntity.setPerson(person);
-        personFunctionalityEntity.setFunctionality(PersonFunctionality.XR);
-        personFuncList.add(personFunctionalityEntity);
-        AlterSchoolPostbody newSchool = new AlterSchoolPostbody(2, testschool, 1, 2, "1", "", "",
-                "", "ff0000", personFuncList, criterias);
-        ResponseEntity<School> responseEntity = cut.alterSchool(newSchool);
-        List<Criteria> allCriterias = criteriaRepo.findAll();
-        List<School> allSchools = schoolRepo.findAll();
-        assertTrue(allCriterias.stream().anyMatch(e -> e.getCriteriaName().equals(testcriteria)));
-        Stream<School> schoolInDB = findMatchingSchool(testschool, allSchools);
-        assertEquals(1, schoolInDB.count());
-        schoolInDB = findMatchingSchool(testschool, allSchools);
-        School schoolObject = schoolInDB.findFirst().get();
-        assertEquals(1L,
-            schoolObject.getPersonSchoolMapping().get(0).getPerson().getId().longValue());
-        assertEquals(PersonFunctionality.XR,
-            schoolObject.getPersonSchoolMapping().get(0).getFunctionality());
-        assertEquals(testschool, schoolObject.getSchoolName());
-        assertEquals(3.333, schoolObject.getLatitude().doubleValue(), 0.000001);
-        assertEquals(4.444, schoolObject.getLongitude().doubleValue(), 0.000001);
-        assertEquals("1", schoolObject.getSchoolPicture());
+	List<PersonFunctionalityEntity> personFuncList = new ArrayList<>();
+	List<Criteria> criterias = new ArrayList<>();
+	String testcriteria = "test5";
+	criterias.add(new Criteria(testcriteria));
+	String testschool = TESTSCHOOL5;
+	PersonFunctionalityEntity personFunctionalityEntity = new PersonFunctionalityEntity();
+	Person person = new Person();
+	person.setId(1L);
+	personFunctionalityEntity.setPerson(person);
+	personFunctionalityEntity.setFunctionality(PersonFunctionality.XR);
+	personFuncList.add(personFunctionalityEntity);
+	AlterSchoolPostbody newSchool = new AlterSchoolPostbody(2, SHORT_TESTSCHOOL, testschool, 1, 2, "1", "", "", "",
+		"ff0000", personFuncList, criterias);
+	ResponseEntity<School> responseEntity = cut.alterSchool(newSchool);
+	List<Criteria> allCriterias = criteriaRepo.findAll();
+	List<School> allSchools = schoolRepo.findAll();
+	assertTrue(allCriterias.stream().anyMatch(e -> e.getCriteriaName().equals(testcriteria)));
+	Stream<School> schoolInDB = findMatchingSchool(testschool, allSchools);
+	assertEquals(1, schoolInDB.count());
+	schoolInDB = findMatchingSchool(testschool, allSchools);
+	School schoolObject = schoolInDB.findFirst().get();
+	assertEquals(1L, schoolObject.getPersonSchoolMapping().get(0).getPerson().getId().longValue());
+	assertEquals(PersonFunctionality.XR, schoolObject.getPersonSchoolMapping().get(0).getFunctionality());
+	assertEquals(testschool, schoolObject.getSchoolName());
+	assertEquals(3.333, schoolObject.getLatitude().doubleValue(), 0.000001);
+	assertEquals(4.444, schoolObject.getLongitude().doubleValue(), 0.000001);
+	assertEquals("1", schoolObject.getSchoolPicture());
+	assertEquals(SHORT_TESTSCHOOL, schoolObject.getShortSchoolName());
+
     }
 
     @Test
     void testAddNewSchoolNotNullExistingPersonEmptyFunctionalityNotNullCriterias() {
-        List<PersonFunctionalityEntity> personFuncList = new ArrayList<>();
-        List<Criteria> criterias = new ArrayList<>();
-        String testcriteria = "test5";
-        criterias.add(new Criteria(testcriteria));
-        String testschool = "testschool5";
-        PersonFunctionalityEntity personFunctionalityEntity = new PersonFunctionalityEntity();
-        Person person = new Person();
-        person.setId(0L);
-        personFunctionalityEntity.setPerson(person);
-        personFuncList.add(personFunctionalityEntity);
-        AddNewSchoolPostbody newSchool = new AddNewSchoolPostbody(testschool, 21, 12, "", "", "",
-                "", "ff0000", personFuncList, criterias);
-        assertThrows(BadArgumentsException.class, () -> {
-            cut.addNewSchool(newSchool);
-        });
-        List<Criteria> allCriterias = criteriaRepo.findAll();
-        List<School> allSchools = schoolRepo.findAll();
-        assertFalse(allCriterias.stream().anyMatch(e -> e.getCriteriaName().equals(testcriteria)));
-        assertFalse(allSchools.stream().anyMatch(e -> e.getSchoolName().equals(testschool)));
+	List<PersonFunctionalityEntity> personFuncList = new ArrayList<>();
+	List<Criteria> criterias = new ArrayList<>();
+	String testcriteria = "test5";
+	criterias.add(new Criteria(testcriteria));
+	String testschool = TESTSCHOOL5;
+	PersonFunctionalityEntity personFunctionalityEntity = new PersonFunctionalityEntity();
+	Person person = new Person();
+	person.setId(0L);
+	personFunctionalityEntity.setPerson(person);
+	personFuncList.add(personFunctionalityEntity);
+	AddNewSchoolPostbody newSchool = new AddNewSchoolPostbody(SHORT_TESTSCHOOL, testschool, 21, 12, "", "", "", "",
+		"ff0000", personFuncList, criterias);
+	assertThrows(BadArgumentsException.class, () -> {
+	    cut.addNewSchool(newSchool);
+	});
+	List<Criteria> allCriterias = criteriaRepo.findAll();
+	List<School> allSchools = schoolRepo.findAll();
+	assertFalse(allCriterias.stream().anyMatch(e -> e.getCriteriaName().equals(testcriteria)));
+	assertFalse(allSchools.stream().anyMatch(e -> e.getSchoolName().equals(testschool)));
+
     }
 
     @Test
     void testAlterSchoolNotNullExistingPersonEmptyFunctionalityNotNullCriterias() {
-        List<PersonFunctionalityEntity> personFuncList = new ArrayList<>();
-        List<Criteria> criterias = new ArrayList<>();
-        String testcriteria = "test5";
-        criterias.add(new Criteria(testcriteria));
-        String testschool = "testschool5";
-        PersonFunctionalityEntity personFunctionalityEntity = new PersonFunctionalityEntity();
-        Person person = new Person();
-        person.setId(0L);
-        personFunctionalityEntity.setPerson(person);
-        personFuncList.add(personFunctionalityEntity);
-        AlterSchoolPostbody newSchool = new AlterSchoolPostbody(2, testschool, 1, 2, "1", "", "",
-                "", "ff0000", personFuncList, criterias);
-        assertThrows(BadArgumentsException.class, () -> {
-            cut.alterSchool(newSchool);
-        });
-        List<Criteria> allCriterias = criteriaRepo.findAll();
-        List<School> allSchools = schoolRepo.findAll();
-        assertFalse(allCriterias.stream().anyMatch(e -> e.getCriteriaName().equals(testcriteria)));
-        assertFalse(allSchools.stream().anyMatch(e -> e.getSchoolName().equals(testschool)));
+	List<PersonFunctionalityEntity> personFuncList = new ArrayList<>();
+	List<Criteria> criterias = new ArrayList<>();
+	String testcriteria = "test5";
+	criterias.add(new Criteria(testcriteria));
+	String testschool = TESTSCHOOL5;
+	PersonFunctionalityEntity personFunctionalityEntity = new PersonFunctionalityEntity();
+	Person person = new Person();
+	person.setId(0L);
+	personFunctionalityEntity.setPerson(person);
+	personFuncList.add(personFunctionalityEntity);
+	AlterSchoolPostbody newSchool = new AlterSchoolPostbody(2, SHORT_TESTSCHOOL, testschool, 1, 2, "1", "", "", "",
+		"ff0000", personFuncList, criterias);
+	assertThrows(BadArgumentsException.class, () -> {
+	    cut.alterSchool(newSchool);
+	});
+	List<Criteria> allCriterias = criteriaRepo.findAll();
+	List<School> allSchools = schoolRepo.findAll();
+	assertFalse(allCriterias.stream().anyMatch(e -> e.getCriteriaName().equals(testcriteria)));
+	assertFalse(allSchools.stream().anyMatch(e -> e.getSchoolName().equals(testschool)));
     }
 
     private Stream<School> findMatchingSchool(String testschool, List<School> allSchools) {
-        return allSchools.stream().filter(e -> (e.getSchoolName().equals(testschool)));
+	return allSchools.stream().filter(e -> (e.getSchoolName().equals(testschool)));
     }
 
     private void assertFirstSchool(School school) {
-        assertEquals("testschool", school.getSchoolName());
-        assertEquals(1.111, school.getLatitude().doubleValue(), 0.001);
-        assertEquals(2.222, school.getLongitude().doubleValue(), 0.001);
-        assertEquals("0x00", school.getSchoolPicture());
-        assertEquals("text1", school.getAlternativePictureText());
-        assertEquals("ff0000", school.getColor());
+	assertEquals(TESTSCHOOL, school.getSchoolName());
+	assertEquals(SHORT_TESTSCHOOL, school.getShortSchoolName());
+	assertEquals(1.111, school.getLatitude().doubleValue(), 0.001);
+	assertEquals(2.222, school.getLongitude().doubleValue(), 0.001);
+	assertEquals("0x00", school.getSchoolPicture());
+	assertEquals("text1", school.getAlternativePictureText());
+	assertEquals("ff0000", school.getColor());
+    }
+
+    private void assertSchoolEquals(School school, AddNewSchoolPostbody postbody) {
+	assertEquals(postbody.getSchoolName(), school.getSchoolName());
+	assertEquals(postbody.getShortSchoolName(), school.getShortSchoolName());
+	assertEquals(postbody.getLatitude(), school.getLatitude().doubleValue(), 0.001);
+	assertEquals(postbody.getLongitude(), school.getLongitude().doubleValue(), 0.001);
+	assertEquals(postbody.getSchoolPicture(), school.getSchoolPicture());
+	assertEquals(postbody.getAlternativePictureText(), school.getAlternativePictureText());
+	assertEquals(postbody.getColor(), school.getColor());
     }
 
     private void assertSecondSchool(School school) {
-        assertEquals("testschool2", school.getSchoolName());
-        assertEquals(2.222, school.getLatitude().doubleValue(), 0.001);
-        assertEquals(1.111, school.getLongitude().doubleValue(), 0.001);
-        assertEquals("text2", school.getAlternativePictureText());
-        assertEquals("0xFF", school.getSchoolPicture());
+	assertEquals("testschool2", school.getSchoolName());
+	assertEquals("shortTestschool2", school.getShortSchoolName());
+	assertEquals(2.222, school.getLatitude().doubleValue(), 0.001);
+	assertEquals(1.111, school.getLongitude().doubleValue(), 0.001);
+	assertEquals("text2", school.getAlternativePictureText());
+	assertEquals("0xFF", school.getSchoolPicture());
     }
 
     private void assertThirdSchool(School school) {
-        assertEquals("testschool3", school.getSchoolName());
-        assertEquals(3.333, school.getLatitude().doubleValue(), 0.001);
-        assertEquals(4.444, school.getLongitude().doubleValue(), 0.001);
-        assertEquals("0xAF", school.getSchoolPicture());
-        assertEquals("text3", school.getAlternativePictureText());
+	assertEquals("testschool3", school.getSchoolName());
+	assertEquals("shortTestschool3", school.getShortSchoolName());
+	assertEquals(3.333, school.getLatitude().doubleValue(), 0.001);
+	assertEquals(4.444, school.getLongitude().doubleValue(), 0.001);
+	assertEquals("0xAF", school.getSchoolPicture());
+	assertEquals("text3", school.getAlternativePictureText());
 
     }
 }
