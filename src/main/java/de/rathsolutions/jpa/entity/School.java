@@ -55,7 +55,6 @@ public class School {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NonNull
     private String shortSchoolName;
     
     @NonNull
@@ -82,4 +81,12 @@ public class School {
     @JoinTable(name = "school_criteria_mapping", joinColumns = @JoinColumn(name = "school_id"), inverseJoinColumns = @JoinColumn(name = "criteria_id"))
     private List<Criteria> matchingCriterias;
 
+    public School(String shortSchoolName, String schoolName, Double latitude, Double longitude, List<Criteria> matchingCriterias) {
+	this.shortSchoolName = shortSchoolName;
+	this.schoolName = schoolName;
+	this.latitude = latitude;
+	this.longitude = longitude;
+	this.matchingCriterias = matchingCriterias;
+    }
+    
 }
