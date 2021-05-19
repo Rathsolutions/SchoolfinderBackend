@@ -35,6 +35,8 @@ import lombok.Setter;
 @AllArgsConstructor
 public class AddNewSchoolPostbody {
 
+    protected String shortSchoolName;
+    
     protected String schoolName;
 
     protected double latitude;

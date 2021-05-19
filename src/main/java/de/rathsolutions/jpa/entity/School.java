@@ -56,6 +56,9 @@ public class School {
     private Long id;
 
     @NonNull
+    private String shortSchoolName;
+    
+    @NonNull
     private String schoolName;
     @NonNull
     private Double latitude;
