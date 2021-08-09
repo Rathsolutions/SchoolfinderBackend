@@ -37,7 +37,6 @@ import de.rathsolutions.util.exception.ResourceAlreadyExistingException;
 import de.rathsolutions.util.exception.ResourceNotFoundException;
 import de.rathsolutions.util.osm.pojo.OsmPOIEntity;
 import de.rathsolutions.util.osm.pojo.SchoolSearchEntity;
-import de.rathsolutions.util.osm.specific.OsmPOICityOnlyParser;
 import de.rathsolutions.util.osm.specific.OsmPOISchoolParser;
 import io.swagger.v3.oas.annotations.Operation;
 import java.io.IOException;
@@ -47,7 +46,6 @@ import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 import javassist.NotFoundException;
-
 import javax.naming.OperationNotSupportedException;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
@@ -250,7 +248,7 @@ public class SchoolController {
 		throw new BadArgumentsException(e);
 	    }
 	    PersonSchoolMapping personSchoolMapping = new PersonSchoolMapping(personById.get(), matchingSchool,
-		    e.getFunctionality());
+		    e.getFunctionality().toString());
 	    matchingSchool.getPersonSchoolMapping().add(personSchoolMapping);
 	});
     }

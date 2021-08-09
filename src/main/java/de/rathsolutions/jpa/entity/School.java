@@ -33,15 +33,14 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.Lob;
 import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
-
-import org.hibernate.annotations.Type;
-
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.Type;
 
 @Entity
 @Getter
@@ -56,7 +55,7 @@ public class School {
     private Long id;
 
     private String shortSchoolName;
-    
+
     @NonNull
     private String schoolName;
     @NonNull
@@ -73,20 +72,23 @@ public class School {
     private String schoolPicture;
     @Type(type = "text")
     private String alternativePictureText;
-    @OneToMany(cascade = {
-            CascadeType.ALL }, fetch = FetchType.LAZY, mappedBy = "school", orphanRemoval = true)
+    @OneToMany(cascade = { CascadeType.ALL }, fetch = FetchType.LAZY, mappedBy = "school", orphanRemoval = true)
     private List<PersonSchoolMapping> personSchoolMapping = new ArrayList<>();
     @NonNull
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "school_criteria_mapping", joinColumns = @JoinColumn(name = "school_id"), inverseJoinColumns = @JoinColumn(name = "criteria_id"))
     private List<Criteria> matchingCriterias;
 
-    public School(String shortSchoolName, String schoolName, Double latitude, Double longitude, List<Criteria> matchingCriterias) {
+    @ManyToOne
+    private Project project;
+
+    public School(String shortSchoolName, String schoolName, Double latitude, Double longitude,
+	    List<Criteria> matchingCriterias) {
 	this.shortSchoolName = shortSchoolName;
 	this.schoolName = schoolName;
 	this.latitude = latitude;
 	this.longitude = longitude;
 	this.matchingCriterias = matchingCriterias;
     }
-    
+
 }
