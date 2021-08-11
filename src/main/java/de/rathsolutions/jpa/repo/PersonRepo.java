@@ -33,18 +33,17 @@ import de.rathsolutions.jpa.entity.Person;
 @Repository
 public interface PersonRepo extends JpaRepository<Person, Long> {
 
-    public Optional<Person> findByPrenameAndLastnameAndEmailAndPhoneNumber(String prename,
-            String lastname, String email, String phoneNumber);
+    public Optional<Person> findByPrenameAndLastnameAndEmailAndPhoneNumber(String prename, String lastname,
+	    String email, String phoneNumber);
 
     public Optional<Person> findByEmail(String email);
 
     public Optional<Person> findByPrenameAndLastname(String prename, String lastname);
 
-    public Optional<Person> findByPrenameAndLastnameAndEmail(String prename, String lastname,
-            String email);
+    public Optional<Person> findByPrenameAndLastnameAndEmail(String prename, String lastname, String email);
 
-    public boolean existsByPrenameAndLastnameAndEmailAndPhoneNumber(String prename, String lastname,
-            String email, String phonenumber);
+    public boolean existsByPrenameAndLastnameAndEmailAndPhoneNumber(String prename, String lastname, String email,
+	    String phonenumber);
 
     public int countByEmail(String email);
 
@@ -52,6 +51,6 @@ public interface PersonRepo extends JpaRepository<Person, Long> {
 
     public int countByPrenameAndLastnameAndEmail(String prename, String lastname, String email);
 
-    public List<Person> findByPrenameAndLastnameAndEmailContaining(String prename, String lastname,
-            String email, Pageable page);
+    public List<Person> findByPrenameAndLastnameAndEmailContaining(String prename, String lastname, String email,
+	    Pageable page);
 }
