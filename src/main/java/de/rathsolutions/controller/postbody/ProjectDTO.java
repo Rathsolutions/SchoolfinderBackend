@@ -1,8 +1,8 @@
 /*-
  * #%L
- * SchuglemapsBackend
+ * SchoolfinderBackend
  * %%
- * Copyright (C) 2020 Rathsolutions. <info@rathsolutions.de>
+ * Copyright (C) 2020 - 2021 Rathsolutions. <info@rathsolutions.de>
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
@@ -21,41 +21,22 @@
  */
 package de.rathsolutions.controller.postbody;
 
-import java.util.List;
-
-import de.rathsolutions.jpa.entity.Criteria;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 
 @Getter
 @Setter
-@NoArgsConstructor
 @AllArgsConstructor
-public class AddNewSchoolPostbody {
+@NoArgsConstructor
+@ToString
+public class ProjectDTO {
 
-    protected String shortSchoolName;
+    private String id;
 
-    protected String schoolName;
+    private String name;
 
-    protected double latitude;
-
-    protected double longitude;
-
-    protected String color;
-
-    protected String schoolPicture;
-
-    protected String alternativePictureText;
-
-    protected String arContent;
-
-    protected String makerspaceContent;
-
-    protected List<PersonFunctionalityEntity> personSchoolMapping;
-
-    protected List<Criteria> matchingCriterias;
-
-    protected List<ProjectDTO> projects;
+    private String icon;
 }

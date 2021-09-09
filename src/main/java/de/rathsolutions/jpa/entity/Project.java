@@ -21,31 +21,58 @@
  */
 package de.rathsolutions.jpa.entity;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
 import javax.persistence.Lob;
-import javax.persistence.OneToMany;
+import javax.persistence.ManyToMany;
 
+import de.rathsolutions.controller.postbody.ProjectDTO;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
 @Entity
 @Getter
 @Setter
+@NoArgsConstructor
+@RequiredArgsConstructor
 public class Project {
 
     @Id
     @GeneratedValue
     private long id;
 
+    @NonNull
+    @Column(unique = true)
     private String projectName;
 
+    @NonNull
     @Lob
     private String defaultIcon;
 
-    @OneToMany(mappedBy = "project")
-    private List<School> allSchools;
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(name = "school_project_mapping", joinColumns = @JoinColumn(name = "project_id"), inverseJoinColumns = @JoinColumn(name = "school_id"))
+    private List<School> allSchools = new ArrayList<>();
+
+    public void addSchool(School schoolToAdd) {
+	this.allSchools.add(schoolToAdd);
+    }
+
+    public void removeSchool(School schoolToAdd) {
+	this.allSchools.remove(schoolToAdd);
+    }
+
+    public ProjectDTO convertToDto() {
+	return new ProjectDTO(String.valueOf(this.id), this.projectName, this.defaultIcon);
+    }
 }

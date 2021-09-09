@@ -45,16 +45,19 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.xml.sax.SAXException;
 
+import de.rathsolutions.controller.postbody.ProjectDTO;
 import de.rathsolutions.controller.postbody.AddNewSchoolPostbody;
 import de.rathsolutions.controller.postbody.AlterSchoolPostbody;
 import de.rathsolutions.controller.postbody.PersonFunctionalityEntity.PersonFunctionality;
 import de.rathsolutions.jpa.entity.Criteria;
 import de.rathsolutions.jpa.entity.Person;
 import de.rathsolutions.jpa.entity.PersonSchoolMapping;
+import de.rathsolutions.jpa.entity.Project;
 import de.rathsolutions.jpa.entity.School;
 import de.rathsolutions.jpa.repo.CriteriaRepo;
 import de.rathsolutions.jpa.repo.PersonRepo;
 import de.rathsolutions.jpa.repo.PersonSchoolMappingRepo;
+import de.rathsolutions.jpa.repo.ProjectRepo;
 import de.rathsolutions.jpa.repo.SchoolRepo;
 import de.rathsolutions.util.exception.BadArgumentsException;
 import de.rathsolutions.util.exception.ResourceAlreadyExistingException;
@@ -85,6 +88,9 @@ public class SchoolController {
 
     @Autowired
     private PersonSchoolMappingRepo personSchoolMappingRepo;
+
+    @Autowired
+    private ProjectRepo projectRepo;
 
     @Operation(summary = "searches non-registered school resources by their name in an osm document. This schools must not be registered within the application")
     @GetMapping("/search/findNotRegisteredSchoolsByName")
@@ -173,6 +179,13 @@ public class SchoolController {
 	if (isSchoolPostbodyNotValid(addNewSchoolPostbody)) {
 	    throw new BadArgumentsException(addNewSchoolPostbody);
 	}
+	List<Project> allFoundProjects;
+	try {
+	    allFoundProjects = generateProjectEntityListForSchoolPostbody(addNewSchoolPostbody);
+	} catch (NotFoundException e) {
+	    e.printStackTrace();
+	    return ResponseEntity.notFound().build();
+	}
 	List<Criteria> allMatchingSchoolCriterias = generateMatchingSchoolCriteriasAndPersistIfNotExisting(
 		addNewSchoolPostbody);
 	School school = new School(addNewSchoolPostbody.getShortSchoolName(), addNewSchoolPostbody.getSchoolName(),
@@ -183,10 +196,29 @@ public class SchoolController {
 	school.setMakerspaceContent(addNewSchoolPostbody.getMakerspaceContent());
 	school.setColor(addNewSchoolPostbody.getColor());
 	fillPersonSchoolMappingOfSchool(addNewSchoolPostbody, school);
+	allFoundProjects.forEach(project -> {
+	    school.getProject().add(project);
+	});
 	return ResponseEntity.ok(schoolRepo.save(school));
     }
 
-    @Operation(summary = "alterates a already existing school resource")
+    private List<Project> generateProjectEntityListForSchoolPostbody(AddNewSchoolPostbody addNewSchoolPostbody)
+	    throws NotFoundException {
+	List<Project> allFoundProjects = new ArrayList<>();
+	if (addNewSchoolPostbody.getProjects() == null) {
+	    return allFoundProjects;
+	}
+	for (ProjectDTO project : addNewSchoolPostbody.getProjects()) {
+	    Optional<Project> projectEntity = projectRepo.findById(Long.valueOf(project.getId()));
+	    if (projectEntity.isEmpty()) {
+		throw new NotFoundException("One of the requested Projects could not be found!");
+	    }
+	    allFoundProjects.add(projectEntity.get());
+	}
+	return allFoundProjects;
+    }
+
+    @Operation(summary = "alterates an already existing school resource")
     @PatchMapping("/edit/alterSchool")
     @Transactional
     public ResponseEntity<School> alterSchool(@RequestBody AlterSchoolPostbody alterSchoolPostbody) {
@@ -195,6 +227,13 @@ public class SchoolController {
 	    throw new ResourceNotFoundException(alterSchoolPostbody, "school");
 	}
 	School matchingSchool = alreadyExistingSchool.get();
+	List<Project> allFoundProjects;
+	try {
+	    allFoundProjects = generateProjectEntityListForSchoolPostbody(alterSchoolPostbody);
+	} catch (NotFoundException e) {
+	    e.printStackTrace();
+	    return ResponseEntity.notFound().build();
+	}
 	List<Criteria> allMatchingSchoolCriterias = generateMatchingSchoolCriteriasAndPersistIfNotExisting(
 		alterSchoolPostbody);
 	if (isSchoolPostbodyNotValid(alterSchoolPostbody)) {
@@ -209,6 +248,9 @@ public class SchoolController {
 	matchingSchool.setMakerspaceContent(alterSchoolPostbody.getMakerspaceContent());
 	matchingSchool.setColor(alterSchoolPostbody.getColor());
 	matchingSchool.getPersonSchoolMapping().clear();
+	allFoundProjects.forEach(project -> {
+	    matchingSchool.getProject().add(project);
+	});
 	fillPersonSchoolMappingOfSchool(alterSchoolPostbody, matchingSchool);
 	return ResponseEntity.ok(schoolRepo.save(matchingSchool));
     }
