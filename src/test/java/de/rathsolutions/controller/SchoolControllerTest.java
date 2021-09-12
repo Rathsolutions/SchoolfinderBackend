@@ -56,6 +56,7 @@ import de.rathsolutions.controller.postbody.AlterSchoolPostbody;
 import de.rathsolutions.controller.postbody.PersonFunctionalityEntity;
 import de.rathsolutions.controller.postbody.PersonFunctionalityEntity.PersonFunctionality;
 import de.rathsolutions.jpa.entity.Criteria;
+import de.rathsolutions.jpa.entity.Functionality;
 import de.rathsolutions.jpa.entity.Person;
 import de.rathsolutions.jpa.entity.School;
 import de.rathsolutions.jpa.repo.CriteriaRepo;
@@ -71,6 +72,8 @@ import javassist.NotFoundException;
 @SpringBootTest
 @ContextConfiguration(classes = SpringBootMain.class)
 public class SchoolControllerTest {
+
+    private static final Functionality EMPTY_FUNCTIONALITY = new Functionality();
 
     private static final String TESTSCHOOL5 = "testschool5";
 
@@ -453,7 +456,7 @@ public class SchoolControllerTest {
 	Person person = new Person();
 	person.setId(0L);
 	personFunctionalityEntity.setPerson(person);
-	personFunctionalityEntity.setFunctionality(PersonFunctionality.XR);
+	personFunctionalityEntity.setFunctionality(EMPTY_FUNCTIONALITY);
 	personFuncList.add(personFunctionalityEntity);
 	AddNewSchoolPostbody newSchool = new AddNewSchoolPostbody(SHORT_TESTSCHOOL, testschool, 21, 12, "ff0000", "",
 		"", "", "", personFuncList, criterias, null);
@@ -483,7 +486,7 @@ public class SchoolControllerTest {
 	Person person = new Person();
 	person.setId(0L);
 	personFunctionalityEntity.setPerson(person);
-	personFunctionalityEntity.setFunctionality(PersonFunctionality.XR);
+	personFunctionalityEntity.setFunctionality(EMPTY_FUNCTIONALITY);
 	personFuncList.add(personFunctionalityEntity);
 	AlterSchoolPostbody newSchool = new AlterSchoolPostbody(2, SHORT_TESTSCHOOL, testschool, 1, 2, "1", "", "", "",
 		"ff0000", personFuncList, criterias, null);
@@ -516,7 +519,7 @@ public class SchoolControllerTest {
 	Person person = new Person();
 	person.setId(1L);
 	personFunctionalityEntity.setPerson(person);
-	personFunctionalityEntity.setFunctionality(PersonFunctionality.XR);
+	personFunctionalityEntity.setFunctionality(EMPTY_FUNCTIONALITY);
 	personFuncList.add(personFunctionalityEntity);
 	AlterSchoolPostbody newSchool = new AlterSchoolPostbody(2, SHORT_TESTSCHOOL, testschool, 1, 2, "1", "", "", "",
 		"ff0000", personFuncList, criterias, null);

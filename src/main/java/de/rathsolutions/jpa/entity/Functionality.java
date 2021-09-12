@@ -1,8 +1,8 @@
 /*-
  * #%L
- * SchuglemapsBackend
+ * SchoolfinderBackend
  * %%
- * Copyright (C) 2020 Rathsolutions. <info@rathsolutions.de>
+ * Copyright (C) 2020 - 2021 Rathsolutions. <info@rathsolutions.de>
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
@@ -21,44 +21,36 @@
  */
 package de.rathsolutions.jpa.entity;
 
+import java.util.List;
+
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import de.rathsolutions.controller.postbody.FunctionalityDTO;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
 @Entity
 @Getter
 @Setter
-@NoArgsConstructor
-@RequiredArgsConstructor
-
-public class PersonSchoolMapping {
-
-//    @NonNull
-//    @EmbeddedId
-//    private PersonSchoolMappingKey id = new PersonSchoolMappingKey();
+public class Functionality {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private long id;
 
-    @NonNull
-    @ManyToOne
-    private Person person;
-    @NonNull
-    @ManyToOne
+    private String name;
+
+    @OneToMany(mappedBy = "functionality")
     @JsonIgnore
-    private School school;
-    @NonNull
-    @ManyToOne
-    private Functionality functionality;
+    private List<PersonSchoolMapping> allFunctionalities;
+
+    public FunctionalityDTO convertToDto() {
+	return new FunctionalityDTO(String.valueOf(this.id), this.name);
+    }
 }

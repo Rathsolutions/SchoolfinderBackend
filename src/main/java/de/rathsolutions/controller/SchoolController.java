@@ -45,16 +45,17 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.xml.sax.SAXException;
 
-import de.rathsolutions.controller.postbody.ProjectDTO;
 import de.rathsolutions.controller.postbody.AddNewSchoolPostbody;
 import de.rathsolutions.controller.postbody.AlterSchoolPostbody;
-import de.rathsolutions.controller.postbody.PersonFunctionalityEntity.PersonFunctionality;
+import de.rathsolutions.controller.postbody.ProjectDTO;
 import de.rathsolutions.jpa.entity.Criteria;
+import de.rathsolutions.jpa.entity.Functionality;
 import de.rathsolutions.jpa.entity.Person;
 import de.rathsolutions.jpa.entity.PersonSchoolMapping;
 import de.rathsolutions.jpa.entity.Project;
 import de.rathsolutions.jpa.entity.School;
 import de.rathsolutions.jpa.repo.CriteriaRepo;
+import de.rathsolutions.jpa.repo.FunctionalityRepo;
 import de.rathsolutions.jpa.repo.PersonRepo;
 import de.rathsolutions.jpa.repo.PersonSchoolMappingRepo;
 import de.rathsolutions.jpa.repo.ProjectRepo;
@@ -91,6 +92,9 @@ public class SchoolController {
 
     @Autowired
     private ProjectRepo projectRepo;
+
+    @Autowired
+    private FunctionalityRepo functionalityRepo;
 
     @Operation(summary = "searches non-registered school resources by their name in an osm document. This schools must not be registered within the application")
     @GetMapping("/search/findNotRegisteredSchoolsByName")
@@ -266,8 +270,7 @@ public class SchoolController {
 	    throw new ResourceNotFoundException(schoolId, "School could not be found");
 	}
 	Optional<PersonSchoolMapping> personSchoolMapping = personSchoolMappingRepo
-		.findOneBySchoolAndPersonAndFunctionality(school.get(), person.get(),
-			PersonFunctionality.valueOf(functionality.toUpperCase()).toString());
+		.findOneBySchoolAndPersonAndFunctionality(school.get(), person.get(), functionality.toString());
 	if (personSchoolMapping.isEmpty()) {
 	    throw new ResourceNotFoundException(person.toString(),
 		    "The person has no mapping to school " + school.toString());
@@ -292,8 +295,10 @@ public class SchoolController {
 	    if (e.getFunctionality() == null) {
 		throw new BadArgumentsException(e);
 	    }
+	    Optional<Functionality> matchingFunctionalityOptional = functionalityRepo
+		    .findOneByName(e.getFunctionality().getName());
 	    PersonSchoolMapping personSchoolMapping = new PersonSchoolMapping(personById.get(), matchingSchool,
-		    e.getFunctionality().toString());
+		    matchingFunctionalityOptional.get());
 	    matchingSchool.getPersonSchoolMapping().add(personSchoolMapping);
 	});
     }

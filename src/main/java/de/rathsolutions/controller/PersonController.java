@@ -60,6 +60,12 @@ public class PersonController {
 		.ok(personRepo.existsByPrenameAndLastnameAndEmailAndPhoneNumber(prename, lastname, email, phonenumber));
     }
 
+    @Operation(summary = "returns all persons")
+    @GetMapping("/search/findAll")
+    public ResponseEntity<List<Person>> findAll() {
+	return ResponseEntity.ok(personRepo.findAll());
+    }
+
     @Operation(summary = "queries for all persons according to a school id")
     @GetMapping("/search/getPersonsForSchool")
     public ResponseEntity<List<PersonSchoolMapping>> getPersonsForSchool(long id) {
