@@ -61,4 +61,5 @@ public class PersonSchoolMapping {
     @NonNull
     @ManyToOne
     private Functionality functionality;
+
 }
