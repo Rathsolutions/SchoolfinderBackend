@@ -21,6 +21,7 @@
  */
 package de.rathsolutions.controller.postbody;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import de.rathsolutions.jpa.entity.Criteria;
@@ -33,29 +34,28 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class AddNewSchoolPostbody {
+public class SchoolDTO {
 
-    protected String shortSchoolName;
+    private long id;
 
-    protected String schoolName;
+    private String shortSchoolName;
 
-    protected double latitude;
+    private String schoolName;
 
-    protected double longitude;
+    private double latitude;
 
-    protected String color;
+    private double longitude;
 
-    protected String schoolPicture;
+    private String color;
 
-    protected String alternativePictureText;
+    private String schoolPicture;
 
-    protected String arContent;
+    private String alternativePictureText;
 
-    protected String makerspaceContent;
+    private List<PersonFunctionalityDTO> personSchoolMapping = new ArrayList<>();
 
-    protected List<PersonFunctionalityEntity> personSchoolMapping;
+    private List<Criteria> matchingCriterias = new ArrayList<>();
 
-    protected List<Criteria> matchingCriterias;
+    private List<ProjectDTO> projects = new ArrayList<>();
 
-    protected List<ProjectDTO> projects;
 }

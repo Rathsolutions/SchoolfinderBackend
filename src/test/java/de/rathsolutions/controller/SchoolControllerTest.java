@@ -51,10 +51,9 @@ import org.springframework.transaction.annotation.Transactional;
 import org.xml.sax.SAXException;
 
 import de.rathsolutions.SpringBootMain;
-import de.rathsolutions.controller.postbody.AddNewSchoolPostbody;
-import de.rathsolutions.controller.postbody.AlterSchoolPostbody;
-import de.rathsolutions.controller.postbody.PersonFunctionalityEntity;
-import de.rathsolutions.controller.postbody.PersonFunctionalityEntity.PersonFunctionality;
+import de.rathsolutions.controller.postbody.PersonFunctionalityDTO;
+import de.rathsolutions.controller.postbody.PersonFunctionalityDTO.PersonFunctionality;
+import de.rathsolutions.controller.postbody.SchoolDTO;
 import de.rathsolutions.jpa.entity.Criteria;
 import de.rathsolutions.jpa.entity.Functionality;
 import de.rathsolutions.jpa.entity.Person;
@@ -72,6 +71,8 @@ import javassist.NotFoundException;
 @SpringBootTest
 @ContextConfiguration(classes = SpringBootMain.class)
 public class SchoolControllerTest {
+
+    private static final int SCHOOL_MOCK_ID = -1;
 
     private static final Functionality EMPTY_FUNCTIONALITY = new Functionality();
 
@@ -124,7 +125,7 @@ public class SchoolControllerTest {
     void testFindSchoolsByCriteriaExisting() {
 	List<Criteria> criterias = new ArrayList<>();
 	criterias.add(new Criteria("test"));
-	List<School> schoolsByCriteria = cut.findSchoolsByCriteria(criterias);
+	List<SchoolDTO> schoolsByCriteria = cut.findSchoolsByCriteria(criterias);
 	assertEquals(2, schoolsByCriteria.size());
 	assertFirstSchool(schoolsByCriteria.get(0));
 	assertThirdSchool(schoolsByCriteria.get(1));
@@ -134,7 +135,7 @@ public class SchoolControllerTest {
     void testFindSchoolsByCriteriaNotExisting() {
 	List<Criteria> criterias = new ArrayList<>();
 	criterias.add(new Criteria("test3"));
-	List<School> schoolsByCriteria = cut.findSchoolsByCriteria(criterias);
+	List<SchoolDTO> schoolsByCriteria = cut.findSchoolsByCriteria(criterias);
 	assertEquals(0, schoolsByCriteria.size());
     }
 
@@ -143,7 +144,7 @@ public class SchoolControllerTest {
 	List<Criteria> criterias = new ArrayList<>();
 	criterias.add(new Criteria("test"));
 	criterias.add(new Criteria("test1"));
-	List<School> schoolsByCriteria = cut.findSchoolsByCriteria(criterias);
+	List<SchoolDTO> schoolsByCriteria = cut.findSchoolsByCriteria(criterias);
 	assertEquals(3, schoolsByCriteria.size());
 	assertFirstSchool(schoolsByCriteria.get(0));
 	assertSecondSchool(schoolsByCriteria.get(1));
@@ -155,7 +156,7 @@ public class SchoolControllerTest {
 	List<Criteria> criterias = new ArrayList<>();
 	criterias.add(new Criteria("test"));
 	criterias.add(new Criteria("test12"));
-	List<School> schoolsByCriteria = cut.findSchoolsByCriteria(criterias);
+	List<SchoolDTO> schoolsByCriteria = cut.findSchoolsByCriteria(criterias);
 	assertEquals(2, schoolsByCriteria.size());
 	assertFirstSchool(schoolsByCriteria.get(0));
 	assertThirdSchool(schoolsByCriteria.get(1));
@@ -163,7 +164,7 @@ public class SchoolControllerTest {
 
     @Test
     void testFindAllSchools() {
-	List<School> allSchools = cut.findAllSchools();
+	List<SchoolDTO> allSchools = cut.findAllSchools();
 	assertEquals(3, allSchools.size());
     }
 
@@ -171,7 +172,7 @@ public class SchoolControllerTest {
     void testFindAllSchoolsByInBoundsWrongCriteriaRightBounds() {
 	List<Long> longCriterias = new ArrayList<>();
 	longCriterias.add(1L);
-	List<School> allSchoolsByInBounds = cut.findAllSchoolsByInBounds("1.110", "1.112", "2.221", "2.223",
+	List<SchoolDTO> allSchoolsByInBounds = cut.findAllSchoolsByInBounds("1.110", "1.112", "2.221", "2.223",
 		longCriterias, false);
 	assertEquals(0, allSchoolsByInBounds.size());
     }
@@ -180,7 +181,7 @@ public class SchoolControllerTest {
     void testFindAllSchoolsByInBoundsRightCriteriaRightBounds() {
 	List<Long> longCriterias = new ArrayList<>();
 	longCriterias.add(0L);
-	List<School> allSchoolsByInBounds = cut.findAllSchoolsByInBounds("1.110", "1.112", "2.221", "2.223",
+	List<SchoolDTO> allSchoolsByInBounds = cut.findAllSchoolsByInBounds("1.110", "1.112", "2.221", "2.223",
 		longCriterias, false);
 	assertEquals(1, allSchoolsByInBounds.size());
 	assertFirstSchool(allSchoolsByInBounds.get(0));
@@ -190,7 +191,7 @@ public class SchoolControllerTest {
     void testFindAllSchoolsByInBoundsRightCriteriaWrongBounds() {
 	List<Long> longCriterias = new ArrayList<>();
 	longCriterias.add(0L);
-	List<School> allSchoolsByInBounds = cut.findAllSchoolsByInBounds("2.221", "2.223", "1.110", "1.112",
+	List<SchoolDTO> allSchoolsByInBounds = cut.findAllSchoolsByInBounds("2.221", "2.223", "1.110", "1.112",
 		longCriterias, false);
 	assertEquals(0, allSchoolsByInBounds.size());
     }
@@ -200,7 +201,7 @@ public class SchoolControllerTest {
 	List<Long> longCriterias = new ArrayList<>();
 	longCriterias.add(0L);
 	longCriterias.add(1L);
-	List<School> allSchoolsByInBounds = cut.findAllSchoolsByInBounds("1.110", "1.112", "2.221", "2.223",
+	List<SchoolDTO> allSchoolsByInBounds = cut.findAllSchoolsByInBounds("1.110", "1.112", "2.221", "2.223",
 		longCriterias, false);
 	assertEquals(1, allSchoolsByInBounds.size());
 	assertFirstSchool(allSchoolsByInBounds.get(0));
@@ -211,7 +212,7 @@ public class SchoolControllerTest {
 	List<Long> longCriterias = new ArrayList<>();
 	longCriterias.add(0L);
 	longCriterias.add(1L);
-	List<School> allSchoolsByInBounds = cut.findAllSchoolsByInBounds("0", "3", "0", "3", longCriterias, false);
+	List<SchoolDTO> allSchoolsByInBounds = cut.findAllSchoolsByInBounds("0", "3", "0", "3", longCriterias, false);
 	assertEquals(2, allSchoolsByInBounds.size());
 	assertFirstSchool(allSchoolsByInBounds.get(0));
 	assertSecondSchool(allSchoolsByInBounds.get(1));
@@ -222,7 +223,7 @@ public class SchoolControllerTest {
 	List<Long> longCriterias = new ArrayList<>();
 	longCriterias.add(0L);
 	longCriterias.add(1L);
-	List<School> allSchoolsByInBounds = cut.findAllSchoolsByInBounds("3.332", "3.334", "4.443", "4.445",
+	List<SchoolDTO> allSchoolsByInBounds = cut.findAllSchoolsByInBounds("3.332", "3.334", "4.443", "4.445",
 		longCriterias, true);
 	assertEquals(1, allSchoolsByInBounds.size());
 	assertThirdSchool(allSchoolsByInBounds.get(0));
@@ -233,14 +234,14 @@ public class SchoolControllerTest {
 	List<Long> longCriterias = new ArrayList<>();
 	longCriterias.add(0L);
 	longCriterias.add(1L);
-	List<School> allSchoolsByInBounds = cut.findAllSchoolsByInBounds("0", "5", "0", "5", longCriterias, true);
+	List<SchoolDTO> allSchoolsByInBounds = cut.findAllSchoolsByInBounds("0", "5", "0", "5", longCriterias, true);
 	assertEquals(1, allSchoolsByInBounds.size());
 	assertThirdSchool(allSchoolsByInBounds.get(0));
     }
 
     @Test
     void testFindAllSchoolsByInBoundsNullCriteriasLargeRightBound() {
-	List<School> allSchoolsByInBounds = cut.findAllSchoolsByInBounds("0", "3", "0", "3", null, false);
+	List<SchoolDTO> allSchoolsByInBounds = cut.findAllSchoolsByInBounds("0", "3", "0", "3", null, false);
 	assertEquals(2, allSchoolsByInBounds.size());
 	assertFirstSchool(allSchoolsByInBounds.get(0));
 	assertSecondSchool(allSchoolsByInBounds.get(1));
@@ -249,7 +250,7 @@ public class SchoolControllerTest {
     @Test
     void testFindAllSchoolsByInBoundsEmptyCriteriasLargeRightBound() {
 	List<Long> longCriterias = new ArrayList<>();
-	List<School> allSchoolsByInBounds = cut.findAllSchoolsByInBounds("0", "3", "0", "3", longCriterias, false);
+	List<SchoolDTO> allSchoolsByInBounds = cut.findAllSchoolsByInBounds("0", "3", "0", "3", longCriterias, false);
 	assertEquals(2, allSchoolsByInBounds.size());
 	assertFirstSchool(allSchoolsByInBounds.get(0));
 	assertSecondSchool(allSchoolsByInBounds.get(1));
@@ -257,7 +258,7 @@ public class SchoolControllerTest {
 
     @Test
     void testFindAllSchoolsByInBoundsNullCriteriasRightBounds() {
-	List<School> allSchoolsByInBounds = cut.findAllSchoolsByInBounds("1.110", "1.113", "2.221", "2.223", null,
+	List<SchoolDTO> allSchoolsByInBounds = cut.findAllSchoolsByInBounds("1.110", "1.113", "2.221", "2.223", null,
 		false);
 	assertEquals(1, allSchoolsByInBounds.size());
 	assertFirstSchool(allSchoolsByInBounds.get(0));
@@ -265,13 +266,13 @@ public class SchoolControllerTest {
 
     @Test
     void testFindSchoolDetails() {
-	ResponseEntity<School> findFirstSchoolDetails = cut.findSchoolDetails(0);
+	ResponseEntity<SchoolDTO> findFirstSchoolDetails = cut.findSchoolDetails(0);
 	assertFirstSchool(findFirstSchoolDetails.getBody());
     }
 
     @Test
     void testFindSchoolDetailsNoSchoolFound() {
-	ResponseEntity<School> findFirstSchoolDetails = cut.findSchoolDetails(5);
+	ResponseEntity<SchoolDTO> findFirstSchoolDetails = cut.findSchoolDetails(5);
 	assertEquals(HttpStatus.NOT_FOUND, findFirstSchoolDetails.getStatusCode());
 	assertNull(findFirstSchoolDetails.getBody());
     }
@@ -279,29 +280,29 @@ public class SchoolControllerTest {
     @Test
     @Transactional
     void testAddNewSchoolAlreadyExisting() {
-	AddNewSchoolPostbody newSchool = new AddNewSchoolPostbody(SHORT_TESTSCHOOL, TESTSCHOOL, 21, 12, "ff0000", "",
-		"", "", "", null, null, null);
+	SchoolDTO newSchool = new SchoolDTO(SCHOOL_MOCK_ID, SHORT_TESTSCHOOL, TESTSCHOOL, 21, 12, "ff0000", "", "",
+		null, null, null);
 	assertThrows(ResourceAlreadyExistingException.class, () -> {
 	    cut.addNewSchool(newSchool);
 	});
-	assertFirstSchool(schoolRepo.getOne(0L));
+	assertFirstSchool(schoolRepo.getOne(0L).convertToDTO());
     }
 
     @Test
     @Transactional
     void testAlterSchoolNotExisting() {
-	AlterSchoolPostbody newSchool = new AlterSchoolPostbody(4, SHORT_NOT_EXISTING, TESTSCHOOL5, 21, 12, "ff0000",
-		"", "", "", "", null, null, null);
+	SchoolDTO newSchool = new SchoolDTO(4, SHORT_NOT_EXISTING, TESTSCHOOL5, 21, 12, "ff0000", "", "", null, null,
+		null);
 	assertThrows(ResourceNotFoundException.class, () -> {
 	    cut.alterSchool(newSchool);
 	});
-	assertFirstSchool(schoolRepo.getOne(0L));
+	assertFirstSchool(schoolRepo.getOne(0L).convertToDTO());
     }
 
     @Test
     void testAddNewSchoolNullPersonsNullCriterias() {
-	AddNewSchoolPostbody newSchool = new AddNewSchoolPostbody(SHORT_NOT_EXISTING, TESTSCHOOL5, 21, 12, "ff0000", "",
-		"", "", "", null, null, null);
+	SchoolDTO newSchool = new SchoolDTO(SCHOOL_MOCK_ID, SHORT_NOT_EXISTING, TESTSCHOOL5, 21, 12, "ff0000", "", "",
+		null, null, null);
 	assertThrows(BadArgumentsException.class, () -> {
 	    cut.addNewSchool(newSchool);
 	});
@@ -309,8 +310,8 @@ public class SchoolControllerTest {
 
     @Test
     void testAlterSchoolNullPersonsNullCriterias() {
-	AlterSchoolPostbody newSchool = new AlterSchoolPostbody(1, SHORT_NOT_EXISTING, TESTSCHOOL5, 21, 12, "", "", "",
-		"", "ff0000", null, null, null);
+	SchoolDTO newSchool = new SchoolDTO(1, SHORT_NOT_EXISTING, TESTSCHOOL5, 21, 12, "", "", "ff0000", null, null,
+		null);
 	assertThrows(BadArgumentsException.class, () -> {
 	    cut.alterSchool(newSchool);
 	});
@@ -318,8 +319,8 @@ public class SchoolControllerTest {
 
     @Test
     void testAddNewSchoolNullColor() {
-	AddNewSchoolPostbody newSchool = new AddNewSchoolPostbody(SHORT_NOT_EXISTING, TESTSCHOOL5, 21, 12, null, "", "",
-		"", "", null, null, null);
+	SchoolDTO newSchool = new SchoolDTO(SCHOOL_MOCK_ID, SHORT_NOT_EXISTING, TESTSCHOOL5, 21, 12, null, "", "", null,
+		null, null);
 	assertThrows(BadArgumentsException.class, () -> {
 	    cut.addNewSchool(newSchool);
 	});
@@ -327,8 +328,7 @@ public class SchoolControllerTest {
 
     @Test
     void testAlterSchoolNullColor() {
-	AlterSchoolPostbody newSchool = new AlterSchoolPostbody(1, SHORT_NOT_EXISTING, TESTSCHOOL5, 21, 12, "", "", "",
-		"", null, null, null, null);
+	SchoolDTO newSchool = new SchoolDTO(1, SHORT_NOT_EXISTING, TESTSCHOOL5, 21, 12, "", "", null, null, null, null);
 	assertThrows(BadArgumentsException.class, () -> {
 	    cut.alterSchool(newSchool);
 	});
@@ -336,8 +336,8 @@ public class SchoolControllerTest {
 
     @Test
     void testAddNewSchoolEmptyColor() {
-	AddNewSchoolPostbody newSchool = new AddNewSchoolPostbody(SHORT_NOT_EXISTING, TESTSCHOOL5, 21, 12, "", "", "",
-		"", "", null, null, null);
+	SchoolDTO newSchool = new SchoolDTO(SCHOOL_MOCK_ID, SHORT_NOT_EXISTING, TESTSCHOOL5, 21, 12, "", "", "", null,
+		null, null);
 	assertThrows(BadArgumentsException.class, () -> {
 	    cut.addNewSchool(newSchool);
 	});
@@ -345,8 +345,7 @@ public class SchoolControllerTest {
 
     @Test
     void testAlterSchoolEmptyColor() {
-	AlterSchoolPostbody newSchool = new AlterSchoolPostbody(1, SHORT_NOT_EXISTING, TESTSCHOOL5, 21, 12, "", "", "",
-		"", "", null, null, null);
+	SchoolDTO newSchool = new SchoolDTO(1, SHORT_NOT_EXISTING, TESTSCHOOL5, 21, 12, "", "", "", null, null, null);
 	assertThrows(BadArgumentsException.class, () -> {
 	    cut.alterSchool(newSchool);
 	});
@@ -354,8 +353,8 @@ public class SchoolControllerTest {
 
     @Test
     void testAddNewSchoolColorNotMatchingRegex() {
-	AddNewSchoolPostbody newSchool = new AddNewSchoolPostbody(SHORT_NOT_EXISTING, TESTSCHOOL5, 21, 12, "", "", "",
-		"", "schoolfinder", null, null, null);
+	SchoolDTO newSchool = new SchoolDTO(SCHOOL_MOCK_ID, SHORT_NOT_EXISTING, TESTSCHOOL5, 21, 12, "", "",
+		"schoolfinder", null, null, null);
 	assertThrows(BadArgumentsException.class, () -> {
 	    cut.addNewSchool(newSchool);
 	});
@@ -363,8 +362,8 @@ public class SchoolControllerTest {
 
     @Test
     void testAlterSchoolColorNotMatchingHexRegex() {
-	AlterSchoolPostbody newSchool = new AlterSchoolPostbody(1, SHORT_NOT_EXISTING, TESTSCHOOL5, 21, 12, "", "", "",
-		"", "schoolfinder", null, null, null);
+	SchoolDTO newSchool = new SchoolDTO(1, SHORT_NOT_EXISTING, TESTSCHOOL5, 21, 12, "", "", "schoolfinder", null,
+		null, null);
 	assertThrows(BadArgumentsException.class, () -> {
 	    cut.alterSchool(newSchool);
 	});
@@ -375,8 +374,8 @@ public class SchoolControllerTest {
 	List<Criteria> criterias = new ArrayList<>();
 	String testcriteria = "test5";
 	criterias.add(new Criteria(testcriteria));
-	AddNewSchoolPostbody newSchool = new AddNewSchoolPostbody(SHORT_NOT_EXISTING, TESTSCHOOL5, 21, 12, "ff0000", "",
-		"", "", "", null, criterias, null);
+	SchoolDTO newSchool = new SchoolDTO(SCHOOL_MOCK_ID, SHORT_NOT_EXISTING, TESTSCHOOL5, 21, 12, "ff0000", "", "",
+		null, criterias, null);
 	assertThrows(BadArgumentsException.class, () -> {
 	    cut.addNewSchool(newSchool);
 	});
@@ -389,8 +388,8 @@ public class SchoolControllerTest {
 	List<Criteria> criterias = new ArrayList<>();
 	String testcriteria = "test5";
 	criterias.add(new Criteria(testcriteria));
-	AlterSchoolPostbody newSchool = new AlterSchoolPostbody(1, SHORT_TESTSCHOOL, TESTSCHOOL, 21, 12, "", "", "", "",
-		"ff0000", null, criterias, null);
+	SchoolDTO newSchool = new SchoolDTO(1, SHORT_TESTSCHOOL, TESTSCHOOL, 21, 12, "", "", "ff0000", null, criterias,
+		null);
 	assertThrows(BadArgumentsException.class, () -> {
 	    cut.alterSchool(newSchool);
 	});
@@ -400,18 +399,18 @@ public class SchoolControllerTest {
 
     @Test
     void testAddNewSchoolNotNullNotExistingPersonNotNullCriterias() {
-	List<PersonFunctionalityEntity> personFuncList = new ArrayList<>();
+	List<PersonFunctionalityDTO> personFuncList = new ArrayList<>();
 	List<Criteria> criterias = new ArrayList<>();
 	String testcriteria = "test5";
 	criterias.add(new Criteria(testcriteria));
 	String testschool = TESTSCHOOL5;
-	PersonFunctionalityEntity personFunctionalityEntity = new PersonFunctionalityEntity();
+	PersonFunctionalityDTO personFunctionalityEntity = new PersonFunctionalityDTO();
 	Person person = new Person();
 	person.setId(5L);
 	personFunctionalityEntity.setPerson(person);
 	personFuncList.add(personFunctionalityEntity);
-	AddNewSchoolPostbody newSchool = new AddNewSchoolPostbody(SHORT_TESTSCHOOL, testschool, 21, 12, "ff0000", "",
-		"", "", "", personFuncList, criterias, null);
+	SchoolDTO newSchool = new SchoolDTO(SCHOOL_MOCK_ID, SHORT_TESTSCHOOL, testschool, 21, 12, "ff0000", "", "",
+		personFuncList, criterias, null);
 	assertThrows(ResourceNotFoundException.class, () -> {
 	    cut.addNewSchool(newSchool);
 	});
@@ -423,18 +422,18 @@ public class SchoolControllerTest {
 
     @Test
     void testAlterSchoolNotNullNotExistingPersonNotNullCriterias() {
-	List<PersonFunctionalityEntity> personFuncList = new ArrayList<>();
+	List<PersonFunctionalityDTO> personFuncList = new ArrayList<>();
 	List<Criteria> criterias = new ArrayList<>();
 	String testcriteria = "test5";
 	criterias.add(new Criteria(testcriteria));
 	String testschool = TESTSCHOOL5;
-	PersonFunctionalityEntity personFunctionalityEntity = new PersonFunctionalityEntity();
+	PersonFunctionalityDTO personFunctionalityEntity = new PersonFunctionalityDTO();
 	Person person = new Person();
 	person.setId(5L);
 	personFunctionalityEntity.setPerson(person);
 	personFuncList.add(personFunctionalityEntity);
-	AlterSchoolPostbody newSchool = new AlterSchoolPostbody(1, SHORT_TESTSCHOOL, testschool, 21, 12, "", "", "", "",
-		"ff0000", personFuncList, criterias, null);
+	SchoolDTO newSchool = new SchoolDTO(1, SHORT_TESTSCHOOL, testschool, 21, 12, "", "", "ff0000", personFuncList,
+		criterias, null);
 	assertThrows(ResourceNotFoundException.class, () -> {
 	    cut.alterSchool(newSchool);
 	});
@@ -447,20 +446,20 @@ public class SchoolControllerTest {
     @Test
     @Transactional
     void testAddNewSchoolNotNullExistingPersonNotEmptyFunctionalityNotNullCriterias() {
-	List<PersonFunctionalityEntity> personFuncList = new ArrayList<>();
+	List<PersonFunctionalityDTO> personFuncList = new ArrayList<>();
 	List<Criteria> criterias = new ArrayList<>();
 	String testcriteria = "test5";
 	criterias.add(new Criteria(testcriteria));
 	String testschool = TESTSCHOOL5;
-	PersonFunctionalityEntity personFunctionalityEntity = new PersonFunctionalityEntity();
+	PersonFunctionalityDTO personFunctionalityEntity = new PersonFunctionalityDTO();
 	Person person = new Person();
 	person.setId(0L);
 	personFunctionalityEntity.setPerson(person);
 	personFunctionalityEntity.setFunctionality(EMPTY_FUNCTIONALITY);
 	personFuncList.add(personFunctionalityEntity);
-	AddNewSchoolPostbody newSchool = new AddNewSchoolPostbody(SHORT_TESTSCHOOL, testschool, 21, 12, "ff0000", "",
-		"", "", "", personFuncList, criterias, null);
-	ResponseEntity<School> responseEntity = cut.addNewSchool(newSchool);
+	SchoolDTO newSchool = new SchoolDTO(SCHOOL_MOCK_ID, SHORT_TESTSCHOOL, testschool, 21, 12, "ff0000", "", "",
+		personFuncList, criterias, null);
+	ResponseEntity<SchoolDTO> responseEntity = cut.addNewSchool(newSchool);
 	List<Criteria> allCriterias = criteriaRepo.findAll();
 	List<School> allSchools = schoolRepo.findAll();
 	assertTrue(allCriterias.stream().anyMatch(e -> e.getCriteriaName().equals(testcriteria)));
@@ -477,20 +476,20 @@ public class SchoolControllerTest {
     @Test
     @Transactional
     void testAlterSchoolNotNullExistingPersonAndAlreadyAddedPersonNotEmptyFunctionalityNotNullCriterias() {
-	List<PersonFunctionalityEntity> personFuncList = new ArrayList<>();
+	List<PersonFunctionalityDTO> personFuncList = new ArrayList<>();
 	List<Criteria> criterias = new ArrayList<>();
 	String testcriteria = "test5";
 	criterias.add(new Criteria(testcriteria));
 	String testschool = TESTSCHOOL5;
-	PersonFunctionalityEntity personFunctionalityEntity = new PersonFunctionalityEntity();
+	PersonFunctionalityDTO personFunctionalityEntity = new PersonFunctionalityDTO();
 	Person person = new Person();
 	person.setId(0L);
 	personFunctionalityEntity.setPerson(person);
 	personFunctionalityEntity.setFunctionality(EMPTY_FUNCTIONALITY);
 	personFuncList.add(personFunctionalityEntity);
-	AlterSchoolPostbody newSchool = new AlterSchoolPostbody(2, SHORT_TESTSCHOOL, testschool, 1, 2, "1", "", "", "",
-		"ff0000", personFuncList, criterias, null);
-	ResponseEntity<School> responseEntity = cut.alterSchool(newSchool);
+	SchoolDTO newSchool = new SchoolDTO(2, SHORT_TESTSCHOOL, testschool, 1, 2, "1", "", "ff0000", personFuncList,
+		criterias, null);
+	ResponseEntity<SchoolDTO> responseEntity = cut.alterSchool(newSchool);
 	List<Criteria> allCriterias = criteriaRepo.findAll();
 	List<School> allSchools = schoolRepo.findAll();
 	assertTrue(allCriterias.stream().anyMatch(e -> e.getCriteriaName().equals(testcriteria)));
@@ -510,20 +509,20 @@ public class SchoolControllerTest {
     @Test
     @Transactional
     void testAlterSchoolNotNullExistingPersonNotEmptyFunctionalityNotNullCriterias() {
-	List<PersonFunctionalityEntity> personFuncList = new ArrayList<>();
+	List<PersonFunctionalityDTO> personFuncList = new ArrayList<>();
 	List<Criteria> criterias = new ArrayList<>();
 	String testcriteria = "test5";
 	criterias.add(new Criteria(testcriteria));
 	String testschool = TESTSCHOOL5;
-	PersonFunctionalityEntity personFunctionalityEntity = new PersonFunctionalityEntity();
+	PersonFunctionalityDTO personFunctionalityEntity = new PersonFunctionalityDTO();
 	Person person = new Person();
 	person.setId(1L);
 	personFunctionalityEntity.setPerson(person);
 	personFunctionalityEntity.setFunctionality(EMPTY_FUNCTIONALITY);
 	personFuncList.add(personFunctionalityEntity);
-	AlterSchoolPostbody newSchool = new AlterSchoolPostbody(2, SHORT_TESTSCHOOL, testschool, 1, 2, "1", "", "", "",
-		"ff0000", personFuncList, criterias, null);
-	ResponseEntity<School> responseEntity = cut.alterSchool(newSchool);
+	SchoolDTO newSchool = new SchoolDTO(2, SHORT_TESTSCHOOL, testschool, 1, 2, "1", "", "ff0000", personFuncList,
+		criterias, null);
+	ResponseEntity<SchoolDTO> responseEntity = cut.alterSchool(newSchool);
 	List<Criteria> allCriterias = criteriaRepo.findAll();
 	List<School> allSchools = schoolRepo.findAll();
 	assertTrue(allCriterias.stream().anyMatch(e -> e.getCriteriaName().equals(testcriteria)));
@@ -543,18 +542,18 @@ public class SchoolControllerTest {
 
     @Test
     void testAddNewSchoolNotNullExistingPersonEmptyFunctionalityNotNullCriterias() {
-	List<PersonFunctionalityEntity> personFuncList = new ArrayList<>();
+	List<PersonFunctionalityDTO> personFuncList = new ArrayList<>();
 	List<Criteria> criterias = new ArrayList<>();
 	String testcriteria = "test5";
 	criterias.add(new Criteria(testcriteria));
 	String testschool = TESTSCHOOL5;
-	PersonFunctionalityEntity personFunctionalityEntity = new PersonFunctionalityEntity();
+	PersonFunctionalityDTO personFunctionalityEntity = new PersonFunctionalityDTO();
 	Person person = new Person();
 	person.setId(0L);
 	personFunctionalityEntity.setPerson(person);
 	personFuncList.add(personFunctionalityEntity);
-	AddNewSchoolPostbody newSchool = new AddNewSchoolPostbody(SHORT_TESTSCHOOL, testschool, 21, 12, "", "", "", "",
-		"ff0000", personFuncList, criterias, null);
+	SchoolDTO newSchool = new SchoolDTO(SCHOOL_MOCK_ID, SHORT_TESTSCHOOL, testschool, 21, 12, "", "", "ff0000",
+		personFuncList, criterias, null);
 	assertThrows(BadArgumentsException.class, () -> {
 	    cut.addNewSchool(newSchool);
 	});
@@ -567,18 +566,18 @@ public class SchoolControllerTest {
 
     @Test
     void testAlterSchoolNotNullExistingPersonEmptyFunctionalityNotNullCriterias() {
-	List<PersonFunctionalityEntity> personFuncList = new ArrayList<>();
+	List<PersonFunctionalityDTO> personFuncList = new ArrayList<>();
 	List<Criteria> criterias = new ArrayList<>();
 	String testcriteria = "test5";
 	criterias.add(new Criteria(testcriteria));
 	String testschool = TESTSCHOOL5;
-	PersonFunctionalityEntity personFunctionalityEntity = new PersonFunctionalityEntity();
+	PersonFunctionalityDTO personFunctionalityEntity = new PersonFunctionalityDTO();
 	Person person = new Person();
 	person.setId(0L);
 	personFunctionalityEntity.setPerson(person);
 	personFuncList.add(personFunctionalityEntity);
-	AlterSchoolPostbody newSchool = new AlterSchoolPostbody(2, SHORT_TESTSCHOOL, testschool, 1, 2, "1", "", "", "",
-		"ff0000", personFuncList, criterias, null);
+	SchoolDTO newSchool = new SchoolDTO(2, SHORT_TESTSCHOOL, testschool, 1, 2, "1", "", "ff0000", personFuncList,
+		criterias, null);
 	assertThrows(BadArgumentsException.class, () -> {
 	    cut.alterSchool(newSchool);
 	});
@@ -592,40 +591,40 @@ public class SchoolControllerTest {
 	return allSchools.stream().filter(e -> (e.getSchoolName().equals(testschool)));
     }
 
-    private void assertFirstSchool(School school) {
+    private void assertFirstSchool(SchoolDTO school) {
 	assertEquals(TESTSCHOOL, school.getSchoolName());
 	assertEquals(SHORT_TESTSCHOOL, school.getShortSchoolName());
-	assertEquals(1.111, school.getLatitude().doubleValue(), 0.001);
-	assertEquals(2.222, school.getLongitude().doubleValue(), 0.001);
+	assertEquals(1.111, school.getLatitude(), 0.001);
+	assertEquals(2.222, school.getLongitude(), 0.001);
 	assertEquals("0x00", school.getSchoolPicture());
 	assertEquals("text1", school.getAlternativePictureText());
 	assertEquals("ff0000", school.getColor());
     }
 
-    private void assertSchoolEquals(School school, AddNewSchoolPostbody postbody) {
+    private void assertSchoolEquals(SchoolDTO school, SchoolDTO postbody) {
 	assertEquals(postbody.getSchoolName(), school.getSchoolName());
 	assertEquals(postbody.getShortSchoolName(), school.getShortSchoolName());
-	assertEquals(postbody.getLatitude(), school.getLatitude().doubleValue(), 0.001);
-	assertEquals(postbody.getLongitude(), school.getLongitude().doubleValue(), 0.001);
+	assertEquals(postbody.getLatitude(), school.getLatitude(), 0.001);
+	assertEquals(postbody.getLongitude(), school.getLongitude(), 0.001);
 	assertEquals(postbody.getSchoolPicture(), school.getSchoolPicture());
 	assertEquals(postbody.getAlternativePictureText(), school.getAlternativePictureText());
 	assertEquals(postbody.getColor(), school.getColor());
     }
 
-    private void assertSecondSchool(School school) {
+    private void assertSecondSchool(SchoolDTO school) {
 	assertEquals("testschool2", school.getSchoolName());
 	assertEquals("shortTestschool2", school.getShortSchoolName());
-	assertEquals(2.222, school.getLatitude().doubleValue(), 0.001);
-	assertEquals(1.111, school.getLongitude().doubleValue(), 0.001);
+	assertEquals(2.222, school.getLatitude(), 0.001);
+	assertEquals(1.111, school.getLongitude(), 0.001);
 	assertEquals("text2", school.getAlternativePictureText());
 	assertEquals("0xFF", school.getSchoolPicture());
     }
 
-    private void assertThirdSchool(School school) {
+    private void assertThirdSchool(SchoolDTO school) {
 	assertEquals("testschool3", school.getSchoolName());
 	assertEquals("shortTestschool3", school.getShortSchoolName());
-	assertEquals(3.333, school.getLatitude().doubleValue(), 0.001);
-	assertEquals(4.444, school.getLongitude().doubleValue(), 0.001);
+	assertEquals(3.333, school.getLatitude(), 0.001);
+	assertEquals(4.444, school.getLongitude(), 0.001);
 	assertEquals("0xAF", school.getSchoolPicture());
 	assertEquals("text3", school.getAlternativePictureText());
 

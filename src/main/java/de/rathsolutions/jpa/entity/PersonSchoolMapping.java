@@ -27,8 +27,11 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 
+import org.hibernate.annotations.Type;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import de.rathsolutions.controller.postbody.PersonFunctionalityDTO;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
@@ -61,5 +64,17 @@ public class PersonSchoolMapping {
     @NonNull
     @ManyToOne
     private Functionality functionality;
+
+    @Type(type = "text")
+    private String description;
+
+    public PersonFunctionalityDTO convertToDTO() {
+	PersonFunctionalityDTO personFunctionalityDTO = new PersonFunctionalityDTO();
+	personFunctionalityDTO.setFunctionality(this.functionality);
+	personFunctionalityDTO.setMappingId(this.id);
+	personFunctionalityDTO.setPerson(this.person);
+	personFunctionalityDTO.setDescription(this.description);
+	return personFunctionalityDTO;
+    }
 
 }

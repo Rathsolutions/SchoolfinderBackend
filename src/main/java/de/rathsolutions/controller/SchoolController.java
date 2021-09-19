@@ -45,9 +45,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.xml.sax.SAXException;
 
-import de.rathsolutions.controller.postbody.AddNewSchoolPostbody;
-import de.rathsolutions.controller.postbody.AlterSchoolPostbody;
 import de.rathsolutions.controller.postbody.ProjectDTO;
+import de.rathsolutions.controller.postbody.SchoolDTO;
 import de.rathsolutions.jpa.entity.Criteria;
 import de.rathsolutions.jpa.entity.Functionality;
 import de.rathsolutions.jpa.entity.Person;
@@ -115,28 +114,29 @@ public class SchoolController {
 
     @Operation(summary = "searches registered school resources by a list of criterias in the database")
     @GetMapping("/search/findSchoolsByCriteria")
-    public List<School> findSchoolsByCriteria(List<Criteria> criterias) {
+    public List<SchoolDTO> findSchoolsByCriteria(List<Criteria> criterias) {
 	List<Criteria> criteriasFromDb = new ArrayList<>();
 	criterias.stream().forEach(e -> criteriasFromDb.add(criteriaRepo.findByCriteriaName(e.getCriteriaName())));
-	return schoolRepo.findDistinctByMatchingCriteriasIn(criteriasFromDb);
+	return schoolRepo.findDistinctByMatchingCriteriasIn(criteriasFromDb).stream().map(e -> e.convertToDTO())
+		.collect(Collectors.toList());
     }
 
     @Operation(summary = "searches all school resources")
     @GetMapping("/search/findAllSchools")
-    public List<School> findAllSchools() {
-	return schoolRepo.findAll();
+    public List<SchoolDTO> findAllSchools() {
+	return schoolRepo.findAll().stream().map(e -> e.convertToDTO()).collect(Collectors.toList());
     }
 
     @Operation(summary = "searches all school resources ordered by their name")
     @GetMapping("/search/findAllSchoolsOrderedByName")
-    public List<School> findAllSchoolsOrderByName() {
-	return schoolRepo.findAllByOrderBySchoolName();
+    public List<SchoolDTO> findAllSchoolsOrderByName() {
+	return schoolRepo.findAllByOrderBySchoolName().stream().map(e -> e.convertToDTO()).collect(Collectors.toList());
     }
 
     @Operation(summary = "searches all school resources within latlong boundaries")
     @GetMapping("/search/findAllSchoolsInBounds")
     @Transactional
-    public List<School> findAllSchoolsByInBounds(String leftLatBound, String rightLatBound, String topLongBound,
+    public List<SchoolDTO> findAllSchoolsByInBounds(String leftLatBound, String rightLatBound, String topLongBound,
 	    String bottomLongBound,
 	    @RequestParam(value = "criteriaNumbers", required = false) List<Long> criteriaNumbers,
 	    @RequestParam(value = "exclusiveSearch", required = false, defaultValue = "false") boolean exclusiveSearch) {
@@ -150,32 +150,32 @@ public class SchoolController {
 		    .findDistinctByLatitudeBetweenAndLongitudeBetweenAndMatchingCriteriasIn(leftLat, rightLat, topLong,
 			    bottomLong, criterias);
 	    if (!exclusiveSearch) {
-		return allSchoolsMatching;
+		return allSchoolsMatching.stream().map(e -> e.convertToDTO()).collect(Collectors.toList());
 	    } else {
 		return allSchoolsMatching.stream().filter(e -> e.getMatchingCriterias().containsAll(criterias))
-			.collect(Collectors.toList());
+			.map(e -> e.convertToDTO()).collect(Collectors.toList());
 	    }
 	}
 	List<School> allByLatitudeBetweenAndLongitudeBetween = schoolRepo
 		.findAllByLatitudeBetweenAndLongitudeBetween(leftLat, rightLat, topLong, bottomLong);
-	return allByLatitudeBetweenAndLongitudeBetween;
+	return allByLatitudeBetweenAndLongitudeBetween.stream().map(e -> e.convertToDTO()).collect(Collectors.toList());
     }
 
     @Operation(summary = "searches a school resource by id with all details")
     @GetMapping("/search/findSchoolDetails")
-    public ResponseEntity<School> findSchoolDetails(long id) {
+    public ResponseEntity<SchoolDTO> findSchoolDetails(long id) {
 	Optional<School> schoolByIdOptional = schoolRepo.findById(id);
 	if (schoolByIdOptional.isEmpty()) {
 	    return ResponseEntity.notFound().build();
 	}
 	School schoolById = schoolByIdOptional.get();
-	return ResponseEntity.ok(schoolById);
+	return ResponseEntity.ok(schoolById.convertToDTO());
     }
 
     @Operation(summary = "creates a new school resource")
     @PutMapping("/create/addNewSchool")
     @Transactional
-    public ResponseEntity<School> addNewSchool(@RequestBody AddNewSchoolPostbody addNewSchoolPostbody) {
+    public ResponseEntity<SchoolDTO> addNewSchool(@RequestBody SchoolDTO addNewSchoolPostbody) {
 	Optional<School> alreadyExistingSchool = schoolRepo.findOneBySchoolName(addNewSchoolPostbody.getSchoolName());
 	if (alreadyExistingSchool.isPresent()) {
 	    throw new ResourceAlreadyExistingException(alreadyExistingSchool.get());
@@ -196,17 +196,15 @@ public class SchoolController {
 		addNewSchoolPostbody.getLatitude(), addNewSchoolPostbody.getLongitude(), allMatchingSchoolCriterias);
 	school.setSchoolPicture(addNewSchoolPostbody.getSchoolPicture());
 	school.setAlternativePictureText(addNewSchoolPostbody.getAlternativePictureText());
-	school.setArContent(addNewSchoolPostbody.getArContent());
-	school.setMakerspaceContent(addNewSchoolPostbody.getMakerspaceContent());
 	school.setColor(addNewSchoolPostbody.getColor());
 	fillPersonSchoolMappingOfSchool(addNewSchoolPostbody, school);
 	allFoundProjects.forEach(project -> {
-	    school.getProject().add(project);
+	    school.getProjects().add(project);
 	});
-	return ResponseEntity.ok(schoolRepo.save(school));
+	return ResponseEntity.ok(schoolRepo.save(school).convertToDTO());
     }
 
-    private List<Project> generateProjectEntityListForSchoolPostbody(AddNewSchoolPostbody addNewSchoolPostbody)
+    private List<Project> generateProjectEntityListForSchoolPostbody(SchoolDTO addNewSchoolPostbody)
 	    throws NotFoundException {
 	List<Project> allFoundProjects = new ArrayList<>();
 	if (addNewSchoolPostbody.getProjects() == null) {
@@ -225,7 +223,7 @@ public class SchoolController {
     @Operation(summary = "alterates an already existing school resource")
     @PatchMapping("/edit/alterSchool")
     @Transactional
-    public ResponseEntity<School> alterSchool(@RequestBody AlterSchoolPostbody alterSchoolPostbody) {
+    public ResponseEntity<SchoolDTO> alterSchool(@RequestBody SchoolDTO alterSchoolPostbody) {
 	Optional<School> alreadyExistingSchool = schoolRepo.findById(alterSchoolPostbody.getId());
 	if (alreadyExistingSchool.isEmpty()) {
 	    throw new ResourceNotFoundException(alterSchoolPostbody, "school");
@@ -248,15 +246,14 @@ public class SchoolController {
 	matchingSchool.setMatchingCriterias(allMatchingSchoolCriterias);
 	matchingSchool.setSchoolPicture(alterSchoolPostbody.getSchoolPicture());
 	matchingSchool.setAlternativePictureText(alterSchoolPostbody.getAlternativePictureText());
-	matchingSchool.setArContent(alterSchoolPostbody.getArContent());
-	matchingSchool.setMakerspaceContent(alterSchoolPostbody.getMakerspaceContent());
 	matchingSchool.setColor(alterSchoolPostbody.getColor());
 	matchingSchool.getPersonSchoolMapping().clear();
+	matchingSchool.getProjects().clear();
 	allFoundProjects.forEach(project -> {
-	    matchingSchool.getProject().add(project);
+	    matchingSchool.getProjects().add(project);
 	});
 	fillPersonSchoolMappingOfSchool(alterSchoolPostbody, matchingSchool);
-	return ResponseEntity.ok(schoolRepo.save(matchingSchool));
+	return ResponseEntity.ok(schoolRepo.save(matchingSchool).convertToDTO());
     }
 
     @GetMapping("/search/findPersonFunctionalityForPersonAndSchoolAndFunctionality")
@@ -280,12 +277,12 @@ public class SchoolController {
 
     @Operation(summary = "deletes a school resource")
     @DeleteMapping("/delete/deleteSchool")
-    public ResponseEntity<School> deleteSchool(long schoolId) {
+    public ResponseEntity<SchoolDTO> deleteSchool(long schoolId) {
 	schoolRepo.deleteById(schoolId);
 	return ResponseEntity.ok().build();
     }
 
-    private void fillPersonSchoolMappingOfSchool(AddNewSchoolPostbody alterSchoolPostbody, School matchingSchool) {
+    private void fillPersonSchoolMappingOfSchool(SchoolDTO alterSchoolPostbody, School matchingSchool) {
 
 	alterSchoolPostbody.getPersonSchoolMapping().forEach(e -> {
 	    Optional<Person> personById = personRepo.findById(e.getPerson().getId());
@@ -299,12 +296,12 @@ public class SchoolController {
 		    .findOneByName(e.getFunctionality().getName());
 	    PersonSchoolMapping personSchoolMapping = new PersonSchoolMapping(personById.get(), matchingSchool,
 		    matchingFunctionalityOptional.get());
+	    personSchoolMapping.setDescription(e.getDescription());
 	    matchingSchool.getPersonSchoolMapping().add(personSchoolMapping);
 	});
     }
 
-    private List<Criteria> generateMatchingSchoolCriteriasAndPersistIfNotExisting(
-	    AddNewSchoolPostbody alterSchoolPostbody) {
+    private List<Criteria> generateMatchingSchoolCriteriasAndPersistIfNotExisting(SchoolDTO alterSchoolPostbody) {
 	List<Criteria> allMatchingSchoolCriterias = new ArrayList<>();
 	if (alterSchoolPostbody.getMatchingCriterias() != null) {
 	    allMatchingSchoolCriterias = criteriaRepo.findAllByCriteriaNameIn(alterSchoolPostbody.getMatchingCriterias()
@@ -321,7 +318,7 @@ public class SchoolController {
 	return allMatchingSchoolCriterias;
     }
 
-    private boolean isSchoolPostbodyNotValid(AddNewSchoolPostbody addNewSchoolPostbody) {
+    private boolean isSchoolPostbodyNotValid(SchoolDTO addNewSchoolPostbody) {
 	return addNewSchoolPostbody.getPersonSchoolMapping() == null
 		|| addNewSchoolPostbody.getPersonSchoolMapping().isEmpty() || addNewSchoolPostbody.getColor() == null
 		|| addNewSchoolPostbody.getColor().isEmpty()

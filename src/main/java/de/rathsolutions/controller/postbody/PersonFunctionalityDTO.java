@@ -33,13 +33,15 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class PersonFunctionalityEntity {
+public class PersonFunctionalityDTO {
 
     private long mappingId;
 
     private Person person;
 
     private Functionality functionality;
+
+    private String description;
 
     @JsonFormat(with = JsonFormat.Feature.ACCEPT_CASE_INSENSITIVE_PROPERTIES)
     public enum PersonFunctionality {

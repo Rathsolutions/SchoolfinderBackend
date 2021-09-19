@@ -38,6 +38,7 @@ import javax.persistence.OneToMany;
 
 import org.hibernate.annotations.Type;
 
+import de.rathsolutions.controller.postbody.SchoolDTO;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
@@ -66,10 +67,6 @@ public class School {
     private Double longitude;
 
     private String color;
-    @Type(type = "text")
-    private String arContent;
-    @Type(type = "text")
-    private String makerspaceContent;
     @Lob
     private String schoolPicture;
     @Type(type = "text")
@@ -82,7 +79,7 @@ public class School {
     private List<Criteria> matchingCriterias;
 
     @ManyToMany(fetch = FetchType.LAZY)
-    private List<Project> project;
+    private List<Project> projects;
 
     public School(String shortSchoolName, String schoolName, Double latitude, Double longitude,
 	    List<Criteria> matchingCriterias) {
@@ -91,6 +88,26 @@ public class School {
 	this.latitude = latitude;
 	this.longitude = longitude;
 	this.matchingCriterias = matchingCriterias;
+    }
+
+    public SchoolDTO convertToDTO() {
+	SchoolDTO dto = new SchoolDTO();
+	dto.setAlternativePictureText(this.alternativePictureText);
+	dto.setColor(this.color);
+	dto.setId(this.id);
+	dto.setLatitude(this.latitude);
+	dto.setLongitude(this.longitude);
+	dto.setMatchingCriterias(getMatchingCriterias());
+	personSchoolMapping.forEach(e -> {
+	    dto.getPersonSchoolMapping().add(e.convertToDTO());
+	});
+	projects.forEach(e -> {
+	    dto.getProjects().add(e.convertToDto());
+	});
+	dto.setSchoolName(this.schoolName);
+	dto.setSchoolPicture(this.schoolPicture);
+	dto.setShortSchoolName(this.shortSchoolName);
+	return dto;
     }
 
 }

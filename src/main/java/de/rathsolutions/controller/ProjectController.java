@@ -21,6 +21,7 @@
  */
 package de.rathsolutions.controller;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -46,6 +47,15 @@ public class ProjectController {
 
     @Autowired
     private ProjectRepo projectRepo;
+
+    @GetMapping(value = "/search/findAll")
+    public ResponseEntity<List<ProjectDTO>> findAll() {
+	List<ProjectDTO> allProjects = new ArrayList<>();
+	projectRepo.findAll().forEach(e -> {
+	    allProjects.add(e.convertToDto());
+	});
+	return ResponseEntity.ok(allProjects);
+    }
 
     @GetMapping("/search/getProjectByName/{name}")
     public ResponseEntity<ProjectDTO> getProjectByName(@PathVariable(name = "name", required = true) String name) {
