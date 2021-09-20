@@ -1,8 +1,8 @@
 /*-
  * #%L
- * SchuglemapsBackend
+ * SchoolfinderBackend
  * %%
- * Copyright (C) 2020 Rathsolutions. <info@rathsolutions.de>
+ * Copyright (C) 2020 - 2021 Rathsolutions. <info@rathsolutions.de>
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
@@ -25,8 +25,13 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.Table;
 
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.Point;
+import org.locationtech.jts.geom.Polygon;
+
+import de.rathsolutions.controller.postbody.AreaDTO;
+import de.rathsolutions.controller.postbody.Position;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
@@ -38,14 +43,28 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @RequiredArgsConstructor
-@Table(name = "user_table")
-public class User {
+public class Area {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private long id;
+
     @NonNull
-    private String username;
-    @NonNull
-    private String password;
+    private String name;
+
+    private Point areaInstitutionPosition;
+
+    private Polygon area;
+
+    public AreaDTO convertToDTO() {
+	AreaDTO dto = new AreaDTO();
+	dto.setId(this.id);
+	dto.setAreaName(this.name);
+	dto.setAreaInstitutionPosition(new Position(areaInstitutionPosition.getX(), areaInstitutionPosition.getY()));
+	for (Coordinate c : area.getCoordinates()) {
+	    dto.getAreaPolygon().add(new Position(c.getX(), c.getY()));
+	}
+	return dto;
+    }
+
 }
