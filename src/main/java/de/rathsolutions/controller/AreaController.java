@@ -35,6 +35,7 @@ import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import de.rathsolutions.controller.postbody.AreaDTO;
@@ -49,6 +50,15 @@ public class AreaController {
     @Autowired
     private AreaRepository repository;
 
+    @GetMapping("/search/findByName")
+    public ResponseEntity<AreaDTO> findByName(@RequestParam(value = "name") String name) {
+	Optional<Area> areaOptional = repository.findOneByNameIgnoreCase(name);
+	if (areaOptional.isEmpty()) {
+	    return ResponseEntity.badRequest().build();
+	}
+	return ResponseEntity.ok(areaOptional.get().convertToDTO());
+    }
+
     @GetMapping("/search/findAll")
     public ResponseEntity<List<AreaDTO>> findAll() {
 	return ResponseEntity.ok(repository.findAll().stream().map(e -> e.convertToDTO()).collect(Collectors.toList()));
@@ -56,7 +66,7 @@ public class AreaController {
 
     @PutMapping(value = "/create")
     public ResponseEntity<AreaDTO> create(@RequestBody AreaDTO dto) {
-	Optional<Area> areaByName = repository.findOneByNameIgnoreCase(dto.getAreaName());
+	Optional<Area> areaByName = repository.findOneByNameIgnoreCase(dto.getName());
 	if (areaByName.isPresent()) {
 	    return ResponseEntity.status(HttpStatus.CONFLICT).build();
 	}
@@ -67,7 +77,7 @@ public class AreaController {
 
     @PatchMapping(value = "/edit")
     public ResponseEntity<AreaDTO> edit(@RequestBody AreaDTO dto) {
-	Optional<Area> areaByName = repository.findOneByNameIgnoreCase(dto.getAreaName());
+	Optional<Area> areaByName = repository.findOneByNameIgnoreCase(dto.getName());
 	if (areaByName.isEmpty()) {
 	    return ResponseEntity.notFound().build();
 	}
@@ -77,7 +87,8 @@ public class AreaController {
     }
 
     private Area fillArea(AreaDTO dto, Area area) {
-	area.setName(dto.getAreaName());
+	area.setName(dto.getName());
+	area.setColor(dto.getColor());
 	org.locationtech.jts.geom.Point locationPoint = GeometryUtils.createPoint(
 		dto.getAreaInstitutionPosition().getLatitude(), dto.getAreaInstitutionPosition().getLongitude());
 	area.setAreaInstitutionPosition(locationPoint);

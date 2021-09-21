@@ -35,7 +35,9 @@ public class AreaDTO {
 
     private long id;
 
-    private String areaName;
+    private String name;
+
+    private String color;
 
     private Position areaInstitutionPosition;
 

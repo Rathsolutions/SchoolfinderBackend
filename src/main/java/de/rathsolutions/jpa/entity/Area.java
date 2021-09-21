@@ -56,10 +56,13 @@ public class Area {
 
     private Polygon area;
 
+    private String color;
+
     public AreaDTO convertToDTO() {
 	AreaDTO dto = new AreaDTO();
 	dto.setId(this.id);
-	dto.setAreaName(this.name);
+	dto.setName(this.name);
+	dto.setColor(color);
 	dto.setAreaInstitutionPosition(new Position(areaInstitutionPosition.getX(), areaInstitutionPosition.getY()));
 	for (Coordinate c : area.getCoordinates()) {
 	    dto.getAreaPolygon().add(new Position(c.getX(), c.getY()));
