@@ -79,7 +79,7 @@ public class School {
     private List<Criteria> matchingCriterias;
 
     @ManyToMany(fetch = FetchType.LAZY)
-    private List<Project> projects;
+    private List<Project> projects = new ArrayList<>();
 
     public School(String shortSchoolName, String schoolName, Double latitude, Double longitude,
 	    List<Criteria> matchingCriterias) {
