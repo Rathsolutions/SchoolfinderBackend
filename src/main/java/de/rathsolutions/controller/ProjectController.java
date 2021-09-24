@@ -21,10 +21,13 @@
  */
 package de.rathsolutions.controller;
 
+import de.rathsolutions.controller.postbody.ProjectDTO;
+import de.rathsolutions.jpa.entity.Project;
+import de.rathsolutions.jpa.entity.School;
+import de.rathsolutions.jpa.repo.ProjectRepo;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,11 +38,6 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import de.rathsolutions.controller.postbody.ProjectDTO;
-import de.rathsolutions.jpa.entity.Project;
-import de.rathsolutions.jpa.entity.School;
-import de.rathsolutions.jpa.repo.ProjectRepo;
 
 @RestController
 @RequestMapping("/api/v1/project")
@@ -79,7 +77,7 @@ public class ProjectController {
     @PutMapping("/create")
     public ResponseEntity<ProjectDTO> createProject(@RequestBody ProjectDTO projectToCreate) {
 	System.out.println(projectToCreate.toString());
-	Project projectEntity = new Project(projectToCreate.getName(), projectToCreate.getIcon());
+	Project projectEntity = new Project(projectToCreate.getName(), projectToCreate.getIcon().getBytes());
 	return ResponseEntity.ok(projectRepo.save(projectEntity).convertToDto());
     }
 
@@ -92,7 +90,7 @@ public class ProjectController {
 	}
 	Project projectEntity = projectEntityOptional.get();
 	projectEntity.setProjectName(projectToCreate.getName());
-	projectEntity.setDefaultIcon(projectToCreate.getIcon());
+	projectEntity.setDefaultIcon(projectToCreate.getIcon().getBytes());
 	return ResponseEntity.ok(projectRepo.save(projectEntity).convertToDto());
     }
 
