@@ -139,6 +139,14 @@ public class SchoolController {
 	    String bottomLongBound,
 	    @RequestParam(value = "criteriaNumbers", required = false) List<Long> criteriaNumbers,
 	    @RequestParam(value = "exclusiveSearch", required = false, defaultValue = "false") boolean exclusiveSearch) {
+	return findAllSchoolsByInBoundsInternal(leftLatBound, rightLatBound, topLongBound, bottomLongBound,
+		criteriaNumbers, exclusiveSearch).stream().map(e -> e.convertToDTO()).collect(Collectors.toList());
+    }
+
+    private List<School> findAllSchoolsByInBoundsInternal(String leftLatBound, String rightLatBound,
+	    String topLongBound, String bottomLongBound,
+	    @RequestParam(value = "criteriaNumbers", required = false) List<Long> criteriaNumbers,
+	    @RequestParam(value = "exclusiveSearch", required = false, defaultValue = "false") boolean exclusiveSearch) {
 	Double leftLat = Double.valueOf(leftLatBound);
 	Double rightLat = Double.valueOf(rightLatBound);
 	Double topLong = Double.valueOf(topLongBound);
@@ -149,15 +157,31 @@ public class SchoolController {
 		    .findDistinctByLatitudeBetweenAndLongitudeBetweenAndMatchingCriteriasIn(leftLat, rightLat, topLong,
 			    bottomLong, criterias);
 	    if (!exclusiveSearch) {
-		return allSchoolsMatching.stream().map(e -> e.convertToDTO()).collect(Collectors.toList());
+		return allSchoolsMatching;
 	    } else {
 		return allSchoolsMatching.stream().filter(e -> e.getMatchingCriterias().containsAll(criterias))
-			.map(e -> e.convertToDTO()).collect(Collectors.toList());
+			.collect(Collectors.toList());
 	    }
 	}
-	List<School> allByLatitudeBetweenAndLongitudeBetween = schoolRepo
-		.findAllByLatitudeBetweenAndLongitudeBetween(leftLat, rightLat, topLong, bottomLong);
-	return allByLatitudeBetweenAndLongitudeBetween.stream().map(e -> e.convertToDTO()).collect(Collectors.toList());
+	return schoolRepo.findAllByLatitudeBetweenAndLongitudeBetween(leftLat, rightLat, topLong, bottomLong);
+    }
+
+    @Operation(summary = "searches all school resources within latlong boundaries")
+    @GetMapping("/search/findAllSchoolsInBoundsHavingCriteriasAndProject")
+    @Transactional
+    public ResponseEntity<List<SchoolDTO>> findAllSchoolsInBoundsHavingCriteriasAndProject(String leftLatBound,
+	    String rightLatBound, String topLongBound, String bottomLongBound,
+	    @RequestParam(value = "projectId", required = false) Long projectId,
+	    @RequestParam(value = "criteriaNumbers", required = false) List<Long> criteriaNumbers,
+	    @RequestParam(value = "exclusiveSearch", required = false, defaultValue = "false") boolean exclusiveSearch) {
+	List<School> matchingSchools = this.findAllSchoolsByInBoundsInternal(leftLatBound, rightLatBound, topLongBound,
+		bottomLongBound, criteriaNumbers, exclusiveSearch);
+	if (projectId == null) {
+	    return ResponseEntity.ok(matchingSchools.stream().map(e -> e.convertToDTO()).collect(Collectors.toList()));
+	}
+	return ResponseEntity.ok(matchingSchools.stream()
+		.filter(e -> e.getProjects().stream().anyMatch(f -> f.getId() == projectId.longValue()))
+		.map(e -> e.convertToDTO()).collect(Collectors.toList()));
     }
 
     @Operation(summary = "searches a school resource by id with all details")
