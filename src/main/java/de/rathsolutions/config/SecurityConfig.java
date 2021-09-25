@@ -59,8 +59,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     public CorsConfigurationSource corsConfigurationSource() {
 	final CorsConfiguration configuration = new CorsConfiguration();
 
-	configuration
-		.setAllowedOrigins(Arrays.asList("https://schoolfinder.rathsolutions.de", "http://localhost:4200"));
+	configuration.setAllowedOrigins(
+		Arrays.asList("https://schoolfinder.rathsolutions.de", "http://localhost:4200", "*"));
 	configuration.setAllowedHeaders(Collections.singletonList("*"));
 	configuration.addExposedHeader("Authorization");
 	configuration.setAllowCredentials(true);

@@ -45,7 +45,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.xml.sax.SAXException;
 
-import de.rathsolutions.controller.postbody.ProjectDTO;
 import de.rathsolutions.controller.postbody.SchoolDTO;
 import de.rathsolutions.jpa.entity.Criteria;
 import de.rathsolutions.jpa.entity.Functionality;
@@ -207,17 +206,16 @@ public class SchoolController {
     private List<Project> generateProjectEntityListForSchoolPostbody(SchoolDTO addNewSchoolPostbody)
 	    throws NotFoundException {
 	List<Project> allFoundProjects = new ArrayList<>();
-	if (addNewSchoolPostbody.getProjects() == null) {
+	if (addNewSchoolPostbody.getProject() == null) {
 	    return allFoundProjects;
 	}
-	for (ProjectDTO project : addNewSchoolPostbody.getProjects()) {
-	    Optional<Project> projectEntity = projectRepo.findById(Long.valueOf(project.getId()));
-	    if (projectEntity.isEmpty()) {
-		throw new NotFoundException("One of the requested Projects could not be found!");
-	    }
-	    allFoundProjects.add(projectEntity.get());
+	Optional<Project> projectEntity = projectRepo.findById(Long.valueOf(addNewSchoolPostbody.getProject().getId()));
+	if (projectEntity.isEmpty()) {
+	    throw new NotFoundException("One of the requested Projects could not be found!");
 	}
+	allFoundProjects.add(projectEntity.get());
 	return allFoundProjects;
+
     }
 
     @Operation(summary = "alterates an already existing school resource")

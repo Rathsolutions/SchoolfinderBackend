@@ -56,6 +56,6 @@ public class SchoolDTO {
 
     private List<Criteria> matchingCriterias = new ArrayList<>();
 
-    private List<ProjectDTO> projects = new ArrayList<>();
+    private ProjectDTO project;
 
 }

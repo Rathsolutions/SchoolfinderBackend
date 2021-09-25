@@ -101,9 +101,7 @@ public class School {
 	personSchoolMapping.forEach(e -> {
 	    dto.getPersonSchoolMapping().add(e.convertToDTO());
 	});
-	projects.forEach(e -> {
-	    dto.getProjects().add(e.convertToDto());
-	});
+	dto.setProject(this.projects.get(0).convertToDto());
 	dto.setSchoolName(this.schoolName);
 	dto.setSchoolPicture(this.schoolPicture);
 	dto.setShortSchoolName(this.shortSchoolName);
