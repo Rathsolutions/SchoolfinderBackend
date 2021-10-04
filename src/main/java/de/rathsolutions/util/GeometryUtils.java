@@ -41,6 +41,8 @@ public final class GeometryUtils {
     }
 
     public static Polygon createPolygon(List<Coordinate> coordinateList) {
-	return GEOMETRY_FACTORY.createPolygon(coordinateList.toArray(new Coordinate[coordinateList.size()]));
+	Polygon polygon = GEOMETRY_FACTORY.createPolygon(coordinateList.toArray(new Coordinate[coordinateList.size()]));
+	polygon.setSRID(3857);
+	return polygon;
     }
 }

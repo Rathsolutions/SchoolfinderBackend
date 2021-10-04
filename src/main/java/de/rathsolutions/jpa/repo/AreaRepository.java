@@ -21,9 +21,12 @@
  */
 package de.rathsolutions.jpa.repo;
 
+import java.util.List;
 import java.util.Optional;
 
+import org.locationtech.jts.geom.Point;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import de.rathsolutions.jpa.entity.Area;
@@ -32,4 +35,7 @@ import de.rathsolutions.jpa.entity.Area;
 public interface AreaRepository extends JpaRepository<Area, Long> {
 
     public Optional<Area> findOneByNameIgnoreCase(String name);
+
+    @Query(value = "SELECT * FROM public.area WHERE ST_contains(area, ST_Transform(:p, 3857))", nativeQuery = true)
+    public List<Area> findAreasContainingPoint(Point p);
 }

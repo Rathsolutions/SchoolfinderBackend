@@ -58,4 +58,6 @@ public class SchoolDTO {
 
     private ProjectDTO project;
 
+    private String correspondingAreaName;
+
 }

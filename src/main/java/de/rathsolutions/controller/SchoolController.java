@@ -32,6 +32,7 @@ import javax.naming.OperationNotSupportedException;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 
+import org.locationtech.jts.geom.Point;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
@@ -46,18 +47,21 @@ import org.springframework.web.bind.annotation.RestController;
 import org.xml.sax.SAXException;
 
 import de.rathsolutions.controller.postbody.SchoolDTO;
+import de.rathsolutions.jpa.entity.Area;
 import de.rathsolutions.jpa.entity.Criteria;
 import de.rathsolutions.jpa.entity.Functionality;
 import de.rathsolutions.jpa.entity.Person;
 import de.rathsolutions.jpa.entity.PersonSchoolMapping;
 import de.rathsolutions.jpa.entity.Project;
 import de.rathsolutions.jpa.entity.School;
+import de.rathsolutions.jpa.repo.AreaRepository;
 import de.rathsolutions.jpa.repo.CriteriaRepo;
 import de.rathsolutions.jpa.repo.FunctionalityRepo;
 import de.rathsolutions.jpa.repo.PersonRepo;
 import de.rathsolutions.jpa.repo.PersonSchoolMappingRepo;
 import de.rathsolutions.jpa.repo.ProjectRepo;
 import de.rathsolutions.jpa.repo.SchoolRepo;
+import de.rathsolutions.util.GeometryUtils;
 import de.rathsolutions.util.exception.BadArgumentsException;
 import de.rathsolutions.util.exception.ResourceAlreadyExistingException;
 import de.rathsolutions.util.exception.ResourceNotFoundException;
@@ -94,6 +98,9 @@ public class SchoolController {
     @Autowired
     private FunctionalityRepo functionalityRepo;
 
+    @Autowired
+    private AreaRepository areaRepo;
+
     @Operation(summary = "searches non-registered school resources by their name in an osm document. This schools must not be registered within the application")
     @GetMapping("/search/findNotRegisteredSchoolsByName")
     public ResponseEntity<List<OsmPOIEntity>> findNotRegisteredSchoolsByNameAdmin(
@@ -123,7 +130,17 @@ public class SchoolController {
     @Operation(summary = "searches all school resources")
     @GetMapping("/search/findAllSchools")
     public List<SchoolDTO> findAllSchools() {
-	return schoolRepo.findAll().stream().map(e -> e.convertToDTO()).collect(Collectors.toList());
+	List<SchoolDTO> allSchools = schoolRepo.findAll().stream().map(e -> e.convertToDTO())
+		.collect(Collectors.toList());
+	allSchools.forEach(e -> {
+	    Point locationPoint = GeometryUtils.createPoint(e.getLatitude(), e.getLongitude());
+	    locationPoint.setSRID(4326);
+	    List<Area> areasContainingPoint = areaRepo.findAreasContainingPoint(locationPoint);
+	    if (!areasContainingPoint.isEmpty()) {
+		e.setCorrespondingAreaName(areasContainingPoint.get(0).getName());
+	    }
+	});
+	return allSchools;
     }
 
     @Operation(summary = "searches all school resources ordered by their name")
