@@ -236,7 +236,6 @@ public class SchoolController {
 		addNewSchoolPostbody.getLatitude(), addNewSchoolPostbody.getLongitude(), allMatchingSchoolCriterias);
 	school.setSchoolPicture(addNewSchoolPostbody.getSchoolPicture());
 	school.setAlternativePictureText(addNewSchoolPostbody.getAlternativePictureText());
-	school.setColor(addNewSchoolPostbody.getColor());
 	fillPersonSchoolMappingOfSchool(addNewSchoolPostbody, school);
 	allFoundProjects.forEach(project -> {
 	    school.getProjects().add(project);
@@ -285,7 +284,6 @@ public class SchoolController {
 	matchingSchool.setMatchingCriterias(allMatchingSchoolCriterias);
 	matchingSchool.setSchoolPicture(alterSchoolPostbody.getSchoolPicture());
 	matchingSchool.setAlternativePictureText(alterSchoolPostbody.getAlternativePictureText());
-	matchingSchool.setColor(alterSchoolPostbody.getColor());
 	matchingSchool.getPersonSchoolMapping().clear();
 	matchingSchool.getProjects().clear();
 	allFoundProjects.forEach(project -> {
@@ -359,8 +357,6 @@ public class SchoolController {
 
     private boolean isSchoolPostbodyNotValid(SchoolDTO addNewSchoolPostbody) {
 	return addNewSchoolPostbody.getPersonSchoolMapping() == null
-		|| addNewSchoolPostbody.getPersonSchoolMapping().isEmpty() || addNewSchoolPostbody.getColor() == null
-		|| addNewSchoolPostbody.getColor().isEmpty()
-		|| !addNewSchoolPostbody.getColor().matches(COLOR_CODE_REGEX);
+		|| addNewSchoolPostbody.getPersonSchoolMapping().isEmpty();
     }
 }

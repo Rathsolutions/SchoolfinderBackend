@@ -66,7 +66,6 @@ public class School {
     @NonNull
     private Double longitude;
 
-    private String color;
     @Lob
     private String schoolPicture;
     @Type(type = "text")
@@ -93,7 +92,6 @@ public class School {
     public SchoolDTO convertToDTO() {
 	SchoolDTO dto = new SchoolDTO();
 	dto.setAlternativePictureText(this.alternativePictureText);
-	dto.setColor(this.color);
 	dto.setId(this.id);
 	dto.setLatitude(this.latitude);
 	dto.setLongitude(this.longitude);

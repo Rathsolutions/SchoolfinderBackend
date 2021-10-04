@@ -88,8 +88,8 @@ public class ProjectController {
 
     @PutMapping("/create")
     public ResponseEntity<ProjectDTO> createProject(@RequestBody ProjectDTO projectToCreate) {
-	System.out.println(projectToCreate.toString());
-	Project projectEntity = new Project(projectToCreate.getName(), projectToCreate.getIcon().getBytes());
+	Project projectEntity = new Project(projectToCreate.getName(), projectToCreate.getIcon().getBytes(),
+		projectToCreate.getScaling());
 	return ResponseEntity.ok(projectRepo.save(projectEntity).convertToDto());
     }
 
@@ -103,6 +103,7 @@ public class ProjectController {
 	Project projectEntity = projectEntityOptional.get();
 	projectEntity.setProjectName(projectToCreate.getName());
 	projectEntity.setDefaultIcon(projectToCreate.getIcon().getBytes());
+	projectEntity.setScaling(projectToCreate.getScaling());
 	return ResponseEntity.ok(projectRepo.save(projectEntity).convertToDto());
     }
 

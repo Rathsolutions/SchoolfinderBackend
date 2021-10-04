@@ -46,8 +46,6 @@ public class SchoolDTO {
 
     private double longitude;
 
-    private String color;
-
     private String schoolPicture;
 
     private String alternativePictureText;

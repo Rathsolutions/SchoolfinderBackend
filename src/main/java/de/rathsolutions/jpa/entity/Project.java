@@ -21,9 +21,9 @@
  */
 package de.rathsolutions.jpa.entity;
 
-import de.rathsolutions.controller.postbody.ProjectDTO;
 import java.util.ArrayList;
 import java.util.List;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -32,6 +32,8 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
+
+import de.rathsolutions.controller.postbody.ProjectDTO;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
@@ -56,6 +58,14 @@ public class Project {
     @NonNull
     private byte[] defaultIcon;
 
+    private Double scaling = 1.0;
+
+    public Project(String projectName, byte[] defaultIcon, double scaling) {
+	this.projectName = projectName;
+	this.defaultIcon = defaultIcon;
+	this.scaling = scaling;
+    }
+
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "school_project_mapping", joinColumns = @JoinColumn(name = "project_id"), inverseJoinColumns = @JoinColumn(name = "school_id"))
     private List<School> allSchools = new ArrayList<>();
@@ -69,6 +79,6 @@ public class Project {
     }
 
     public ProjectDTO convertToDto() {
-	return new ProjectDTO(String.valueOf(this.id), this.projectName, new String(this.defaultIcon));
+	return new ProjectDTO(String.valueOf(this.id), this.projectName, new String(this.defaultIcon), this.scaling);
     }
 }

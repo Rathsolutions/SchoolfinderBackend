@@ -39,4 +39,6 @@ public class ProjectDTO {
     private String name;
 
     private String icon;
+
+    private Double scaling = 0.03;
 }
