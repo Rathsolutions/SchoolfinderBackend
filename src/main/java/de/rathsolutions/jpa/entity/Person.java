@@ -21,9 +21,9 @@
  */
 package de.rathsolutions.jpa.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.ArrayList;
 import java.util.List;
+
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -31,6 +31,9 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
@@ -56,17 +59,16 @@ public class Person {
     private String email;
 
     private String phoneNumber;
-    
-    public Person(String prename, String lastname, String email, String phoneNumber) {
-        this.prename = prename;
-        this.lastname = lastname;
-        this.email = email;
-        this.phoneNumber = phoneNumber;
-    }
 
-    @OneToMany(cascade = { CascadeType.PERSIST,
-            CascadeType.MERGE }, fetch = FetchType.LAZY, mappedBy = "person")
+    @OneToMany(cascade = { CascadeType.PERSIST, CascadeType.MERGE }, fetch = FetchType.LAZY, mappedBy = "person")
     @JsonIgnore
     private List<PersonSchoolMapping> personSchoolMapping = new ArrayList<>();
+
+    public Person(String prename, String lastname, String email, String phoneNumber) {
+	this.prename = prename;
+	this.lastname = lastname;
+	this.email = email;
+	this.phoneNumber = phoneNumber;
+    }
 
 }

@@ -32,6 +32,9 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
+import javax.persistence.OneToMany;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import de.rathsolutions.controller.postbody.ProjectDTO;
 import lombok.Getter;
@@ -69,6 +72,10 @@ public class Project {
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "school_project_mapping", joinColumns = @JoinColumn(name = "project_id"), inverseJoinColumns = @JoinColumn(name = "school_id"))
     private List<School> allSchools = new ArrayList<>();
+
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "primaryProject")
+    @JsonIgnore
+    private List<School> allSchoolsHavingPrimaryProject = new ArrayList<>();
 
     public void addSchool(School schoolToAdd) {
 	this.allSchools.add(schoolToAdd);

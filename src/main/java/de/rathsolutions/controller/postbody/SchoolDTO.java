@@ -54,7 +54,9 @@ public class SchoolDTO {
 
     private List<Criteria> matchingCriterias = new ArrayList<>();
 
-    private ProjectDTO project;
+    private List<ProjectDTO> projects = new ArrayList<>();
+
+    private ProjectDTO primaryProject;
 
     private String correspondingAreaName;
 

@@ -280,8 +280,8 @@ public class SchoolControllerTest {
     @Test
     @Transactional
     void testAddNewSchoolAlreadyExisting() {
-	SchoolDTO newSchool = new SchoolDTO(SCHOOL_MOCK_ID, SHORT_TESTSCHOOL, TESTSCHOOL, 21, 12, "ff0000", "", "",
-		null, null, null, "");
+	SchoolDTO newSchool = new SchoolDTO(SCHOOL_MOCK_ID, SHORT_TESTSCHOOL, TESTSCHOOL, 21, 12, "", "", null, null,
+		null, null, "");
 	assertThrows(ResourceAlreadyExistingException.class, () -> {
 	    cut.addNewSchool(newSchool);
 	});
@@ -291,8 +291,8 @@ public class SchoolControllerTest {
     @Test
     @Transactional
     void testAlterSchoolNotExisting() {
-	SchoolDTO newSchool = new SchoolDTO(4, SHORT_NOT_EXISTING, TESTSCHOOL5, 21, 12, "ff0000", "", "", null, null,
-		null, "");
+	SchoolDTO newSchool = new SchoolDTO(4, SHORT_NOT_EXISTING, TESTSCHOOL5, 21, 12, "", "", null, null, null, null,
+		"");
 	assertThrows(ResourceNotFoundException.class, () -> {
 	    cut.alterSchool(newSchool);
 	});
@@ -301,8 +301,8 @@ public class SchoolControllerTest {
 
     @Test
     void testAddNewSchoolNullPersonsNullCriterias() {
-	SchoolDTO newSchool = new SchoolDTO(SCHOOL_MOCK_ID, SHORT_NOT_EXISTING, TESTSCHOOL5, 21, 12, "ff0000", "", "",
-		null, null, null, "");
+	SchoolDTO newSchool = new SchoolDTO(SCHOOL_MOCK_ID, SHORT_NOT_EXISTING, TESTSCHOOL5, 21, 12, "", "", null, null,
+		null, null, "");
 	assertThrows(BadArgumentsException.class, () -> {
 	    cut.addNewSchool(newSchool);
 	});
@@ -310,8 +310,8 @@ public class SchoolControllerTest {
 
     @Test
     void testAlterSchoolNullPersonsNullCriterias() {
-	SchoolDTO newSchool = new SchoolDTO(1, SHORT_NOT_EXISTING, TESTSCHOOL5, 21, 12, "", "", "ff0000", null, null,
-		null, "");
+	SchoolDTO newSchool = new SchoolDTO(1, SHORT_NOT_EXISTING, TESTSCHOOL5, 21, 12, "", "", null, null, null, null,
+		"");
 	assertThrows(BadArgumentsException.class, () -> {
 	    cut.alterSchool(newSchool);
 	});
@@ -319,7 +319,7 @@ public class SchoolControllerTest {
 
     @Test
     void testAddNewSchoolNullColor() {
-	SchoolDTO newSchool = new SchoolDTO(SCHOOL_MOCK_ID, SHORT_NOT_EXISTING, TESTSCHOOL5, 21, 12, null, "", "", null,
+	SchoolDTO newSchool = new SchoolDTO(SCHOOL_MOCK_ID, SHORT_NOT_EXISTING, TESTSCHOOL5, 21, 12, "", "", null, null,
 		null, null, "");
 	assertThrows(BadArgumentsException.class, () -> {
 	    cut.addNewSchool(newSchool);
@@ -337,7 +337,7 @@ public class SchoolControllerTest {
 
     @Test
     void testAddNewSchoolEmptyColor() {
-	SchoolDTO newSchool = new SchoolDTO(SCHOOL_MOCK_ID, SHORT_NOT_EXISTING, TESTSCHOOL5, 21, 12, "", "", "", null,
+	SchoolDTO newSchool = new SchoolDTO(SCHOOL_MOCK_ID, SHORT_NOT_EXISTING, TESTSCHOOL5, 21, 12, "", "", null, null,
 		null, null, "");
 	assertThrows(BadArgumentsException.class, () -> {
 	    cut.addNewSchool(newSchool);
@@ -346,7 +346,7 @@ public class SchoolControllerTest {
 
     @Test
     void testAlterSchoolEmptyColor() {
-	SchoolDTO newSchool = new SchoolDTO(1, SHORT_NOT_EXISTING, TESTSCHOOL5, 21, 12, "", "", "", null, null, null,
+	SchoolDTO newSchool = new SchoolDTO(1, SHORT_NOT_EXISTING, TESTSCHOOL5, 21, 12, "", "", null, null, null, null,
 		"");
 	assertThrows(BadArgumentsException.class, () -> {
 	    cut.alterSchool(newSchool);
@@ -355,8 +355,8 @@ public class SchoolControllerTest {
 
     @Test
     void testAddNewSchoolColorNotMatchingRegex() {
-	SchoolDTO newSchool = new SchoolDTO(SCHOOL_MOCK_ID, SHORT_NOT_EXISTING, TESTSCHOOL5, 21, 12, "", "",
-		"schoolfinder", null, null, null, "");
+	SchoolDTO newSchool = new SchoolDTO(SCHOOL_MOCK_ID, SHORT_NOT_EXISTING, TESTSCHOOL5, 21, 12, "", "", null, null,
+		null, null, "");
 	assertThrows(BadArgumentsException.class, () -> {
 	    cut.addNewSchool(newSchool);
 	});
@@ -364,8 +364,8 @@ public class SchoolControllerTest {
 
     @Test
     void testAlterSchoolColorNotMatchingHexRegex() {
-	SchoolDTO newSchool = new SchoolDTO(1, SHORT_NOT_EXISTING, TESTSCHOOL5, 21, 12, "", "", "schoolfinder", null,
-		null, null, "");
+	SchoolDTO newSchool = new SchoolDTO(1, SHORT_NOT_EXISTING, TESTSCHOOL5, 21, 12, "", "", null, null, null, null,
+		"");
 	assertThrows(BadArgumentsException.class, () -> {
 	    cut.alterSchool(newSchool);
 	});
@@ -376,8 +376,8 @@ public class SchoolControllerTest {
 	List<Criteria> criterias = new ArrayList<>();
 	String testcriteria = "test5";
 	criterias.add(new Criteria(testcriteria));
-	SchoolDTO newSchool = new SchoolDTO(SCHOOL_MOCK_ID, SHORT_NOT_EXISTING, TESTSCHOOL5, 21, 12, "ff0000", "", "",
-		null, criterias, null, "");
+	SchoolDTO newSchool = new SchoolDTO(SCHOOL_MOCK_ID, SHORT_NOT_EXISTING, TESTSCHOOL5, 21, 12, "", "", null,
+		criterias, null, null, "");
 	assertThrows(BadArgumentsException.class, () -> {
 	    cut.addNewSchool(newSchool);
 	});
@@ -390,7 +390,7 @@ public class SchoolControllerTest {
 	List<Criteria> criterias = new ArrayList<>();
 	String testcriteria = "test5";
 	criterias.add(new Criteria(testcriteria));
-	SchoolDTO newSchool = new SchoolDTO(1, SHORT_TESTSCHOOL, TESTSCHOOL, 21, 12, "", "", "ff0000", null, criterias,
+	SchoolDTO newSchool = new SchoolDTO(1, SHORT_TESTSCHOOL, TESTSCHOOL, 21, 12, "", "", null, criterias, null,
 		null, "");
 	assertThrows(BadArgumentsException.class, () -> {
 	    cut.alterSchool(newSchool);
@@ -411,8 +411,8 @@ public class SchoolControllerTest {
 	person.setId(5L);
 	personFunctionalityEntity.setPerson(person);
 	personFuncList.add(personFunctionalityEntity);
-	SchoolDTO newSchool = new SchoolDTO(SCHOOL_MOCK_ID, SHORT_TESTSCHOOL, testschool, 21, 12, "ff0000", "", "",
-		personFuncList, criterias, null, "");
+	SchoolDTO newSchool = new SchoolDTO(SCHOOL_MOCK_ID, SHORT_TESTSCHOOL, testschool, 21, 12, "", "",
+		personFuncList, criterias, null, null, "");
 	assertThrows(ResourceNotFoundException.class, () -> {
 	    cut.addNewSchool(newSchool);
 	});
@@ -434,8 +434,8 @@ public class SchoolControllerTest {
 	person.setId(5L);
 	personFunctionalityEntity.setPerson(person);
 	personFuncList.add(personFunctionalityEntity);
-	SchoolDTO newSchool = new SchoolDTO(1, SHORT_TESTSCHOOL, testschool, 21, 12, "", "", "ff0000", personFuncList,
-		criterias, null, "");
+	SchoolDTO newSchool = new SchoolDTO(1, SHORT_TESTSCHOOL, testschool, 21, 12, "", "", personFuncList, criterias,
+		null, null, "");
 	assertThrows(ResourceNotFoundException.class, () -> {
 	    cut.alterSchool(newSchool);
 	});
@@ -459,8 +459,8 @@ public class SchoolControllerTest {
 	personFunctionalityEntity.setPerson(person);
 	personFunctionalityEntity.setFunctionality(EMPTY_FUNCTIONALITY);
 	personFuncList.add(personFunctionalityEntity);
-	SchoolDTO newSchool = new SchoolDTO(SCHOOL_MOCK_ID, SHORT_TESTSCHOOL, testschool, 21, 12, "ff0000", "", "",
-		personFuncList, criterias, null, "");
+	SchoolDTO newSchool = new SchoolDTO(SCHOOL_MOCK_ID, SHORT_TESTSCHOOL, testschool, 21, 12, "", "",
+		personFuncList, criterias, null, null, "");
 	ResponseEntity<SchoolDTO> responseEntity = cut.addNewSchool(newSchool);
 	List<Criteria> allCriterias = criteriaRepo.findAll();
 	List<School> allSchools = schoolRepo.findAll();
@@ -489,8 +489,8 @@ public class SchoolControllerTest {
 	personFunctionalityEntity.setPerson(person);
 	personFunctionalityEntity.setFunctionality(EMPTY_FUNCTIONALITY);
 	personFuncList.add(personFunctionalityEntity);
-	SchoolDTO newSchool = new SchoolDTO(2, SHORT_TESTSCHOOL, testschool, 1, 2, "1", "", "ff0000", personFuncList,
-		criterias, null, "");
+	SchoolDTO newSchool = new SchoolDTO(2, SHORT_TESTSCHOOL, testschool, 1, 2, "1", "", personFuncList, criterias,
+		null, null, "");
 	ResponseEntity<SchoolDTO> responseEntity = cut.alterSchool(newSchool);
 	List<Criteria> allCriterias = criteriaRepo.findAll();
 	List<School> allSchools = schoolRepo.findAll();
@@ -522,8 +522,8 @@ public class SchoolControllerTest {
 	personFunctionalityEntity.setPerson(person);
 	personFunctionalityEntity.setFunctionality(EMPTY_FUNCTIONALITY);
 	personFuncList.add(personFunctionalityEntity);
-	SchoolDTO newSchool = new SchoolDTO(2, SHORT_TESTSCHOOL, testschool, 1, 2, "1", "", "ff0000", personFuncList,
-		criterias, null, "");
+	SchoolDTO newSchool = new SchoolDTO(2, SHORT_TESTSCHOOL, testschool, 1, 2, "1", "", personFuncList, criterias,
+		null, null, "");
 	ResponseEntity<SchoolDTO> responseEntity = cut.alterSchool(newSchool);
 	List<Criteria> allCriterias = criteriaRepo.findAll();
 	List<School> allSchools = schoolRepo.findAll();
@@ -554,8 +554,8 @@ public class SchoolControllerTest {
 	person.setId(0L);
 	personFunctionalityEntity.setPerson(person);
 	personFuncList.add(personFunctionalityEntity);
-	SchoolDTO newSchool = new SchoolDTO(SCHOOL_MOCK_ID, SHORT_TESTSCHOOL, testschool, 21, 12, "", "", "ff0000",
-		personFuncList, criterias, null, "");
+	SchoolDTO newSchool = new SchoolDTO(SCHOOL_MOCK_ID, SHORT_TESTSCHOOL, testschool, 21, 12, "", "",
+		personFuncList, criterias, null, null, "");
 	assertThrows(BadArgumentsException.class, () -> {
 	    cut.addNewSchool(newSchool);
 	});
@@ -578,8 +578,8 @@ public class SchoolControllerTest {
 	person.setId(0L);
 	personFunctionalityEntity.setPerson(person);
 	personFuncList.add(personFunctionalityEntity);
-	SchoolDTO newSchool = new SchoolDTO(2, SHORT_TESTSCHOOL, testschool, 1, 2, "1", "", "ff0000", personFuncList,
-		criterias, null, "");
+	SchoolDTO newSchool = new SchoolDTO(2, SHORT_TESTSCHOOL, testschool, 1, 2, "1", "", personFuncList, criterias,
+		null, null, "");
 	assertThrows(BadArgumentsException.class, () -> {
 	    cut.alterSchool(newSchool);
 	});
@@ -600,7 +600,6 @@ public class SchoolControllerTest {
 	assertEquals(2.222, school.getLongitude(), 0.001);
 	assertEquals("0x00", school.getSchoolPicture());
 	assertEquals("text1", school.getAlternativePictureText());
-	assertEquals("ff0000", school.getColor());
     }
 
     private void assertSchoolEquals(SchoolDTO school, SchoolDTO postbody) {
@@ -610,7 +609,6 @@ public class SchoolControllerTest {
 	assertEquals(postbody.getLongitude(), school.getLongitude(), 0.001);
 	assertEquals(postbody.getSchoolPicture(), school.getSchoolPicture());
 	assertEquals(postbody.getAlternativePictureText(), school.getAlternativePictureText());
-	assertEquals(postbody.getColor(), school.getColor());
     }
 
     private void assertSecondSchool(SchoolDTO school) {

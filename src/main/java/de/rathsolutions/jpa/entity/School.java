@@ -34,6 +34,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.Lob;
 import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 
 import org.hibernate.annotations.Type;
@@ -80,6 +81,9 @@ public class School {
     @ManyToMany(fetch = FetchType.LAZY)
     private List<Project> projects = new ArrayList<>();
 
+    @ManyToOne(optional = false)
+    private Project primaryProject;
+
     public School(String shortSchoolName, String schoolName, Double latitude, Double longitude,
 	    List<Criteria> matchingCriterias) {
 	this.shortSchoolName = shortSchoolName;
@@ -96,10 +100,13 @@ public class School {
 	dto.setLatitude(this.latitude);
 	dto.setLongitude(this.longitude);
 	dto.setMatchingCriterias(getMatchingCriterias());
-	personSchoolMapping.forEach(e -> {
+	this.personSchoolMapping.forEach(e -> {
 	    dto.getPersonSchoolMapping().add(e.convertToDTO());
 	});
-	dto.setProject(this.projects.get(0).convertToDto());
+	this.projects.forEach(e -> {
+	    dto.getProjects().add(e.convertToDto());
+	});
+	dto.setPrimaryProject(this.primaryProject.convertToDto());
 	dto.setSchoolName(this.schoolName);
 	dto.setSchoolPicture(this.schoolPicture);
 	dto.setShortSchoolName(this.shortSchoolName);

@@ -49,6 +49,15 @@ public class ProjectController {
     @Autowired
     private ProjectRepo projectRepo;
 
+    @GetMapping(value = "/{id}")
+    public ResponseEntity<ProjectDTO> findById(@PathVariable(value = "id") long id) {
+	Optional<Project> findById = projectRepo.findById(id);
+	if (findById.isEmpty()) {
+	    return ResponseEntity.notFound().build();
+	}
+	return ResponseEntity.ok(findById.get().convertToDto());
+    }
+
     @GetMapping(value = "/search/findAll")
     public ResponseEntity<List<ProjectDTO>> findAll() {
 	List<ProjectDTO> allProjects = new ArrayList<>();

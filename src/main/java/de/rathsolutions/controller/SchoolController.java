@@ -46,6 +46,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.xml.sax.SAXException;
 
+import de.rathsolutions.controller.postbody.ProjectDTO;
 import de.rathsolutions.controller.postbody.SchoolDTO;
 import de.rathsolutions.jpa.entity.Area;
 import de.rathsolutions.jpa.entity.Criteria;
@@ -234,6 +235,7 @@ public class SchoolController {
 		addNewSchoolPostbody);
 	School school = new School(addNewSchoolPostbody.getShortSchoolName(), addNewSchoolPostbody.getSchoolName(),
 		addNewSchoolPostbody.getLatitude(), addNewSchoolPostbody.getLongitude(), allMatchingSchoolCriterias);
+	addPrimaryProjectToSchoolPostbody(addNewSchoolPostbody, school, allFoundProjects);
 	school.setSchoolPicture(addNewSchoolPostbody.getSchoolPicture());
 	school.setAlternativePictureText(addNewSchoolPostbody.getAlternativePictureText());
 	fillPersonSchoolMappingOfSchool(addNewSchoolPostbody, school);
@@ -241,21 +243,6 @@ public class SchoolController {
 	    school.getProjects().add(project);
 	});
 	return ResponseEntity.ok(schoolRepo.save(school).convertToDTO());
-    }
-
-    private List<Project> generateProjectEntityListForSchoolPostbody(SchoolDTO addNewSchoolPostbody)
-	    throws NotFoundException {
-	List<Project> allFoundProjects = new ArrayList<>();
-	if (addNewSchoolPostbody.getProject() == null) {
-	    return allFoundProjects;
-	}
-	Optional<Project> projectEntity = projectRepo.findById(Long.valueOf(addNewSchoolPostbody.getProject().getId()));
-	if (projectEntity.isEmpty()) {
-	    throw new NotFoundException("One of the requested Projects could not be found!");
-	}
-	allFoundProjects.add(projectEntity.get());
-	return allFoundProjects;
-
     }
 
     @Operation(summary = "alterates an already existing school resource")
@@ -279,6 +266,7 @@ public class SchoolController {
 	if (isSchoolPostbodyNotValid(alterSchoolPostbody)) {
 	    throw new BadArgumentsException(alterSchoolPostbody);
 	}
+	addPrimaryProjectToSchoolPostbody(alterSchoolPostbody, matchingSchool, allFoundProjects);
 	matchingSchool.setShortSchoolName(alterSchoolPostbody.getShortSchoolName());
 	matchingSchool.setSchoolName(alterSchoolPostbody.getSchoolName());
 	matchingSchool.setMatchingCriterias(allMatchingSchoolCriterias);
@@ -291,6 +279,17 @@ public class SchoolController {
 	});
 	fillPersonSchoolMappingOfSchool(alterSchoolPostbody, matchingSchool);
 	return ResponseEntity.ok(schoolRepo.save(matchingSchool).convertToDTO());
+    }
+
+    private void addPrimaryProjectToSchoolPostbody(SchoolDTO alterSchoolPostbody, School matchingSchool,
+	    List<Project> allFoundProjects) {
+	List<Project> primaryProjectFromAllFoundProjects = allFoundProjects.stream()
+		.filter(e -> e.getId() == Long.valueOf(alterSchoolPostbody.getPrimaryProject().getId()))
+		.collect(Collectors.toList());
+	if (primaryProjectFromAllFoundProjects.size() != 1) {
+	    throw new BadArgumentsException(alterSchoolPostbody);
+	}
+	matchingSchool.setPrimaryProject(primaryProjectFromAllFoundProjects.get(0));
     }
 
     @GetMapping("/search/findPersonFunctionalityForPersonAndSchoolAndFunctionality")
@@ -336,6 +335,23 @@ public class SchoolController {
 	    personSchoolMapping.setDescription(e.getDescription());
 	    matchingSchool.getPersonSchoolMapping().add(personSchoolMapping);
 	});
+    }
+
+    private List<Project> generateProjectEntityListForSchoolPostbody(SchoolDTO addNewSchoolPostbody)
+	    throws NotFoundException {
+	List<Project> allFoundProjects = new ArrayList<>();
+	if (addNewSchoolPostbody.getProjects() == null) {
+	    return allFoundProjects;
+	}
+	for (ProjectDTO e : addNewSchoolPostbody.getProjects()) {
+	    Optional<Project> projectEntity = projectRepo.findById(Long.valueOf(e.getId()));
+	    if (projectEntity.isEmpty()) {
+		throw new NotFoundException("One of the requested Projects could not be found!");
+	    }
+	    allFoundProjects.add(projectEntity.get());
+	}
+	return allFoundProjects;
+
     }
 
     private List<Criteria> generateMatchingSchoolCriteriasAndPersistIfNotExisting(SchoolDTO alterSchoolPostbody) {
