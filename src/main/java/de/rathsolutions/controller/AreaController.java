@@ -30,8 +30,10 @@ import org.locationtech.jts.geom.Coordinate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -84,6 +86,15 @@ public class AreaController {
 	Area area = areaByName.get();
 	fillArea(dto, area);
 	return ResponseEntity.ok(repository.save(area).convertToDTO());
+    }
+
+    @DeleteMapping(value = "/delete/{id}")
+    public ResponseEntity<Long> delete(@PathVariable(name = "id") long id) {
+	if (!repository.existsById(id)) {
+	    return ResponseEntity.notFound().build();
+	}
+	repository.deleteById(id);
+	return ResponseEntity.ok(id);
     }
 
     private Area fillArea(AreaDTO dto, Area area) {
