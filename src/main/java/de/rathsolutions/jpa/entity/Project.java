@@ -21,9 +21,10 @@
  */
 package de.rathsolutions.jpa.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import de.rathsolutions.controller.postbody.ProjectDTO;
 import java.util.ArrayList;
 import java.util.List;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -33,10 +34,6 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
-import de.rathsolutions.controller.postbody.ProjectDTO;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
@@ -86,6 +83,6 @@ public class Project {
     }
 
     public ProjectDTO convertToDto() {
-	return new ProjectDTO(String.valueOf(this.id), this.projectName, new String(this.defaultIcon), this.scaling);
+	return new ProjectDTO(this.id, this.projectName, new String(this.defaultIcon), this.scaling);
     }
 }

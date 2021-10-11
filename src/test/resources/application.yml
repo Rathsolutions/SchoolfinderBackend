@@ -1,9 +1,13 @@
 spring:
   datasource:
-     url: jdbc:h2:file:./test;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
-     username: sa
-     password: sa
-     driver-class-name: org.h2.Driver
-logging:
-  level:
-    de.nicorath: DEBUG
+    url: jdbc:postgresql://localhost:5433/postgres
+    username: postgres
+    password: school123
+  jpa:
+    database-platform: org.hibernate.spatial.dialect.postgis.PostgisPG9Dialect
+    hibernate:
+      ddl-auto: create-drop
+    defer-datasource-initialization: true
+  sql:
+    init:
+      mode: always

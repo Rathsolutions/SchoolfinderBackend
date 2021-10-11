@@ -34,7 +34,7 @@ import lombok.ToString;
 @ToString
 public class ProjectDTO {
 
-    private String id;
+    private long id;
 
     private String name;
 

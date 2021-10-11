@@ -22,7 +22,6 @@
 package de.rathsolutions.util;
 
 import java.util.List;
-
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Point;

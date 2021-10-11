@@ -21,11 +21,15 @@
  */
 package de.rathsolutions.controller;
 
+import de.rathsolutions.controller.postbody.ProjectDTO;
+import de.rathsolutions.jpa.entity.Project;
+import de.rathsolutions.jpa.entity.School;
+import de.rathsolutions.jpa.repo.ProjectRepo;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -36,11 +40,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
-import de.rathsolutions.controller.postbody.ProjectDTO;
-import de.rathsolutions.jpa.entity.Project;
-import de.rathsolutions.jpa.entity.School;
-import de.rathsolutions.jpa.repo.ProjectRepo;
 
 @RestController
 @RequestMapping("/api/v1/project")
@@ -77,7 +76,7 @@ public class ProjectController {
     }
 
     @GetMapping(value = "/search/getAllSchoolsForProjectWithId")
-    public ResponseEntity<List<School>> getMethodName(@RequestParam Long id) {
+    public ResponseEntity<List<School>> getAllSchoolsForProjectWithId(@RequestParam Long id) {
 	Optional<Project> projectByName = projectRepo.findById(id);
 	if (projectByName.isEmpty()) {
 	    return ResponseEntity.notFound().build();
@@ -97,6 +96,9 @@ public class ProjectController {
 
     @PutMapping("/create")
     public ResponseEntity<ProjectDTO> createProject(@RequestBody ProjectDTO projectToCreate) {
+	if (projectRepo.findOneByProjectName(projectToCreate.getName()).isPresent()) {
+	    return ResponseEntity.status(HttpStatus.CONFLICT).build();
+	}
 	Project projectEntity = new Project(projectToCreate.getName(), projectToCreate.getIcon().getBytes(),
 		projectToCreate.getScaling());
 	return ResponseEntity.ok(projectRepo.save(projectEntity).convertToDto());

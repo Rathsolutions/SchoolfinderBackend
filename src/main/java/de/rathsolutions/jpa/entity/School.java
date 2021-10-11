@@ -21,9 +21,9 @@
  */
 package de.rathsolutions.jpa.entity;
 
+import de.rathsolutions.controller.postbody.SchoolDTO;
 import java.util.ArrayList;
 import java.util.List;
-
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -32,19 +32,15 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
-import javax.persistence.Lob;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
-
-import org.hibernate.annotations.Type;
-
-import de.rathsolutions.controller.postbody.SchoolDTO;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.Type;
 
 @Entity
 @Getter
@@ -67,8 +63,7 @@ public class School {
     @NonNull
     private Double longitude;
 
-    @Lob
-    private String schoolPicture;
+    private byte[] schoolPicture;
     @Type(type = "text")
     private String alternativePictureText;
     @OneToMany(cascade = { CascadeType.ALL }, fetch = FetchType.LAZY, mappedBy = "school", orphanRemoval = true)
@@ -108,7 +103,7 @@ public class School {
 	});
 	dto.setPrimaryProject(this.primaryProject.convertToDto());
 	dto.setSchoolName(this.schoolName);
-	dto.setSchoolPicture(this.schoolPicture);
+	dto.setSchoolPicture(new String(this.schoolPicture));
 	dto.setShortSchoolName(this.shortSchoolName);
 	return dto;
     }
