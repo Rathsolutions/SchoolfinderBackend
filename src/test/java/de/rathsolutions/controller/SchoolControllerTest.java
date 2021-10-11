@@ -646,7 +646,7 @@ public class SchoolControllerTest {
 	assertEquals(2.222, school.getLongitude(), 0.001);
 	assertEquals("image1", school.getSchoolPicture());
 	assertEquals("text1", school.getAlternativePictureText());
-	assertEquals("-1", school.getPrimaryProject().getId());
+	assertEquals(-1, school.getPrimaryProject().getId());
     }
 
     private void assertSchoolEquals(SchoolDTO school, SchoolDTO postbody) {
@@ -665,7 +665,7 @@ public class SchoolControllerTest {
 	assertEquals(1.111, school.getLongitude(), 0.001);
 	assertEquals("text2", school.getAlternativePictureText());
 	assertEquals("image2", school.getSchoolPicture());
-	assertEquals("-1", school.getPrimaryProject().getId());
+	assertEquals(-1, school.getPrimaryProject().getId());
 
     }
 
@@ -676,7 +676,7 @@ public class SchoolControllerTest {
 	assertEquals(4.444, school.getLongitude(), 0.001);
 	assertEquals("image3", school.getSchoolPicture());
 	assertEquals("text3", school.getAlternativePictureText());
-	assertEquals("-2", school.getPrimaryProject().getId());
+	assertEquals(-2, school.getPrimaryProject().getId());
 
     }
 }
