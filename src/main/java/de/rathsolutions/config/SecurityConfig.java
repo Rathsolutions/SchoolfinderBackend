@@ -23,7 +23,6 @@ package de.rathsolutions.config;
 
 import java.util.Arrays;
 import java.util.Collections;
-
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -58,7 +57,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
 	final CorsConfiguration configuration = new CorsConfiguration();
-	configuration.setAllowedOrigins(Arrays.asList("*"));
+	configuration
+		.setAllowedOrigins(Arrays.asList("https://schoolfindernew.rathsolutions.de", "http://localhost:4200"));
 	configuration.setAllowedHeaders(Collections.singletonList("*"));
 	configuration.addExposedHeader("Authorization");
 	configuration.setAllowCredentials(true);

@@ -233,7 +233,9 @@ public class SchoolController {
 	School school = new School(addNewSchoolPostbody.getShortSchoolName(), addNewSchoolPostbody.getSchoolName(),
 		addNewSchoolPostbody.getLatitude(), addNewSchoolPostbody.getLongitude(), allMatchingSchoolCriterias);
 	addPrimaryProjectToSchoolPostbody(addNewSchoolPostbody, school, allFoundProjects);
-	school.setSchoolPicture(addNewSchoolPostbody.getSchoolPicture().getBytes());
+	if (addNewSchoolPostbody.getSchoolPicture() != null) {
+	    school.setSchoolPicture(addNewSchoolPostbody.getSchoolPicture().getBytes());
+	}
 	school.setAlternativePictureText(addNewSchoolPostbody.getAlternativePictureText());
 	fillPersonSchoolMappingOfSchool(addNewSchoolPostbody, school);
 	allFoundProjects.forEach(project -> {
@@ -267,7 +269,11 @@ public class SchoolController {
 	matchingSchool.setShortSchoolName(alterSchoolPostbody.getShortSchoolName());
 	matchingSchool.setSchoolName(alterSchoolPostbody.getSchoolName());
 	matchingSchool.setMatchingCriterias(allMatchingSchoolCriterias);
-	matchingSchool.setSchoolPicture(alterSchoolPostbody.getSchoolPicture().getBytes());
+	if (alterSchoolPostbody.getSchoolPicture() != null) {
+	    matchingSchool.setSchoolPicture(alterSchoolPostbody.getSchoolPicture().getBytes());
+	} else {
+	    matchingSchool.setSchoolPicture(null);
+	}
 	matchingSchool.setAlternativePictureText(alterSchoolPostbody.getAlternativePictureText());
 	matchingSchool.getPersonSchoolMapping().clear();
 	matchingSchool.getProjects().clear();
