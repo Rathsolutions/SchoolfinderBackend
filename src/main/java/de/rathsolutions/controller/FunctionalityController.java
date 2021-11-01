@@ -78,6 +78,11 @@ public class FunctionalityController {
 	if (functionalityOptional.isEmpty()) {
 	    return ResponseEntity.status(HttpStatus.CONFLICT).build();
 	}
+	Optional<Functionality> correspondingInDb = functionalityRepo.findOneByName(entity.getName());
+	if (!correspondingInDb.isEmpty() && Long.valueOf(entity.getId()) != correspondingInDb.get().getId()
+		&& correspondingInDb.get().getName().equalsIgnoreCase(entity.getName())) {
+	    return ResponseEntity.status(HttpStatus.CONFLICT).build();
+	}
 	functionalityOptional.get().setName(entity.getName());
 	return ResponseEntity.ok(functionalityRepo.save(functionalityOptional.get()).convertToDto());
     }

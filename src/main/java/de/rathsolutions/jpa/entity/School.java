@@ -39,6 +39,7 @@ import javax.persistence.OneToMany;
 import org.hibernate.annotations.Type;
 
 import de.rathsolutions.controller.postbody.SchoolDTO;
+import de.rathsolutions.jpa.entity.additional.AdditionalInformation;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
@@ -81,6 +82,16 @@ public class School {
 
     @ManyToOne(optional = false)
     private Project primaryProject;
+
+    private SchoolType type;
+
+    @ManyToMany
+    @JoinTable(name = "additional_information_mapping", joinColumns = @JoinColumn(name = "school_id"), inverseJoinColumns = @JoinColumn(name = "additional_information_id"))
+    private List<AdditionalInformation> additionalInformation;
+
+    private String generalEmail;
+
+    private String generalPhoneNumber;
 
     public School(String shortSchoolName, String schoolName, Double latitude, Double longitude,
 	    List<Criteria> matchingCriterias) {
