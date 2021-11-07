@@ -60,4 +60,6 @@ public class SchoolDTO {
 
     private String correspondingAreaName;
 
+    private List<AdditionalInformationDTO> additionalInformation = new ArrayList<>();
+
 }

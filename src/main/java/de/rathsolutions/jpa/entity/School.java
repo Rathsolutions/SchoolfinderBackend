@@ -38,6 +38,7 @@ import javax.persistence.OneToMany;
 
 import org.hibernate.annotations.Type;
 
+import de.rathsolutions.controller.postbody.AdditionalInformationDTO;
 import de.rathsolutions.controller.postbody.SchoolDTO;
 import de.rathsolutions.jpa.entity.additional.AdditionalInformation;
 import lombok.Getter;
@@ -87,7 +88,7 @@ public class School {
 
     @ManyToMany
     @JoinTable(name = "additional_information_mapping", joinColumns = @JoinColumn(name = "school_id"), inverseJoinColumns = @JoinColumn(name = "additional_information_id"))
-    private List<AdditionalInformation> additionalInformation;
+    private List<AdditionalInformation> additionalInformation = new ArrayList<>();
 
     private String generalEmail;
 
@@ -114,6 +115,10 @@ public class School {
 	});
 	this.projects.forEach(e -> {
 	    dto.getProjects().add(e.convertToDto());
+	});
+	this.additionalInformation.forEach(e -> {
+	    dto.getAdditionalInformation()
+		    .add(new AdditionalInformationDTO(e.getId(), e.getValue(), e.getType().getValue()));
 	});
 	dto.setPrimaryProject(this.primaryProject.convertToDto());
 	dto.setSchoolName(this.schoolName);

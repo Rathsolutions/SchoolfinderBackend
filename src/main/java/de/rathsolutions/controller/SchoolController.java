@@ -21,40 +21,17 @@
  */
 package de.rathsolutions.controller;
 
-import de.rathsolutions.controller.postbody.ProjectDTO;
-import de.rathsolutions.controller.postbody.SchoolDTO;
-import de.rathsolutions.jpa.entity.Area;
-import de.rathsolutions.jpa.entity.Criteria;
-import de.rathsolutions.jpa.entity.Functionality;
-import de.rathsolutions.jpa.entity.Person;
-import de.rathsolutions.jpa.entity.PersonSchoolMapping;
-import de.rathsolutions.jpa.entity.Project;
-import de.rathsolutions.jpa.entity.School;
-import de.rathsolutions.jpa.repo.AreaRepository;
-import de.rathsolutions.jpa.repo.CriteriaRepo;
-import de.rathsolutions.jpa.repo.FunctionalityRepo;
-import de.rathsolutions.jpa.repo.PersonRepo;
-import de.rathsolutions.jpa.repo.PersonSchoolMappingRepo;
-import de.rathsolutions.jpa.repo.ProjectRepo;
-import de.rathsolutions.jpa.repo.SchoolRepo;
-import de.rathsolutions.util.GeometryUtils;
-import de.rathsolutions.util.exception.BadArgumentsException;
-import de.rathsolutions.util.exception.ResourceAlreadyExistingException;
-import de.rathsolutions.util.exception.ResourceNotFoundException;
-import de.rathsolutions.util.osm.pojo.OsmPOIEntity;
-import de.rathsolutions.util.osm.pojo.SchoolSearchEntity;
-import de.rathsolutions.util.osm.specific.OsmPOISchoolParser;
-import io.swagger.v3.oas.annotations.Operation;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
-import javassist.NotFoundException;
+
 import javax.naming.OperationNotSupportedException;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
+
 import org.locationtech.jts.geom.Point;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -68,6 +45,36 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.xml.sax.SAXException;
+
+import de.rathsolutions.controller.postbody.ProjectDTO;
+import de.rathsolutions.controller.postbody.SchoolDTO;
+import de.rathsolutions.jpa.entity.Area;
+import de.rathsolutions.jpa.entity.Criteria;
+import de.rathsolutions.jpa.entity.Functionality;
+import de.rathsolutions.jpa.entity.Person;
+import de.rathsolutions.jpa.entity.PersonSchoolMapping;
+import de.rathsolutions.jpa.entity.Project;
+import de.rathsolutions.jpa.entity.School;
+import de.rathsolutions.jpa.entity.additional.AdditionalInformation;
+import de.rathsolutions.jpa.entity.additional.InformationType;
+import de.rathsolutions.jpa.repo.AdditionalInformationRepo;
+import de.rathsolutions.jpa.repo.AreaRepository;
+import de.rathsolutions.jpa.repo.CriteriaRepo;
+import de.rathsolutions.jpa.repo.FunctionalityRepo;
+import de.rathsolutions.jpa.repo.InformationTypeRepo;
+import de.rathsolutions.jpa.repo.PersonRepo;
+import de.rathsolutions.jpa.repo.PersonSchoolMappingRepo;
+import de.rathsolutions.jpa.repo.ProjectRepo;
+import de.rathsolutions.jpa.repo.SchoolRepo;
+import de.rathsolutions.util.GeometryUtils;
+import de.rathsolutions.util.exception.BadArgumentsException;
+import de.rathsolutions.util.exception.ResourceAlreadyExistingException;
+import de.rathsolutions.util.exception.ResourceNotFoundException;
+import de.rathsolutions.util.osm.pojo.OsmPOIEntity;
+import de.rathsolutions.util.osm.pojo.SchoolSearchEntity;
+import de.rathsolutions.util.osm.specific.OsmPOISchoolParser;
+import io.swagger.v3.oas.annotations.Operation;
+import javassist.NotFoundException;
 
 @RestController
 @RequestMapping("/api/v1/schools")
@@ -98,6 +105,12 @@ public class SchoolController {
 
     @Autowired
     private AreaRepository areaRepo;
+
+    @Autowired
+    private AdditionalInformationRepo additionalInformationRepo;
+
+    @Autowired
+    private InformationTypeRepo informationTypeRepo;
 
     @Operation(summary = "searches non-registered school resources by their name in an osm document. This schools must not be registered within the application")
     @GetMapping("/search/findNotRegisteredSchoolsByName")
@@ -233,6 +246,7 @@ public class SchoolController {
 	School school = new School(addNewSchoolPostbody.getShortSchoolName(), addNewSchoolPostbody.getSchoolName(),
 		addNewSchoolPostbody.getLatitude(), addNewSchoolPostbody.getLongitude(), allMatchingSchoolCriterias);
 	addPrimaryProjectToSchoolPostbody(addNewSchoolPostbody, school, allFoundProjects);
+	school.setAdditionalInformation(generateAdditionalInformationAndPersistIfNotExisting(addNewSchoolPostbody));
 	if (addNewSchoolPostbody.getSchoolPicture() != null) {
 	    school.setSchoolPicture(addNewSchoolPostbody.getSchoolPicture().getBytes());
 	}
@@ -266,6 +280,8 @@ public class SchoolController {
 	    throw new BadArgumentsException(alterSchoolPostbody);
 	}
 	addPrimaryProjectToSchoolPostbody(alterSchoolPostbody, matchingSchool, allFoundProjects);
+	matchingSchool
+		.setAdditionalInformation(generateAdditionalInformationAndPersistIfNotExisting(alterSchoolPostbody));
 	matchingSchool.setShortSchoolName(alterSchoolPostbody.getShortSchoolName());
 	matchingSchool.setSchoolName(alterSchoolPostbody.getSchoolName());
 	matchingSchool.setMatchingCriterias(allMatchingSchoolCriterias);
@@ -360,6 +376,36 @@ public class SchoolController {
 
     }
 
+    /**
+     * Generates a list with all additional information (as entities, must be
+     * retrived within a transaction) and persists them if they are not present
+     * 
+     * @param postbody the school dto post
+     * @return a list with all additional information objects
+     */
+    private List<AdditionalInformation> generateAdditionalInformationAndPersistIfNotExisting(SchoolDTO postbody) {
+	List<AdditionalInformation> resultList = new ArrayList<>();
+	postbody.getAdditionalInformation().forEach(e -> {
+	    Optional<InformationType> informationTypeOptional = informationTypeRepo.findOneByValue(e.getType());
+	    if (informationTypeOptional.isEmpty()) {
+		throw new BadArgumentsException("One of the additional information types could not be found!");
+	    }
+	    Optional<AdditionalInformation> additionalInformationOptional = additionalInformationRepo
+		    .findOneByValueAndType(e.getValue(), informationTypeOptional.get());
+	    AdditionalInformation toAdd = null;
+	    if (additionalInformationOptional.isEmpty()) {
+		toAdd = new AdditionalInformation();
+		toAdd.setType(informationTypeOptional.get());
+		toAdd.setValue(e.getValue());
+		toAdd = additionalInformationRepo.save(toAdd);
+	    } else {
+		toAdd = additionalInformationOptional.get();
+	    }
+	    resultList.add(toAdd);
+	});
+	return resultList;
+    }
+
     private List<Criteria> generateMatchingSchoolCriteriasAndPersistIfNotExisting(SchoolDTO alterSchoolPostbody) {
 	List<Criteria> allMatchingSchoolCriterias = new ArrayList<>();
 	if (alterSchoolPostbody.getMatchingCriterias() != null) {
@@ -368,7 +414,6 @@ public class SchoolController {
 	    List<Criteria> listForStream = allMatchingSchoolCriterias;
 	    alterSchoolPostbody.getMatchingCriterias().forEach(e -> {
 		if (!listForStream.stream().anyMatch(f -> f.getCriteriaName().equalsIgnoreCase(e.getCriteriaName()))) {
-		    System.out.println(e.getCriteriaName().length());
 		    Criteria savedCrit = criteriaRepo.save(new Criteria(e.getCriteriaName()));
 		    listForStream.add(savedCrit);
 		}
