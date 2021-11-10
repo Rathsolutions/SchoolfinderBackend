@@ -21,9 +21,11 @@
  */
 package de.rathsolutions.jpa.entity;
 
+import de.rathsolutions.controller.postbody.AdditionalInformationDTO;
+import de.rathsolutions.controller.postbody.SchoolDTO;
+import de.rathsolutions.jpa.entity.additional.AdditionalInformation;
 import java.util.ArrayList;
 import java.util.List;
-
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -35,17 +37,12 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
-
-import org.hibernate.annotations.Type;
-
-import de.rathsolutions.controller.postbody.AdditionalInformationDTO;
-import de.rathsolutions.controller.postbody.SchoolDTO;
-import de.rathsolutions.jpa.entity.additional.AdditionalInformation;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.Type;
 
 @Entity
 @Getter
@@ -94,6 +91,10 @@ public class School {
 
     private String generalPhoneNumber;
 
+    private String address;
+
+    private String homepage;
+
     public School(String shortSchoolName, String schoolName, Double latitude, Double longitude,
 	    List<Criteria> matchingCriterias) {
 	this.shortSchoolName = shortSchoolName;
@@ -126,6 +127,11 @@ public class School {
 	    dto.setSchoolPicture(new String(this.schoolPicture));
 	}
 	dto.setShortSchoolName(this.shortSchoolName);
+	dto.setAddress(this.address);
+	dto.setHomepage(this.homepage);
+	dto.setGeneralEmail(this.generalEmail);
+	dto.setGeneralPhoneNumber(this.generalPhoneNumber);
+	dto.setSchoolType(this.type);
 	return dto;
     }
 

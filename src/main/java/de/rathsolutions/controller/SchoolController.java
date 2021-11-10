@@ -21,31 +21,6 @@
  */
 package de.rathsolutions.controller;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.concurrent.ExecutionException;
-import java.util.stream.Collectors;
-
-import javax.naming.OperationNotSupportedException;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.TransformerException;
-
-import org.locationtech.jts.geom.Point;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-import org.xml.sax.SAXException;
-
 import de.rathsolutions.controller.postbody.ProjectDTO;
 import de.rathsolutions.controller.postbody.SchoolDTO;
 import de.rathsolutions.jpa.entity.Area;
@@ -55,6 +30,7 @@ import de.rathsolutions.jpa.entity.Person;
 import de.rathsolutions.jpa.entity.PersonSchoolMapping;
 import de.rathsolutions.jpa.entity.Project;
 import de.rathsolutions.jpa.entity.School;
+import de.rathsolutions.jpa.entity.SchoolType;
 import de.rathsolutions.jpa.entity.additional.AdditionalInformation;
 import de.rathsolutions.jpa.entity.additional.InformationType;
 import de.rathsolutions.jpa.repo.AdditionalInformationRepo;
@@ -74,7 +50,29 @@ import de.rathsolutions.util.osm.pojo.OsmPOIEntity;
 import de.rathsolutions.util.osm.pojo.SchoolSearchEntity;
 import de.rathsolutions.util.osm.specific.OsmPOISchoolParser;
 import io.swagger.v3.oas.annotations.Operation;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
 import javassist.NotFoundException;
+import javax.naming.OperationNotSupportedException;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerException;
+import org.locationtech.jts.geom.Point;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+import org.xml.sax.SAXException;
 
 @RestController
 @RequestMapping("/api/v1/schools")
@@ -223,6 +221,16 @@ public class SchoolController {
 	return ResponseEntity.ok(schoolById.convertToDTO());
     }
 
+    @Operation(summary = "retrieves all known school types")
+    @GetMapping("/search/getAllTypes")
+    public ResponseEntity<List<String>> getAllTypes() {
+	List<String> toReturn = new ArrayList<>();
+	for (SchoolType type : SchoolType.values()) {
+	    toReturn.add(type.name());
+	}
+	return ResponseEntity.ok(toReturn);
+    }
+
     @Operation(summary = "creates a new school resource")
     @PutMapping("/create/addNewSchool")
     @Transactional
@@ -230,9 +238,6 @@ public class SchoolController {
 	Optional<School> alreadyExistingSchool = schoolRepo.findOneBySchoolName(addNewSchoolPostbody.getSchoolName());
 	if (alreadyExistingSchool.isPresent()) {
 	    throw new ResourceAlreadyExistingException(alreadyExistingSchool.get());
-	}
-	if (isSchoolPostbodyNotValid(addNewSchoolPostbody)) {
-	    throw new BadArgumentsException(addNewSchoolPostbody);
 	}
 	List<Project> allFoundProjects;
 	try {
@@ -243,18 +248,11 @@ public class SchoolController {
 	}
 	List<Criteria> allMatchingSchoolCriterias = generateMatchingSchoolCriteriasAndPersistIfNotExisting(
 		addNewSchoolPostbody);
-	School school = new School(addNewSchoolPostbody.getShortSchoolName(), addNewSchoolPostbody.getSchoolName(),
-		addNewSchoolPostbody.getLatitude(), addNewSchoolPostbody.getLongitude(), allMatchingSchoolCriterias);
-	addPrimaryProjectToSchoolPostbody(addNewSchoolPostbody, school, allFoundProjects);
-	school.setAdditionalInformation(generateAdditionalInformationAndPersistIfNotExisting(addNewSchoolPostbody));
-	if (addNewSchoolPostbody.getSchoolPicture() != null) {
-	    school.setSchoolPicture(addNewSchoolPostbody.getSchoolPicture().getBytes());
-	}
-	school.setAlternativePictureText(addNewSchoolPostbody.getAlternativePictureText());
-	fillPersonSchoolMappingOfSchool(addNewSchoolPostbody, school);
-	allFoundProjects.forEach(project -> {
-	    school.getProjects().add(project);
-	});
+	School school = new School();
+	school.setLatitude(addNewSchoolPostbody.getLatitude());
+	school.setLongitude(addNewSchoolPostbody.getLongitude());
+	fillSchoolPostbodyWithAllInformation(addNewSchoolPostbody, school, allFoundProjects,
+		allMatchingSchoolCriterias);
 	return ResponseEntity.ok(schoolRepo.save(school).convertToDTO());
     }
 
@@ -276,28 +274,38 @@ public class SchoolController {
 	}
 	List<Criteria> allMatchingSchoolCriterias = generateMatchingSchoolCriteriasAndPersistIfNotExisting(
 		alterSchoolPostbody);
-	if (isSchoolPostbodyNotValid(alterSchoolPostbody)) {
-	    throw new BadArgumentsException(alterSchoolPostbody);
-	}
-	addPrimaryProjectToSchoolPostbody(alterSchoolPostbody, matchingSchool, allFoundProjects);
-	matchingSchool
-		.setAdditionalInformation(generateAdditionalInformationAndPersistIfNotExisting(alterSchoolPostbody));
-	matchingSchool.setShortSchoolName(alterSchoolPostbody.getShortSchoolName());
-	matchingSchool.setSchoolName(alterSchoolPostbody.getSchoolName());
-	matchingSchool.setMatchingCriterias(allMatchingSchoolCriterias);
-	if (alterSchoolPostbody.getSchoolPicture() != null) {
-	    matchingSchool.setSchoolPicture(alterSchoolPostbody.getSchoolPicture().getBytes());
-	} else {
-	    matchingSchool.setSchoolPicture(null);
-	}
-	matchingSchool.setAlternativePictureText(alterSchoolPostbody.getAlternativePictureText());
-	matchingSchool.getPersonSchoolMapping().clear();
-	matchingSchool.getProjects().clear();
-	allFoundProjects.forEach(project -> {
-	    matchingSchool.getProjects().add(project);
-	});
-	fillPersonSchoolMappingOfSchool(alterSchoolPostbody, matchingSchool);
+	fillSchoolPostbodyWithAllInformation(alterSchoolPostbody, matchingSchool, allFoundProjects,
+		allMatchingSchoolCriterias);
 	return ResponseEntity.ok(schoolRepo.save(matchingSchool).convertToDTO());
+    }
+
+    private void fillSchoolPostbodyWithAllInformation(SchoolDTO schoolPostbody, School schoolEntity,
+	    List<Project> allFoundProjects, List<Criteria> allMatchingSchoolCriterias) {
+	if (isSchoolPostbodyNotValid(schoolPostbody)) {
+	    throw new BadArgumentsException(schoolPostbody);
+	}
+	addPrimaryProjectToSchoolPostbody(schoolPostbody, schoolEntity, allFoundProjects);
+	schoolEntity.setAdditionalInformation(generateAdditionalInformationAndPersistIfNotExisting(schoolPostbody));
+	schoolEntity.setShortSchoolName(schoolPostbody.getShortSchoolName());
+	schoolEntity.setSchoolName(schoolPostbody.getSchoolName());
+	schoolEntity.setMatchingCriterias(allMatchingSchoolCriterias);
+	schoolEntity.setAddress(schoolPostbody.getAddress());
+	schoolEntity.setType(schoolPostbody.getSchoolType());
+	schoolEntity.setGeneralEmail(schoolPostbody.getGeneralEmail());
+	schoolEntity.setGeneralPhoneNumber(schoolPostbody.getGeneralPhoneNumber());
+	schoolEntity.setHomepage(schoolPostbody.getHomepage());
+	if (schoolPostbody.getSchoolPicture() != null) {
+	    schoolEntity.setSchoolPicture(schoolPostbody.getSchoolPicture().getBytes());
+	} else {
+	    schoolEntity.setSchoolPicture(null);
+	}
+	schoolEntity.setAlternativePictureText(schoolPostbody.getAlternativePictureText());
+	schoolEntity.getPersonSchoolMapping().clear();
+	schoolEntity.getProjects().clear();
+	allFoundProjects.forEach(project -> {
+	    schoolEntity.getProjects().add(project);
+	});
+	fillPersonSchoolMappingOfSchool(schoolPostbody, schoolEntity);
     }
 
     private void addPrimaryProjectToSchoolPostbody(SchoolDTO alterSchoolPostbody, School matchingSchool,
