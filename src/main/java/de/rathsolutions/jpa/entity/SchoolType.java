@@ -21,7 +21,47 @@
  */
 package de.rathsolutions.jpa.entity;
 
-public enum SchoolType {
+import de.rathsolutions.controller.postbody.SchoolTypeDTO;
+import de.rathsolutions.jpa.entity.converter.ColorConverter;
+import java.awt.Color;
+import java.util.List;
+import javax.persistence.Column;
+import javax.persistence.Convert;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.OneToMany;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-    GYMNASIUM, REALSCHULE, BERUFLICHES_GYMNASIUM, WALDORFSCHULE, GRUNDSCHULE, FOERDERSCHULE, HAUPTSCHULE;
+@Entity
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
+public class SchoolType {
+
+    @Id
+    @GeneratedValue
+    private int id;
+
+    @Column(unique = true)
+    private SchoolTypeValue schoolTypeValue;
+
+    @Convert(converter = ColorConverter.class)
+    private Color color;
+
+    @OneToMany(mappedBy = "type")
+    private List<School> allSchools;
+
+    public SchoolTypeDTO convertToDto() {
+	SchoolTypeDTO dto = new SchoolTypeDTO();
+	dto.setB(color.getBlue());
+	dto.setG(color.getGreen());
+	dto.setR(color.getRed());
+	dto.setSchoolTypeValue(schoolTypeValue.getValue());
+	return dto;
+    }
 }

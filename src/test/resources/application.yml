@@ -2,7 +2,7 @@ spring:
   datasource:
     url: jdbc:postgresql://localhost:5433/postgres
     username: postgres
-    password: schoolfinder123
+    password: school123
   jpa:
     database-platform: org.hibernate.spatial.dialect.postgis.PostgisPG9Dialect
     hibernate:

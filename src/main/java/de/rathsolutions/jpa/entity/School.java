@@ -81,6 +81,7 @@ public class School {
     @ManyToOne(optional = false)
     private Project primaryProject;
 
+    @ManyToOne()
     private SchoolType type;
 
     @ManyToMany
@@ -131,7 +132,9 @@ public class School {
 	dto.setHomepage(this.homepage);
 	dto.setGeneralEmail(this.generalEmail);
 	dto.setGeneralPhoneNumber(this.generalPhoneNumber);
-	dto.setSchoolType(this.type);
+	if (this.type != null) {
+	    dto.setSchoolType(this.type.convertToDto());
+	}
 	return dto;
     }
 

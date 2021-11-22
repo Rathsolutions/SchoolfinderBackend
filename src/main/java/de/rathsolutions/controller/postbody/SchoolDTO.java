@@ -22,7 +22,6 @@
 package de.rathsolutions.controller.postbody;
 
 import de.rathsolutions.jpa.entity.Criteria;
-import de.rathsolutions.jpa.entity.SchoolType;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.AllArgsConstructor;
@@ -62,7 +61,7 @@ public class SchoolDTO {
 
     private List<AdditionalInformationDTO> additionalInformation = new ArrayList<>();
 
-    private SchoolType schoolType;
+    private SchoolTypeDTO schoolType;
 
     private String address;
 

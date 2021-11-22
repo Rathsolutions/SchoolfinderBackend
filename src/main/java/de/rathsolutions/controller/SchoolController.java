@@ -21,17 +21,47 @@
  */
 package de.rathsolutions.controller;
 
+import de.rathsolutions.controller.postbody.ProjectDTO;
+import de.rathsolutions.controller.postbody.SchoolDTO;
+import de.rathsolutions.jpa.entity.Area;
+import de.rathsolutions.jpa.entity.Criteria;
+import de.rathsolutions.jpa.entity.Functionality;
+import de.rathsolutions.jpa.entity.Person;
+import de.rathsolutions.jpa.entity.PersonSchoolMapping;
+import de.rathsolutions.jpa.entity.Project;
+import de.rathsolutions.jpa.entity.School;
+import de.rathsolutions.jpa.entity.SchoolType;
+import de.rathsolutions.jpa.entity.SchoolTypeValue;
+import de.rathsolutions.jpa.entity.additional.AdditionalInformation;
+import de.rathsolutions.jpa.entity.additional.InformationType;
+import de.rathsolutions.jpa.repo.AdditionalInformationRepo;
+import de.rathsolutions.jpa.repo.AreaRepository;
+import de.rathsolutions.jpa.repo.CriteriaRepo;
+import de.rathsolutions.jpa.repo.FunctionalityRepo;
+import de.rathsolutions.jpa.repo.InformationTypeRepo;
+import de.rathsolutions.jpa.repo.PersonRepo;
+import de.rathsolutions.jpa.repo.PersonSchoolMappingRepo;
+import de.rathsolutions.jpa.repo.ProjectRepo;
+import de.rathsolutions.jpa.repo.SchoolRepo;
+import de.rathsolutions.jpa.repo.SchoolTypeRepo;
+import de.rathsolutions.util.GeometryUtils;
+import de.rathsolutions.util.exception.BadArgumentsException;
+import de.rathsolutions.util.exception.ResourceAlreadyExistingException;
+import de.rathsolutions.util.exception.ResourceNotFoundException;
+import de.rathsolutions.util.osm.pojo.OsmPOIEntity;
+import de.rathsolutions.util.osm.pojo.SchoolSearchEntity;
+import de.rathsolutions.util.osm.specific.OsmPOISchoolParser;
+import io.swagger.v3.oas.annotations.Operation;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
-
+import javassist.NotFoundException;
 import javax.naming.OperationNotSupportedException;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
-
 import org.locationtech.jts.geom.Point;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -45,37 +75,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.xml.sax.SAXException;
-
-import de.rathsolutions.controller.postbody.ProjectDTO;
-import de.rathsolutions.controller.postbody.SchoolDTO;
-import de.rathsolutions.jpa.entity.Area;
-import de.rathsolutions.jpa.entity.Criteria;
-import de.rathsolutions.jpa.entity.Functionality;
-import de.rathsolutions.jpa.entity.Person;
-import de.rathsolutions.jpa.entity.PersonSchoolMapping;
-import de.rathsolutions.jpa.entity.Project;
-import de.rathsolutions.jpa.entity.School;
-import de.rathsolutions.jpa.entity.SchoolType;
-import de.rathsolutions.jpa.entity.additional.AdditionalInformation;
-import de.rathsolutions.jpa.entity.additional.InformationType;
-import de.rathsolutions.jpa.repo.AdditionalInformationRepo;
-import de.rathsolutions.jpa.repo.AreaRepository;
-import de.rathsolutions.jpa.repo.CriteriaRepo;
-import de.rathsolutions.jpa.repo.FunctionalityRepo;
-import de.rathsolutions.jpa.repo.InformationTypeRepo;
-import de.rathsolutions.jpa.repo.PersonRepo;
-import de.rathsolutions.jpa.repo.PersonSchoolMappingRepo;
-import de.rathsolutions.jpa.repo.ProjectRepo;
-import de.rathsolutions.jpa.repo.SchoolRepo;
-import de.rathsolutions.util.GeometryUtils;
-import de.rathsolutions.util.exception.BadArgumentsException;
-import de.rathsolutions.util.exception.ResourceAlreadyExistingException;
-import de.rathsolutions.util.exception.ResourceNotFoundException;
-import de.rathsolutions.util.osm.pojo.OsmPOIEntity;
-import de.rathsolutions.util.osm.pojo.SchoolSearchEntity;
-import de.rathsolutions.util.osm.specific.OsmPOISchoolParser;
-import io.swagger.v3.oas.annotations.Operation;
-import javassist.NotFoundException;
 
 @RestController
 @RequestMapping("/api/v1/schools")
@@ -112,6 +111,9 @@ public class SchoolController {
 
     @Autowired
     private InformationTypeRepo informationTypeRepo;
+
+    @Autowired
+    private SchoolTypeRepo schoolTypeRepo;
 
     @Operation(summary = "searches non-registered school resources by their name in an osm document. This schools must not be registered within the application")
     @GetMapping("/search/findNotRegisteredSchoolsByName")
@@ -224,16 +226,6 @@ public class SchoolController {
 	return ResponseEntity.ok(schoolById.convertToDTO());
     }
 
-    @Operation(summary = "retrieves all known school types")
-    @GetMapping("/search/getAllTypes")
-    public ResponseEntity<List<String>> getAllTypes() {
-	List<String> toReturn = new ArrayList<>();
-	for (SchoolType type : SchoolType.values()) {
-	    toReturn.add(type.name());
-	}
-	return ResponseEntity.ok(toReturn);
-    }
-
     @Operation(summary = "creates a new school resource")
     @PutMapping("/create/addNewSchool")
     @Transactional
@@ -293,7 +285,7 @@ public class SchoolController {
 	schoolEntity.setSchoolName(schoolPostbody.getSchoolName());
 	schoolEntity.setMatchingCriterias(allMatchingSchoolCriterias);
 	schoolEntity.setAddress(schoolPostbody.getAddress());
-	schoolEntity.setType(schoolPostbody.getSchoolType());
+	fillSchoolType(schoolPostbody, schoolEntity);
 	schoolEntity.setGeneralEmail(schoolPostbody.getGeneralEmail());
 	schoolEntity.setGeneralPhoneNumber(schoolPostbody.getGeneralPhoneNumber());
 	schoolEntity.setHomepage(schoolPostbody.getHomepage());
@@ -309,6 +301,15 @@ public class SchoolController {
 	    schoolEntity.getProjects().add(project);
 	});
 	fillPersonSchoolMappingOfSchool(schoolPostbody, schoolEntity);
+    }
+
+    private void fillSchoolType(SchoolDTO schoolPostbody, School schoolEntity) {
+	Optional<SchoolType> oneBySchoolTypeValue = schoolTypeRepo.findOneBySchoolTypeValue(
+		SchoolTypeValue.toSchoolTypeValue(schoolPostbody.getSchoolType().getSchoolTypeValue()));
+	if (oneBySchoolTypeValue.isEmpty()) {
+	    throw new BadArgumentsException("School Type not present, but neccessary!");
+	}
+	schoolEntity.setType(oneBySchoolTypeValue.get());
     }
 
     private void addPrimaryProjectToSchoolPostbody(SchoolDTO alterSchoolPostbody, School matchingSchool,
