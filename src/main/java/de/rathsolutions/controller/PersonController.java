@@ -21,9 +21,15 @@
  */
 package de.rathsolutions.controller;
 
+import de.rathsolutions.controller.postbody.AddNewPersonPostbody;
+import de.rathsolutions.jpa.entity.Person;
+import de.rathsolutions.jpa.entity.PersonSchoolMapping;
+import de.rathsolutions.jpa.repo.PersonRepo;
+import de.rathsolutions.jpa.repo.PersonSchoolMappingRepo;
+import de.rathsolutions.util.exception.ResourceNotFoundException;
+import io.swagger.v3.oas.annotations.Operation;
 import java.util.List;
 import java.util.Optional;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
@@ -33,14 +39,6 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import de.rathsolutions.controller.postbody.AddNewPersonPostbody;
-import de.rathsolutions.jpa.entity.Person;
-import de.rathsolutions.jpa.entity.PersonSchoolMapping;
-import de.rathsolutions.jpa.repo.PersonRepo;
-import de.rathsolutions.jpa.repo.PersonSchoolMappingRepo;
-import de.rathsolutions.util.exception.ResourceNotFoundException;
-import io.swagger.v3.oas.annotations.Operation;
 
 @RestController
 @RequestMapping("/api/v1/persons")
@@ -72,27 +70,40 @@ public class PersonController {
 
     @Operation(summary = "queries for a database-saved person resource")
     @GetMapping("/search/getPerson")
-    public ResponseEntity<?> getPerson(String prename, String lastname, String email) {
+    public ResponseEntity<?> getPerson(String prename, String lastname, String email, String phoneNumber) {
 	if (prename.isBlank() && lastname.isBlank() && email.isBlank()
 		|| email.isBlank() && (prename.isBlank() || lastname.isBlank())) {
 	    return ResponseEntity.badRequest().body(THIS_PERSON_COULD_NOT_BE_FOUND_PLEASE_SPECIFY_MORE_PARAMETERS);
 	}
 	Optional<Person> person = null;
-	if (!email.isBlank() && personRepo.countByEmail(email) == 1) {
-	    person = personRepo.findByEmail(email);
-	} else if (email.isBlank() && personRepo.countByPrenameAndLastname(prename, lastname) == 1) {
-	    person = personRepo.findByPrenameAndLastname(prename, lastname);
-	} else if (personRepo.countByPrenameAndLastnameAndEmail(prename, lastname, email) == 1) {
-	    person = personRepo.findByPrenameAndLastnameAndEmail(prename, lastname, email);
-	} else {
-	    throw new ResourceNotFoundException(prename + lastname + email, "person");
-	}
+//	if (email.isBlank() && phoneNumber.isBlank()) {
+//	    person = personRepo.findByPrenameAndLastname(prename, lastname);
+//	} else if (!email.isBlank() && phoneNumber.isBlank()) {
+//	    person = personRepo.findByPrenameAndLastnameAndEmail(prename, lastname, email);
+//	} else if (email.isBlank() && !phoneNumber.isBlank()) {
+//	    person = personRepo.findByPrenameAndLastnameAndPhoneNumber(prename, lastname, phoneNumber);
+//	} else {
+	person = personRepo.findByPrenameAndLastnameAndEmailAndPhoneNumber(prename, lastname, email, phoneNumber);
+//	}
+
+//	if (!email.isBlank() && personRepo.countByEmail(email) == 1) {
+//	    person = personRepo.findByEmail(email);
+//	} else if (email.isBlank() && personRepo.countByPrenameAndLastname(prename, lastname) == 1) {
+//	    person = personRepo.findByPrenameAndLastname(prename, lastname);
+//	} else if (personRepo.countByPrenameAndLastnameAndEmail(prename, lastname, email) == 1) {
+//	    person = personRepo.findByPrenameAndLastnameAndEmail(prename, lastname, email);
+//	} else {
+//	    throw new ResourceNotFoundException(prename + lastname + email, "person");
+//	}
+
 	if (person.isEmpty()) {
 	    throw new ResourceNotFoundException(person, "person");
 	}
 	if ((!lastname.isBlank() && !person.get().getLastname().equalsIgnoreCase(lastname))
-		|| (!prename.isBlank() && !person.get().getPrename().equalsIgnoreCase(prename))) {
-	    return ResponseEntity.badRequest().build();
+		|| (!prename.isBlank() && !person.get().getPrename().equalsIgnoreCase(prename))
+		|| (!person.get().getEmail().equalsIgnoreCase(email))
+		|| (!person.get().getPhoneNumber().equalsIgnoreCase(phoneNumber))) {
+	    throw new ResourceNotFoundException(prename + lastname + email, "person");
 	}
 	if (person != null && person.isPresent()) {
 	    return ResponseEntity.ok(person.get());
@@ -116,14 +127,14 @@ public class PersonController {
 		addNewPersonPostbody.getPhoneNumber()).isPresent()) {
 	    return ResponseEntity.status(HttpStatus.CONFLICT).build();
 	}
-	Optional<Person> personByEmail = personRepo.findByEmail(addNewPersonPostbody.getEmail());
-	if (personByEmail.isPresent()
-		&& (personByEmail.get().getPhoneNumber().equals(addNewPersonPostbody.getPhoneNumber())
-			|| personByEmail.get().getEmail().equals(addNewPersonPostbody.getEmail()))
-		&& (!personByEmail.get().getPrename().equalsIgnoreCase(addNewPersonPostbody.getPrename())
-			|| !personByEmail.get().getLastname().equalsIgnoreCase(addNewPersonPostbody.getLastname()))) {
-	    return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-	}
+//	Optional<Person> personByEmail = personRepo.findByEmail(addNewPersonPostbody.getEmail());
+//	if (personByEmail.isPresent()
+//		&& (personByEmail.get().getPhoneNumber().equals(addNewPersonPostbody.getPhoneNumber())
+//			|| personByEmail.get().getEmail().equals(addNewPersonPostbody.getEmail()))
+//		&& (!personByEmail.get().getPrename().equalsIgnoreCase(addNewPersonPostbody.getPrename())
+//			|| !personByEmail.get().getLastname().equalsIgnoreCase(addNewPersonPostbody.getLastname()))) {
+//	    return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+//	}
 	Person person = new Person(addNewPersonPostbody.getPrename(), addNewPersonPostbody.getLastname(),
 		addNewPersonPostbody.getEmail(), addNewPersonPostbody.getPhoneNumber());
 	return ResponseEntity.ok(personRepo.save(person));

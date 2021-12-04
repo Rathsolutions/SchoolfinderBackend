@@ -21,19 +21,16 @@
  */
 package de.rathsolutions.jpa.entity.additional;
 
+import de.rathsolutions.controller.postbody.AdditionalInformationDTO;
+import de.rathsolutions.jpa.entity.School;
 import java.util.List;
-
 import javax.persistence.CascadeType;
-import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
-
-import de.rathsolutions.controller.postbody.AdditionalInformationDTO;
-import de.rathsolutions.jpa.entity.School;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -47,7 +44,6 @@ public class AdditionalInformation {
     @GeneratedValue
     private int id;
 
-    @Column(unique = true)
     private String value;
 
     @ManyToOne(optional = false, fetch = FetchType.EAGER, cascade = { CascadeType.PERSIST, CascadeType.PERSIST,

@@ -21,6 +21,7 @@
  */
 package de.rathsolutions.jpa.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import de.rathsolutions.controller.postbody.SchoolTypeDTO;
 import de.rathsolutions.jpa.entity.converter.ColorConverter;
 import java.awt.Color;
@@ -53,6 +54,7 @@ public class SchoolType {
     @Convert(converter = ColorConverter.class)
     private Color color;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "type")
     private List<School> allSchools;
 

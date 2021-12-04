@@ -21,22 +21,21 @@
  */
 package de.rathsolutions.jpa.entity;
 
+import de.rathsolutions.controller.postbody.AreaDTO;
+import de.rathsolutions.controller.postbody.Position;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-
-import org.locationtech.jts.geom.Coordinate;
-import org.locationtech.jts.geom.Point;
-import org.locationtech.jts.geom.Polygon;
-
-import de.rathsolutions.controller.postbody.AreaDTO;
-import de.rathsolutions.controller.postbody.Position;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.Point;
+import org.locationtech.jts.geom.Polygon;
 
 @Entity
 @Getter
@@ -49,6 +48,7 @@ public class Area {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
+    @Column(unique = true)
     @NonNull
     private String name;
 

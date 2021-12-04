@@ -27,7 +27,7 @@ public enum SchoolTypeValue {
 
     GYMNASIUM("Gymnasium"), REALSCHULE("Realschule"), BERUFLICHES_GYMNASIUM("Berufliches Gymnasium"),
     WALDORFSCHULE("Waldorfschule"), GRUNDSCHULE("Grundschule"), FOERDERSCHULE("Förderschule"),
-    HAUPTSCHULE("Hauptschule");
+    HAUPTSCHULE("Hauptschule"), GEMEINSCHAFTSSCHULE("Gemeinschaftsschule");
 
     @Getter
     private String value;

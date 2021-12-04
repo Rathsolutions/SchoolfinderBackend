@@ -21,14 +21,12 @@
  */
 package de.rathsolutions.jpa.repo;
 
+import de.rathsolutions.jpa.entity.Person;
 import java.util.List;
 import java.util.Optional;
-
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
-
-import de.rathsolutions.jpa.entity.Person;
 
 @Repository
 public interface PersonRepo extends JpaRepository<Person, Long> {
@@ -39,6 +37,8 @@ public interface PersonRepo extends JpaRepository<Person, Long> {
     public Optional<Person> findByEmail(String email);
 
     public Optional<Person> findByPrenameAndLastname(String prename, String lastname);
+
+    public Optional<Person> findByPrenameAndLastnameAndPhoneNumber(String prename, String lastname, String phoneNumber);
 
     public Optional<Person> findByPrenameAndLastnameAndEmail(String prename, String lastname, String email);
 

@@ -65,28 +65,28 @@ public class PersonControllerTest {
 
     @Test
     void testGetPersonBlankEmailAndPrename() {
-	ResponseEntity<?> responseEntity = cut.getPerson("", "test", "");
+	ResponseEntity<?> responseEntity = cut.getPerson("", "test", "", "");
 	assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode());
 	assertEquals("This person could not be found, please specify more parameters!", responseEntity.getBody());
     }
 
     @Test
     void testGetPersonBlankEmailAndLastname() {
-	ResponseEntity<?> responseEntity = cut.getPerson("test", "", "");
+	ResponseEntity<?> responseEntity = cut.getPerson("test", "", "", "");
 	assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode());
 	assertEquals("This person could not be found, please specify more parameters!", responseEntity.getBody());
     }
 
     @Test
     void testGetPersonAllBlank() {
-	ResponseEntity<?> responseEntity = cut.getPerson("", "", "");
+	ResponseEntity<?> responseEntity = cut.getPerson("", "", "", "");
 	assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode());
 	assertEquals("This person could not be found, please specify more parameters!", responseEntity.getBody());
     }
 
     @Test
     void testGetPersonFilledEmailAndPrename() {
-	ResponseEntity<?> responseEntity = cut.getPerson("karl", "", "karl@test.de");
+	ResponseEntity<?> responseEntity = cut.getPerson("karl", "", "karl@test.de", "");
 	assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
 	assertEquals("0815", ((Person) responseEntity.getBody()).getPhoneNumber());
 	assertEquals("karl", ((Person) responseEntity.getBody()).getPrename());
@@ -96,7 +96,7 @@ public class PersonControllerTest {
 
     @Test
     void testGetPersonFilledEmailAndLastname() {
-	ResponseEntity<?> responseEntity = cut.getPerson("", "test", "karl@test.de");
+	ResponseEntity<?> responseEntity = cut.getPerson("", "test", "karl@test.de", "");
 	assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
 	assertEquals("0815", ((Person) responseEntity.getBody()).getPhoneNumber());
 	assertEquals("karl", ((Person) responseEntity.getBody()).getPrename());
@@ -106,7 +106,7 @@ public class PersonControllerTest {
 
     @Test
     void testGetPersonFilledRightValuesAll() {
-	ResponseEntity<?> responseEntity = cut.getPerson("karl", "test", "karl@test.de");
+	ResponseEntity<?> responseEntity = cut.getPerson("karl", "test", "karl@test.de", "");
 	assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
 	assertEquals("0815", ((Person) responseEntity.getBody()).getPhoneNumber());
 	assertEquals("karl", ((Person) responseEntity.getBody()).getPrename());
@@ -116,14 +116,14 @@ public class PersonControllerTest {
 
     @Test
     void testGetPersonFilledEmailAndWrongLastname() {
-	ResponseEntity<?> responseEntity = cut.getPerson("", "test2", "karl@test.de");
+	ResponseEntity<?> responseEntity = cut.getPerson("", "test2", "karl@test.de", "");
 	assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode());
 	assertNull(responseEntity.getBody());
     }
 
     @Test
     void testGetPersonFilledEmailAndWrongPrename() {
-	ResponseEntity<?> responseEntity = cut.getPerson("karl2", "", "karl@test.de");
+	ResponseEntity<?> responseEntity = cut.getPerson("karl2", "", "karl@test.de", "");
 	assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode());
 	assertNull(responseEntity.getBody());
     }
