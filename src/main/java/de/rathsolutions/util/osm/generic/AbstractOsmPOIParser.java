@@ -34,7 +34,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
-import de.rathsolutions.util.osm.pojo.OsmPOIEntity;
+import de.rathsolutions.util.osm.pojo.FinderEntity;
 
 @Slf4j
 public abstract class AbstractOsmPOIParser extends AbstractOsmPOIHandler {
@@ -43,13 +43,13 @@ public abstract class AbstractOsmPOIParser extends AbstractOsmPOIHandler {
      * Handles the current found entry.
      */
     @Override
-    protected OsmPOIEntity handleKeyFound(Element nodeItem, Element nameTag, Element overallItem) {
+    protected FinderEntity handleKeyFound(Element nodeItem, Element nameTag, Element overallItem) {
         if (nameTag == null) {
             return null;
         }
         String name = nameTag.getAttributes().getNamedItem("v").getTextContent();
         String city = getSecondInformationForEntity(overallItem);
-        return new OsmPOIEntity(name, city, Double.valueOf(nodeItem.getAttribute("lat")),
+        return new FinderEntity(name, city, Double.valueOf(nodeItem.getAttribute("lat")),
                 Double.valueOf(nodeItem.getAttribute("lon")));
     }
 

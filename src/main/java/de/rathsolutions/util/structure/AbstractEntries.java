@@ -21,11 +21,12 @@
  */
 package de.rathsolutions.util.structure;
 
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
+import java.util.ArrayList;
 
-@Component
-@Scope("singleton")
-public class OsmCityEntries extends OsmEntries{
+import de.rathsolutions.util.osm.pojo.FinderEntity;
+
+public abstract class AbstractEntries extends ArrayList<FinderEntity> {
+
+    private static final long serialVersionUID = 4773187239301129525L;
 
 }

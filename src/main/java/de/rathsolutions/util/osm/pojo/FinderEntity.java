@@ -24,7 +24,7 @@ package de.rathsolutions.util.osm.pojo;
 import lombok.Data;
 
 @Data
-public class OsmPOIEntity {
+public class FinderEntity {
 
     private final String primaryValue;
 

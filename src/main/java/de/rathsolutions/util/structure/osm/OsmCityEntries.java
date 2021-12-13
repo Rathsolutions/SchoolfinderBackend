@@ -19,14 +19,15 @@
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
  * #L%
  */
-package de.rathsolutions.util.structure;
+package de.rathsolutions.util.structure.osm;
 
-import java.util.ArrayList;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
-import de.rathsolutions.util.osm.pojo.OsmPOIEntity;
+import de.rathsolutions.util.structure.AbstractEntries;
 
-public abstract class OsmEntries extends ArrayList<OsmPOIEntity> {
-
-    private static final long serialVersionUID = 4773187239301129525L;
+@Component
+@Scope("singleton")
+public class OsmCityEntries extends AbstractEntries{
 
 }

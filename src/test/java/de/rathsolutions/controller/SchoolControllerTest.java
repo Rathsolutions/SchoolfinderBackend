@@ -42,7 +42,7 @@ import de.rathsolutions.jpa.repo.SchoolRepo;
 import de.rathsolutions.util.exception.BadArgumentsException;
 import de.rathsolutions.util.exception.ResourceAlreadyExistingException;
 import de.rathsolutions.util.exception.ResourceNotFoundException;
-import de.rathsolutions.util.osm.pojo.OsmPOIEntity;
+import de.rathsolutions.util.osm.pojo.FinderEntity;
 import de.rathsolutions.util.osm.pojo.SchoolSearchEntity;
 import de.rathsolutions.util.osm.specific.OsmPOISchoolParser;
 import java.io.IOException;
@@ -116,11 +116,11 @@ public class SchoolControllerTest {
     void testFindNotRegisteredSchoolsByNameAdminWithValidName()
 	    throws ParserConfigurationException, SAXException, IOException, NotFoundException, TransformerException,
 	    InterruptedException, ExecutionException, OperationNotSupportedException {
-	List<OsmPOIEntity> expectedReturnObject = new ArrayList<>();
-	expectedReturnObject.add(new OsmPOIEntity("test", null, 1, 2));
+	List<FinderEntity> expectedReturnObject = new ArrayList<>();
+	expectedReturnObject.add(new FinderEntity("test", null, 1, 2));
 	when(osmParserMock.processOsmFile(Mockito.any(SchoolSearchEntity.class), anyInt()))
 		.thenReturn(expectedReturnObject);
-	ResponseEntity<List<OsmPOIEntity>> notRegisteredSchoolsByName = cut
+	ResponseEntity<List<FinderEntity>> notRegisteredSchoolsByName = cut
 		.findNotRegisteredSchoolsByNameAdmin("testSchool", "", 1);
 	assertEquals(expectedReturnObject, notRegisteredSchoolsByName.getBody());
     }
@@ -131,7 +131,7 @@ public class SchoolControllerTest {
 	    InterruptedException, ExecutionException, OperationNotSupportedException {
 	when(osmParserMock.processOsmFile(Mockito.any(SchoolSearchEntity.class), anyInt()))
 		.thenThrow(NotFoundException.class);
-	ResponseEntity<List<OsmPOIEntity>> notRegisteredSchoolsByName = cut
+	ResponseEntity<List<FinderEntity>> notRegisteredSchoolsByName = cut
 		.findNotRegisteredSchoolsByNameAdmin("testSchool", "", 1);
 	assertEquals(HttpStatus.NOT_FOUND, notRegisteredSchoolsByName.getStatusCode());
 	assertNull(notRegisteredSchoolsByName.getBody());

@@ -37,10 +37,9 @@ import de.rathsolutions.util.osm.generic.AbstractOsmPOIParser;
 import de.rathsolutions.util.osm.generic.LevenstheinDistanceUtil;
 import de.rathsolutions.util.osm.generic.OsmTags;
 import de.rathsolutions.util.osm.pojo.AbstractSearchEntity;
-import de.rathsolutions.util.osm.pojo.CitySearchEntity;
-import de.rathsolutions.util.osm.pojo.OsmPOIEntity;
-import de.rathsolutions.util.structure.OsmCityEntries;
-import de.rathsolutions.util.structure.OsmEntries;
+import de.rathsolutions.util.osm.pojo.FinderEntity;
+import de.rathsolutions.util.structure.AbstractEntries;
+import de.rathsolutions.util.structure.osm.OsmCityEntries;
 import lombok.extern.slf4j.Slf4j;
 
 @Service
@@ -56,23 +55,22 @@ public class OsmPOICityOnlyParser extends AbstractOsmPOIParser {
     private LevenstheinDistanceUtil levenstheinDistanceUtil;
 
     @Override
-    protected List<OsmPOIEntity> generateResult(List<OsmPOIEntity> resultList,
-            AbstractSearchEntity searchEntity, int amount) throws OperationNotSupportedException {
-        if (resultList.isEmpty()) {
-            return null;
-        }
-        String city
-                = searchEntity.getCity().replaceAll("-", "").replaceAll("\\s+", "").toLowerCase()
-                        + (searchEntity.getDistrict() != null ? searchEntity.getDistrict() : "");
-        List<OsmPOIEntity> nearest = levenstheinDistanceUtil.computeLevenstheinDistance(city,
-            resultList, amount, searchEntity.getDistrict() != null);
-        log.debug("Final entity: " + nearest.toString());
-        return nearest;
+    protected List<FinderEntity> generateResult(List<FinderEntity> resultList, AbstractSearchEntity searchEntity,
+	    int amount) throws OperationNotSupportedException {
+	if (resultList.isEmpty()) {
+	    return null;
+	}
+	String city = searchEntity.getCity().replaceAll("-", "").replaceAll("\\s+", "").toLowerCase()
+		+ (searchEntity.getDistrict() != null ? searchEntity.getDistrict() : "");
+	List<FinderEntity> nearest = levenstheinDistanceUtil.computeLevenstheinDistance(city, resultList, amount,
+		searchEntity.getDistrict() != null, true);
+	log.debug("Final entity: " + nearest.toString());
+	return nearest;
     }
 
     @Override
     protected String getOsmFileName() {
-        return "filteredCities.xml";
+	return "filteredCities.xml";
     }
 
     /**
@@ -85,25 +83,25 @@ public class OsmPOICityOnlyParser extends AbstractOsmPOIParser {
 
     @Override
     protected String getSecondInformationCriteriaAsString(Node currentNode) {
-        String key = currentNode.getAttributes().getNamedItem("k").getTextContent();
-        String val = currentNode.getAttributes().getNamedItem("v").getTextContent();
-        if (OsmTags.IS_IN.getValue().equals(key)) {
-            // Removing not needed information after second ','
-            String[] splittedVal = val.split(",");
-            if (splittedVal.length >= 2) {
-                return splittedVal[0] + " - " + splittedVal[1];
-            } else {
-                return val;
-            }
-        } else if (OsmTags.WIKIPEDIA.getValue().equals(key)) {
-            // Removing ':de'
-            return val.substring(3);
-        }
-        return "";
+	String key = currentNode.getAttributes().getNamedItem("k").getTextContent();
+	String val = currentNode.getAttributes().getNamedItem("v").getTextContent();
+	if (OsmTags.IS_IN.getValue().equals(key)) {
+	    // Removing not needed information after second ','
+	    String[] splittedVal = val.split(",");
+	    if (splittedVal.length >= 2) {
+		return splittedVal[0] + " - " + splittedVal[1];
+	    } else {
+		return val;
+	    }
+	} else if (OsmTags.WIKIPEDIA.getValue().equals(key)) {
+	    // Removing ':de'
+	    return val.substring(3);
+	}
+	return "";
     }
 
     @Override
-    protected OsmEntries getCachedEntries() {
-        return this.osmCityEntries;
+    protected AbstractEntries getCachedEntries() {
+	return this.osmCityEntries;
     }
 }

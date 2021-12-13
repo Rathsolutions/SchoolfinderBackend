@@ -25,7 +25,7 @@ import static org.junit.Assert.assertEquals;
 
 import de.rathsolutions.SpringBootMain;
 import de.rathsolutions.util.osm.pojo.CitySearchEntity;
-import de.rathsolutions.util.osm.pojo.OsmPOIEntity;
+import de.rathsolutions.util.osm.pojo.FinderEntity;
 import de.rathsolutions.util.osm.specific.OsmPOICityOnlyParser;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -54,9 +54,9 @@ class OsmPOICityOnlyParserTest {
     void testFindCorrectCitiesWithFullName()
 	    throws ParserConfigurationException, SAXException, IOException, NotFoundException, TransformerException,
 	    InterruptedException, ExecutionException, OperationNotSupportedException {
-	List<OsmPOIEntity> testObjects = OsmCityTestHelper.getInstance().getTestEntites();
-	for (OsmPOIEntity e : testObjects) {
-	    List<OsmPOIEntity> schoolByName = cut
+	List<FinderEntity> testObjects = OsmCityTestHelper.getInstance().getTestEntites();
+	for (FinderEntity e : testObjects) {
+	    List<FinderEntity> schoolByName = cut
 		    .processOsmFile(new CitySearchEntity(e.getPrimaryValue(), e.getSecondaryValue()), 1);
 	    OsmTestHelper.assertOsmPoiEqual(e, schoolByName.get(0));
 	}
@@ -66,12 +66,12 @@ class OsmPOICityOnlyParserTest {
     void testFindOnPerfectMatchMoreThanOneElement()
 	    throws ParserConfigurationException, SAXException, IOException, NotFoundException, TransformerException,
 	    InterruptedException, ExecutionException, OperationNotSupportedException {
-	List<OsmPOIEntity> testObjects = new ArrayList<>();
+	List<FinderEntity> testObjects = new ArrayList<>();
 	String city = "Steinbach";
-	testObjects.add(new OsmPOIEntity(city, city, 48.7288702, 8.1607982));
-	testObjects.add(new OsmPOIEntity(city, city, 48.9575768, 9.4738062));
-	for (OsmPOIEntity e : testObjects) {
-	    List<OsmPOIEntity> schoolByName = cut.processOsmFile(new CitySearchEntity(e.getPrimaryValue()), 10);
+	testObjects.add(new FinderEntity(city, city, 48.7288702, 8.1607982));
+	testObjects.add(new FinderEntity(city, city, 48.9575768, 9.4738062));
+	for (FinderEntity e : testObjects) {
+	    List<FinderEntity> schoolByName = cut.processOsmFile(new CitySearchEntity(e.getPrimaryValue()), 10);
 	    long exactElementCount = schoolByName.stream().filter(f -> f.getPrimaryValue().equals(e.getPrimaryValue())
 		    && e.getLatVal() == f.getLatVal() && e.getLongVal() == f.getLongVal()).count();
 	    assertEquals(1, exactElementCount);

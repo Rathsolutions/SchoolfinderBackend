@@ -23,9 +23,6 @@ package de.rathsolutions.util.osm.pojo;
 
 import javax.naming.OperationNotSupportedException;
 
-import lombok.Getter;
-import lombok.Setter;
-
 public abstract class AbstractSearchEntity {
 
     protected String name;
@@ -42,35 +39,35 @@ public abstract class AbstractSearchEntity {
      * @return the name
      */
     public String getName() throws OperationNotSupportedException {
-        return name;
+	return name;
     }
 
     /**
      * @return the city
      */
     public String getCity() throws OperationNotSupportedException {
-        return city;
+	return city;
     }
 
     /**
      * @return the street
      */
     public String getStreet() throws OperationNotSupportedException {
-        return street;
+	return street;
     }
 
     /**
      * @return the housenumber
      */
     public String getHousenumber() throws OperationNotSupportedException {
-        return housenumber;
+	return housenumber;
     }
 
     /**
      * @return the district
      */
-    public String getDistrict() throws OperationNotSupportedException{
-        return district;
+    public String getDistrict() throws OperationNotSupportedException {
+	return district;
     }
 
 }

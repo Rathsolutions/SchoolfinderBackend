@@ -38,7 +38,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.xml.sax.SAXException;
 
 import de.rathsolutions.SpringBootMain;
-import de.rathsolutions.util.osm.pojo.OsmPOIEntity;
+import de.rathsolutions.util.osm.pojo.FinderEntity;
 import de.rathsolutions.util.osm.pojo.SchoolSearchEntity;
 import de.rathsolutions.util.osm.specific.OsmPOIReducer;
 import de.rathsolutions.util.osm.specific.OsmPOISchoolParser;
@@ -57,9 +57,9 @@ class OsmPOISchoolParserTest {
     void testFindCorrectElementsInXmlFileWithFullName() throws ParserConfigurationException,
             SAXException, IOException, NotFoundException, TransformerException,
             InterruptedException, ExecutionException, OperationNotSupportedException {
-        List<OsmPOIEntity> testObjects = OsmSchoolTestHelper.getInstance().getTestEntites();
-        for (OsmPOIEntity e : testObjects) {
-            List<OsmPOIEntity> schoolByName = cut.processOsmFile(
+        List<FinderEntity> testObjects = OsmSchoolTestHelper.getInstance().getTestEntites();
+        for (FinderEntity e : testObjects) {
+            List<FinderEntity> schoolByName = cut.processOsmFile(
                 new SchoolSearchEntity(e.getPrimaryValue(), e.getSecondaryValue()), 1);
             OsmTestHelper.assertOsmPoiEqual(e, schoolByName.get(0));
         }

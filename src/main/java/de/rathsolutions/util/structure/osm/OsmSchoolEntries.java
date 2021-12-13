@@ -19,13 +19,15 @@
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
  * #L%
  */
-package de.rathsolutions.util.structure;
+package de.rathsolutions.util.structure.osm;
 
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import de.rathsolutions.util.structure.AbstractEntries;
+
 @Component
 @Scope("singleton")
-public class OsmSchoolEntries extends OsmEntries{
+public class OsmSchoolEntries extends AbstractEntries{
 
 }

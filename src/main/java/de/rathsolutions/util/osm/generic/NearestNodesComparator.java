@@ -23,19 +23,19 @@ package de.rathsolutions.util.osm.generic;
 
 import java.util.Comparator;
 
-import de.rathsolutions.util.osm.pojo.OsmPOIEntity;
+import de.rathsolutions.util.osm.pojo.FinderEntity;
 
-public class NearestNodesComparator implements Comparator<OsmPOIEntity> {
+public class NearestNodesComparator implements Comparator<FinderEntity> {
 
     private static final double COMPARISON_DELTA = 0.01;
-    private OsmPOIEntity nodeToCompare;
+    private FinderEntity nodeToCompare;
 
-    public NearestNodesComparator(OsmPOIEntity n) {
+    public NearestNodesComparator(FinderEntity n) {
         this.nodeToCompare = n;
     }
 
     @Override
-    public int compare(OsmPOIEntity o1, OsmPOIEntity o2) {
+    public int compare(FinderEntity o1, FinderEntity o2) {
         double firstDistance = HaversineUtils.calculateHaversine(nodeToCompare.getLatVal(),
             nodeToCompare.getLongVal(), o1.getLatVal(), o1.getLongVal());
         double secondDistance = HaversineUtils.calculateHaversine(nodeToCompare.getLatVal(),

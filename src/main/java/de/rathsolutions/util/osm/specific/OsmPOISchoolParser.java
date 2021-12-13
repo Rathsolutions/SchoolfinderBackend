@@ -36,9 +36,9 @@ import de.rathsolutions.util.osm.generic.AbstractOsmPOIParser;
 import de.rathsolutions.util.osm.generic.LevenstheinDistanceUtil;
 import de.rathsolutions.util.osm.generic.OsmTags;
 import de.rathsolutions.util.osm.pojo.AbstractSearchEntity;
-import de.rathsolutions.util.osm.pojo.OsmPOIEntity;
-import de.rathsolutions.util.structure.OsmEntries;
-import de.rathsolutions.util.structure.OsmSchoolEntries;
+import de.rathsolutions.util.osm.pojo.FinderEntity;
+import de.rathsolutions.util.structure.AbstractEntries;
+import de.rathsolutions.util.structure.osm.OsmSchoolEntries;
 import lombok.extern.slf4j.Slf4j;
 
 @Service
@@ -55,34 +55,34 @@ public class OsmPOISchoolParser extends AbstractOsmPOIParser {
 
     @Override
     protected String getOsmFileName() {
-        return "filteredSchools.xml";
+	return "filteredSchools.xml";
     }
 
+    @Override
     protected String getSecondInformationCriteriaAsString(Node currentNode) {
-        return OsmTags.CITY.getValue()
-                .equals(currentNode.getAttributes().getNamedItem("k").getTextContent())
-                        ? currentNode.getAttributes().getNamedItem("v").getTextContent()
-                        : "";
+	return OsmTags.CITY.getValue().equals(currentNode.getAttributes().getNamedItem("k").getTextContent())
+		? currentNode.getAttributes().getNamedItem("v").getTextContent()
+		: "";
     }
 
     @Override
-    protected OsmEntries getCachedEntries() {
-        return osmSchoolEntries;
+    protected AbstractEntries getCachedEntries() {
+	return osmSchoolEntries;
     }
 
     @Override
-    protected List<OsmPOIEntity> generateResult(List<OsmPOIEntity> resultList,
-            AbstractSearchEntity searchEntity, int amount) throws OperationNotSupportedException {
-        if (resultList.isEmpty()) {
-            return null;
-        }
-        String cityOrEmpty = searchEntity.getCity() != null ? searchEntity.getCity() : "";
-        String fullName = searchEntity.getName() + cityOrEmpty;
-        fullName = fullName.replaceAll("-", "").replaceAll("\\s+", "").toLowerCase();
-        List<OsmPOIEntity> nearest = levenstheinDistanceUtil.computeLevenstheinDistance(fullName,
-            resultList, amount, !cityOrEmpty.isEmpty());
-        log.debug("Final entity: " + nearest.toString());
-        return nearest;
+    protected List<FinderEntity> generateResult(List<FinderEntity> resultList, AbstractSearchEntity searchEntity,
+	    int amount) throws OperationNotSupportedException {
+	if (resultList.isEmpty()) {
+	    return null;
+	}
+	String cityOrEmpty = searchEntity.getCity() != null ? searchEntity.getCity() : "";
+	String fullName = searchEntity.getName() + cityOrEmpty;
+	fullName = fullName.replaceAll("-", "").replaceAll("\\s+", "").toLowerCase();
+	List<FinderEntity> nearest = levenstheinDistanceUtil.computeLevenstheinDistance(fullName, resultList, amount,
+		!cityOrEmpty.isEmpty(), true);
+	log.debug("Final entity: " + nearest.toString());
+	return nearest;
     }
 
 }

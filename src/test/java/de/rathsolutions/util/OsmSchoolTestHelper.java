@@ -25,38 +25,38 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import de.rathsolutions.util.osm.pojo.OsmPOIEntity;
+import de.rathsolutions.util.osm.pojo.FinderEntity;
 
 public class OsmSchoolTestHelper {
 
     private static OsmSchoolTestHelper instance;
 
-    private List<OsmPOIEntity> testObjects;
+    private List<FinderEntity> testObjects;
 
     private OsmSchoolTestHelper() {
         testObjects = new ArrayList<>();
         testObjects
-                .add(new OsmPOIEntity("Berufliches Bildungszentrum", null, 48.9408981, 8.3967966));
-        testObjects.add(new OsmPOIEntity("Max-Planck-Gymnasium", "Böblingen", 48.6796386, 9.0251714));
+                .add(new FinderEntity("Berufliches Bildungszentrum", null, 48.9408981, 8.3967966));
+        testObjects.add(new FinderEntity("Max-Planck-Gymnasium", "Böblingen", 48.6796386, 9.0251714));
         testObjects.add(
-            new OsmPOIEntity("Grund- und Hauptschule Gemmrigheim", "Gemmrigheim", 49.0286584, 9.1596199));
+            new FinderEntity("Grund- und Hauptschule Gemmrigheim", "Gemmrigheim", 49.0286584, 9.1596199));
         testObjects
-                .add(new OsmPOIEntity("Franz-Oberthür-Schule Städtisches Berufsbildungszentrum I",
+                .add(new FinderEntity("Franz-Oberthür-Schule Städtisches Berufsbildungszentrum I",
                         null, 49.7860555, 9.9543711));
-        testObjects.add(new OsmPOIEntity("Rheinauschule", "Mannheim", 49.4328595, 8.5259034));
-        testObjects.add(new OsmPOIEntity("Grundschule Ipsheim", null, 49.5268451, 10.4792362));
-        testObjects.add(new OsmPOIEntity("Logements", null, 47.5788175, 7.5530249));
-        testObjects.add(new OsmPOIEntity("Spielwegschule", "Münstertal", 47.8778643, 7.8362427));
-        testObjects.add(new OsmPOIEntity("Neunlindenschule", "Ihringen", 48.0445650, 7.6490466));
-        testObjects.add(new OsmPOIEntity("Rheinschulhaus", "Schaffhausen", 47.6937530, 8.6342400));
-        testObjects.add(new OsmPOIEntity("Schulhaus Obertor", null, 47.4935356, 9.2434062));
-        testObjects.add(new OsmPOIEntity("Grundschule Illerbeuren", null, 47.9023859, 10.1276518));
-        testObjects.add(new OsmPOIEntity("Bildungszentrum Bretzfeld", null, 49.1787183, 9.4359423));
-        testObjects.add(new OsmPOIEntity("Grundschule Waltershofen", "Kißlegg", 47.7569435, 9.9184315));
-        testObjects.add(new OsmPOIEntity("Flattichschule", null, 48.9368834, 9.2009058));
+        testObjects.add(new FinderEntity("Rheinauschule", "Mannheim", 49.4328595, 8.5259034));
+        testObjects.add(new FinderEntity("Grundschule Ipsheim", null, 49.5268451, 10.4792362));
+        testObjects.add(new FinderEntity("Logements", null, 47.5788175, 7.5530249));
+        testObjects.add(new FinderEntity("Spielwegschule", "Münstertal", 47.8778643, 7.8362427));
+        testObjects.add(new FinderEntity("Neunlindenschule", "Ihringen", 48.0445650, 7.6490466));
+        testObjects.add(new FinderEntity("Rheinschulhaus", "Schaffhausen", 47.6937530, 8.6342400));
+        testObjects.add(new FinderEntity("Schulhaus Obertor", null, 47.4935356, 9.2434062));
+        testObjects.add(new FinderEntity("Grundschule Illerbeuren", null, 47.9023859, 10.1276518));
+        testObjects.add(new FinderEntity("Bildungszentrum Bretzfeld", null, 49.1787183, 9.4359423));
+        testObjects.add(new FinderEntity("Grundschule Waltershofen", "Kißlegg", 47.7569435, 9.9184315));
+        testObjects.add(new FinderEntity("Flattichschule", null, 48.9368834, 9.2009058));
     }
 
-    public List<OsmPOIEntity> getTestEntites() {
+    public List<FinderEntity> getTestEntites() {
         return Collections.unmodifiableList(testObjects);
     }
 

@@ -39,7 +39,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.xml.sax.SAXException;
 
 import de.rathsolutions.SpringBootMain;
-import de.rathsolutions.util.osm.pojo.OsmPOIEntity;
+import de.rathsolutions.util.osm.pojo.FinderEntity;
 import de.rathsolutions.util.osm.pojo.StreetCitySearchEntity;
 import de.rathsolutions.util.osm.specific.OsmStreetParser;
 import javassist.NotFoundException;
@@ -55,7 +55,7 @@ class OsmStreetParserTest {
 
     @Test
     void testCityStreetSearch() throws OperationNotSupportedException, ParserConfigurationException, SAXException, IOException, NotFoundException, TransformerException, InterruptedException, ExecutionException {
-        List<OsmPOIEntity> findStreetGeocodes
+        List<FinderEntity> findStreetGeocodes
                 = cut.processOsmFile(new StreetCitySearchEntity("Rastatt", "Engelstraße", "21"), 1);
         findStreetGeocodes.stream().forEach(e -> {
             assertEquals(48.859834600000006, e.getLatVal());

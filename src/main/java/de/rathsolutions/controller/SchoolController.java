@@ -21,6 +21,31 @@
  */
 package de.rathsolutions.controller;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
+
+import javax.naming.OperationNotSupportedException;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerException;
+
+import org.locationtech.jts.geom.Point;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+import org.xml.sax.SAXException;
+
 import de.rathsolutions.controller.postbody.ProjectDTO;
 import de.rathsolutions.controller.postbody.SchoolDTO;
 import de.rathsolutions.jpa.entity.Area;
@@ -48,33 +73,11 @@ import de.rathsolutions.util.GeometryUtils;
 import de.rathsolutions.util.exception.BadArgumentsException;
 import de.rathsolutions.util.exception.ResourceAlreadyExistingException;
 import de.rathsolutions.util.exception.ResourceNotFoundException;
-import de.rathsolutions.util.osm.pojo.OsmPOIEntity;
+import de.rathsolutions.util.osm.pojo.FinderEntity;
 import de.rathsolutions.util.osm.pojo.SchoolSearchEntity;
 import de.rathsolutions.util.osm.specific.OsmPOISchoolParser;
 import io.swagger.v3.oas.annotations.Operation;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.concurrent.ExecutionException;
-import java.util.stream.Collectors;
 import javassist.NotFoundException;
-import javax.naming.OperationNotSupportedException;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.TransformerException;
-import org.locationtech.jts.geom.Point;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-import org.xml.sax.SAXException;
 
 @RestController
 @RequestMapping("/api/v1/schools")
@@ -117,13 +120,13 @@ public class SchoolController {
 
     @Operation(summary = "searches non-registered school resources by their name in an osm document. This schools must not be registered within the application")
     @GetMapping("/search/findNotRegisteredSchoolsByName")
-    public ResponseEntity<List<OsmPOIEntity>> findNotRegisteredSchoolsByNameAdmin(
+    public ResponseEntity<List<FinderEntity>> findNotRegisteredSchoolsByNameAdmin(
 	    @RequestParam(defaultValue = "") String name, @RequestParam(defaultValue = "") String city,
 	    @RequestParam(defaultValue = "1") int amount) {
 	try {
-	    List<OsmPOIEntity> resultsByName;
+	    List<FinderEntity> resultsByName;
 	    System.out.println(name);
-	    resultsByName = osmSchoolParser.processOsmFile(new SchoolSearchEntity(name, city), amount);
+	    resultsByName = osmSchoolParser.find(new SchoolSearchEntity(name, city), amount);
 	    return ResponseEntity.ok().header("Copyright", "This list was generated using Open Street Maps Data")
 		    .body(resultsByName);
 	} catch (ParserConfigurationException | SAXException | IOException | NotFoundException | TransformerException

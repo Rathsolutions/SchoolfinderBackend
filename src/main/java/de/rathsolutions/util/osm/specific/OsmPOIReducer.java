@@ -47,8 +47,8 @@ import org.w3c.dom.NodeList;
 import de.rathsolutions.util.osm.generic.AbstractOsmPOIHandler;
 import de.rathsolutions.util.osm.generic.OsmTags;
 import de.rathsolutions.util.osm.pojo.AbstractSearchEntity;
-import de.rathsolutions.util.osm.pojo.OsmPOIEntity;
-import de.rathsolutions.util.structure.OsmEntries;
+import de.rathsolutions.util.osm.pojo.FinderEntity;
+import de.rathsolutions.util.structure.AbstractEntries;
 
 @Service
 @Scope("prototype")
@@ -58,87 +58,86 @@ public class OsmPOIReducer extends AbstractOsmPOIHandler {
     private Transformer transformer;
 
     @Override
-    protected OsmPOIEntity handleKeyFound(Element nodeItem, Element nameTag, Element overallItem) {
-        if (nameTag == null) {
-            return null;
-        }
-        String name = nameTag.getAttributes().getNamedItem("v").getTextContent();
-        String city = name;
-        NodeList childNodes = overallItem.getChildNodes();
-        for (int i = 0; i < childNodes.getLength(); i++) {
-            Node tagNode = childNodes.item(i);
-            if (tagNode != null && tagNode.getAttributes() != null
-                    && tagNode.getAttributes().getNamedItem("k") != null && !OsmTags.isValidTag(
-                        tagNode.getAttributes().getNamedItem("k").getTextContent())) {
-                overallItem.removeChild(tagNode);
-            }
-        }
-        DOMSource source = new DOMSource(overallItem);
-        StreamResult result = new StreamResult(new StringWriter());
-        try {
-            transformer.transform(source, result);
-        } catch (TransformerException e) {
-            e.printStackTrace();
-        }
-        String strObject = result.getWriter().toString().trim().replaceAll("(?m)^[ \\t]*\\r?\\n\"", "");
-        try {
-            writer.write(strObject);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return new OsmPOIEntity(name, city, Double.valueOf(nodeItem.getAttribute("lat")),
-                Double.valueOf(nodeItem.getAttribute("lon")));
+    protected FinderEntity handleKeyFound(Element nodeItem, Element nameTag, Element overallItem) {
+	if (nameTag == null) {
+	    return null;
+	}
+	String name = nameTag.getAttributes().getNamedItem("v").getTextContent();
+	String city = name;
+	NodeList childNodes = overallItem.getChildNodes();
+	for (int i = 0; i < childNodes.getLength(); i++) {
+	    Node tagNode = childNodes.item(i);
+	    if (tagNode != null && tagNode.getAttributes() != null && tagNode.getAttributes().getNamedItem("k") != null
+		    && !OsmTags.isValidTag(tagNode.getAttributes().getNamedItem("k").getTextContent())) {
+		overallItem.removeChild(tagNode);
+	    }
+	}
+	DOMSource source = new DOMSource(overallItem);
+	StreamResult result = new StreamResult(new StringWriter());
+	try {
+	    transformer.transform(source, result);
+	} catch (TransformerException e) {
+	    e.printStackTrace();
+	}
+	String strObject = result.getWriter().toString().trim().replaceAll("(?m)^[ \\t]*\\r?\\n\"", "");
+	try {
+	    writer.write(strObject);
+	} catch (IOException e) {
+	    e.printStackTrace();
+	}
+	return new FinderEntity(name, city, Double.valueOf(nodeItem.getAttribute("lat")),
+		Double.valueOf(nodeItem.getAttribute("lon")));
     }
 
     @Override
     protected void cleanup() {
-        try {
-            this.writer.write("</osm>");
-            this.writer.flush();
-            this.writer.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+	try {
+	    this.writer.write("</osm>");
+	    this.writer.flush();
+	    this.writer.close();
+	} catch (IOException e) {
+	    e.printStackTrace();
+	}
     }
 
     @Override
     protected void init() {
-        try {
-            File file = new File("filteredCitiesNew.xml");
-            file.createNewFile();
-            TransformerFactory transformerFactory = TransformerFactory.newInstance();
-            transformerFactory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
-            transformerFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
-            transformerFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_STYLESHEET, "");
-            transformer = transformerFactory.newTransformer();
-            transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
-            this.writer = new BufferedWriter(new FileWriter(file));
-            this.writer.write("<osm>");
-        } catch (IOException | TransformerConfigurationException e) {
-            e.printStackTrace();
-        }
+	try {
+	    File file = new File("filteredCitiesNew.xml");
+	    file.createNewFile();
+	    TransformerFactory transformerFactory = TransformerFactory.newInstance();
+	    transformerFactory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
+	    transformerFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
+	    transformerFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_STYLESHEET, "");
+	    transformer = transformerFactory.newTransformer();
+	    transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
+	    this.writer = new BufferedWriter(new FileWriter(file));
+	    this.writer.write("<osm>");
+	} catch (IOException | TransformerConfigurationException e) {
+	    e.printStackTrace();
+	}
     }
 
     /**
      * Not needed in this implementation
      */
     @Override
-    protected List<OsmPOIEntity> generateResult(List<OsmPOIEntity> resultList,
-            AbstractSearchEntity searchEntity, int amount) throws OperationNotSupportedException {
-        return null;
+    protected List<FinderEntity> generateResult(List<FinderEntity> resultList, AbstractSearchEntity searchEntity,
+	    int amount) throws OperationNotSupportedException {
+	return null;
     }
 
     @Override
     protected String getOsmFileName() {
-        return "allSchools.xml";
+	return "allSchools.xml";
     }
 
     @Override
-    protected OsmEntries getCachedEntries() {
-        return new OsmEntries() {
+    protected AbstractEntries getCachedEntries() {
+	return new AbstractEntries() {
 
-            private static final long serialVersionUID = -9117143845874310922L;
-        };
+	    private static final long serialVersionUID = -9117143845874310922L;
+	};
     }
 
 }

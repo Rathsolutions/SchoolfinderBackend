@@ -23,10 +23,10 @@ package de.rathsolutions.util;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import de.rathsolutions.util.osm.pojo.OsmPOIEntity;
+import de.rathsolutions.util.osm.pojo.FinderEntity;
 
 public class OsmTestHelper {
-    public static void assertOsmPoiEqual(OsmPOIEntity e, OsmPOIEntity schoolByName) {
+    public static void assertOsmPoiEqual(FinderEntity e, FinderEntity schoolByName) {
         assertEquals(e.getLatVal(), schoolByName.getLatVal());
         assertEquals(e.getLongVal(), schoolByName.getLongVal());
         assertEquals(e.getPrimaryValue(), schoolByName.getPrimaryValue());
