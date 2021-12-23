@@ -21,28 +21,26 @@
  */
 package de.rathsolutions.jpa.repo;
 
-import java.util.List;
-import java.util.Optional;
-
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
-
 import de.rathsolutions.jpa.entity.Criteria;
 import de.rathsolutions.jpa.entity.School;
+import java.util.List;
+import java.util.Optional;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
 @Repository
 public interface SchoolRepo extends JpaRepository<School, Long> {
 
     public List<School> findDistinctByMatchingCriteriasIn(List<Criteria> criteriaName);
 
-    public List<School> findAllByLatitudeBetweenAndLongitudeBetween(double leftLatBound,
-            double rightLatBound, double topLongBound, double bottomLongBound);
-    
+    public List<School> findAllByLatitudeBetweenAndLongitudeBetween(double leftLatBound, double rightLatBound,
+	    double topLongBound, double bottomLongBound);
+
     public List<School> findAllByOrderBySchoolName();
 
-    public List<School> findDistinctByLatitudeBetweenAndLongitudeBetweenAndMatchingCriteriasIn(
-            double leftLatBound, double rightLatBound, double topLongBound, double bottomLongBound,
-            List<Criteria> criterias);
+    public List<School> findDistinctByLatitudeBetweenAndLongitudeBetweenAndMatchingCriteriasIn(double leftLatBound,
+	    double rightLatBound, double topLongBound, double bottomLongBound, List<Criteria> criterias);
 
     public Optional<School> findOneBySchoolName(String schoolName);
+
 }

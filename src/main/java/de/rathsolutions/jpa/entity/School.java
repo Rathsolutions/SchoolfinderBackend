@@ -21,9 +21,11 @@
  */
 package de.rathsolutions.jpa.entity;
 
+import de.rathsolutions.controller.postbody.AdditionalInformationDTO;
+import de.rathsolutions.controller.postbody.SchoolDTO;
+import de.rathsolutions.jpa.entity.additional.AdditionalInformation;
 import java.util.ArrayList;
 import java.util.List;
-
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -35,18 +37,12 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
-
-import org.hibernate.annotations.Type;
-import org.springframework.transaction.annotation.Transactional;
-
-import de.rathsolutions.controller.postbody.AdditionalInformationDTO;
-import de.rathsolutions.controller.postbody.SchoolDTO;
-import de.rathsolutions.jpa.entity.additional.AdditionalInformation;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.Type;
 
 @Entity
 @Getter
@@ -140,20 +136,6 @@ public class School {
 	    dto.setSchoolType(this.type.convertToDto());
 	}
 	return dto;
-    }
-
-    @Transactional
-    public List<String> getSearchableInformation() {
-	List<String> toReturn = new ArrayList<>();
-	toReturn.add(this.address);
-	toReturn.add(this.homepage);
-	toReturn.add(this.generalEmail);
-	toReturn.add(this.generalPhoneNumber);
-	toReturn.add(this.schoolName);
-	toReturn.add(this.shortSchoolName);
-	this.additionalInformation.forEach(e -> toReturn.add(e.getValue()));
-	toReturn.removeIf(e -> e == null);
-	return toReturn;
     }
 
 }

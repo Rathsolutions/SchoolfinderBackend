@@ -21,17 +21,19 @@
  */
 package de.rathsolutions.util.osm.generic;
 
+import de.rathsolutions.util.osm.pojo.FinderEntity;
+import de.rathsolutions.util.osm.pojo.FinderEntitySearchConstraint;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.stream.Collectors;
-
 import org.springframework.stereotype.Service;
-
-import de.rathsolutions.util.osm.pojo.FinderEntity;
 
 @Service
 public class LevenstheinDistanceUtil {
@@ -60,20 +62,35 @@ public class LevenstheinDistanceUtil {
     private List<FinderEntity> computeLevenstheinDistanceInternal(String requestString,
 	    Collection<FinderEntity> resultList, int amount, boolean computeWithSecondaryValue,
 	    boolean perfectMatchAllowed) {
-	HashMap<FinderEntity, Integer> entityDistanceMapping = new HashMap<>();
-	resultList.forEach(e -> {
-	    entityDistanceMapping.put(e, getLevenstheinDistance(requestString.toLowerCase(),
-		    e.getPrimaryValue().toLowerCase() + (computeWithSecondaryValue ? e.getSecondaryValue() : "")));
+	Map<FinderEntitySearchConstraint, Integer> entityDistanceMapping = new HashMap<>();
+	Map<FinderEntitySearchConstraint, FinderEntity> finderEntityDistanceMapping = new HashMap<>();
+	resultList.stream().forEach(e -> {
+	    e.getQueryValues().forEach(f -> {
+		finderEntityDistanceMapping.put(f, e);
+		entityDistanceMapping.put(f, getLevenstheinDistance(requestString.toLowerCase(),
+			f.getPrimaryValue().toLowerCase() + (computeWithSecondaryValue ? f.getSecondaryValue() : "")));
+	    });
 	});
-	Set<Entry<FinderEntity, Integer>> collect = entityDistanceMapping.entrySet().stream()
+	Set<Entry<FinderEntitySearchConstraint, Integer>> collect = entityDistanceMapping.entrySet().stream()
 		.sorted((e, f) -> e.getValue().compareTo(f.getValue())).limit(amount).collect(Collectors.toSet());
-	List<Entry<FinderEntity, Integer>> perfectMatch = collect.stream().filter(e -> e.getValue() == 0)
-		.collect(Collectors.toList());
+	List<Entry<FinderEntitySearchConstraint, Integer>> perfectMatch = collect.stream()
+		.filter(e -> e.getValue() == 0).collect(Collectors.toList());
 	if (!perfectMatch.isEmpty() && perfectMatch.size() == 1 && perfectMatchAllowed) {
-	    return Arrays.asList(perfectMatch.get(0).getKey());
+	    return Arrays.asList(finderEntityDistanceMapping.get(perfectMatch.get(0).getKey()));
 	} else {
-	    return collect.stream().sorted((e, f) -> e.getValue().compareTo(f.getValue())).map(e -> e.getKey())
-		    .collect(Collectors.toList());
+//	    collect.stream().sorted((e, f) -> e.getValue().compareTo(f.getValue())).forEach((e) -> {
+//		System.out.println(e.getKey() + ":" + e.getValue());
+//	    });
+	    List<FinderEntity> toReturn = new ArrayList<>();
+	    Set<String> alreadyAdded = new HashSet<>();
+	    collect.stream().sorted((e, f) -> e.getValue().compareTo(f.getValue())).map(e -> e.getKey())
+		    .map(e -> finderEntityDistanceMapping.get(e)).distinct().forEach(e -> {
+			if (!alreadyAdded.contains(e.getPrimaryValue())) {
+			    toReturn.add(e);
+			    alreadyAdded.add(e.getPrimaryValue());
+			}
+		    });
+	    return toReturn;
 	}
     }
 

@@ -21,6 +21,9 @@
  */
 package de.rathsolutions.util.osm.generic;
 
+import de.rathsolutions.util.osm.pojo.AbstractSearchEntity;
+import de.rathsolutions.util.osm.pojo.FinderEntity;
+import de.rathsolutions.util.osm.specific.FinderService;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -29,11 +32,10 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
-
+import javassist.NotFoundException;
 import javax.naming.OperationNotSupportedException;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.w3c.dom.Document;
@@ -42,11 +44,6 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
-
-import de.rathsolutions.util.osm.pojo.AbstractSearchEntity;
-import de.rathsolutions.util.osm.pojo.FinderEntity;
-import de.rathsolutions.util.osm.specific.FinderService;
-import javassist.NotFoundException;
 
 public abstract class AbstractOsmPOIHandler implements FinderService {
 
@@ -75,7 +72,7 @@ public abstract class AbstractOsmPOIHandler implements FinderService {
 	} else {
 	    resultList = getCachedEntries();
 	}
-	List<FinderEntity> osmPoiInNodes = generateResult(resultList, searchEntity, amount);
+	List<FinderEntity> osmPoiInNodes = generateResult(new ArrayList<>(resultList), searchEntity, amount);
 
 	if (!Objects.isNull(osmPoiInNodes)) {
 	    return osmPoiInNodes;

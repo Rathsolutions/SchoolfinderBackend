@@ -1,14 +1,39 @@
+/*-
+ * #%L
+ * SchoolfinderBackend
+ * %%
+ * Copyright (C) 2020 - 2021 Rathsolutions. <info@rathsolutions.de>
+ * %%
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public
+ * License along with this program.  If not, see
+ * <http://www.gnu.org/licenses/gpl-3.0.html>.
+ * #L%
+ */
 package de.rathsolutions.util.structure.internalFinder;
 
-import javax.annotation.PostConstruct;
-
+import de.rathsolutions.jpa.entity.School;
+import de.rathsolutions.jpa.repo.SchoolRepo;
+import de.rathsolutions.jpa.service.SchoolDAOService;
+import de.rathsolutions.util.osm.pojo.FinderEntity;
+import de.rathsolutions.util.osm.pojo.FinderEntitySearchConstraint;
+import de.rathsolutions.util.structure.AbstractEntries;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
-
-import de.rathsolutions.jpa.repo.SchoolRepo;
-import de.rathsolutions.util.osm.pojo.FinderEntity;
-import de.rathsolutions.util.structure.AbstractEntries;
 
 @Service
 @Scope("singleton")
@@ -19,17 +44,51 @@ public class InstitutionFinderEntries extends AbstractEntries {
     @Autowired
     private SchoolRepo schoolRepo;
 
+    @Autowired
+    private SchoolDAOService schoolDaoService;
+
     /**
      * Builds the internal entry list with all searchable information from
      * institutions
      */
-    @PostConstruct
     public void buildEntryList() {
-	schoolRepo.findAll()
-		.forEach(e -> e.getSearchableInformation().stream()
-			.map(f -> new FinderEntity(f, e.getSchoolName(), e.getLongitude(), e.getLatitude()))
-			.forEach(f -> this.add(f)));
+	List<School> allEntities = schoolRepo.findAll();
 
+	allEntities.stream().forEach(e -> {
+	    List<String> additionalSearchableInformation = schoolDaoService.getAdditionalSearchableInformation(e);
+	    additionalSearchableInformation.stream().map(f -> {
+		return new FinderEntity(e.getSchoolName(), f, Stream.of(f).map(g -> g.split(" "))
+			.map(g -> Stream.of(g).map(h -> new FinderEntitySearchConstraint(h, ""))
+				.collect(Collectors.toList()))
+			.flatMap(List::stream).collect(Collectors.toList()), e.getLatitude(), e.getLongitude());
+	    }).forEach(f -> this.add(f));
+	});
+//
+//	allEntities.stream().map(e -> new FinderEntity(e.getSchoolName(), "",
+//		schoolDaoService.getAdditionalSearchableInformation(e).stream().map(f -> f.split(" ")).map(f -> Stream
+//			.of(f).map(g -> new FinderEntitySearchConstraint(g, Stream.of(f).collect(Collectors.joining())))
+//			.collect(Collectors.toList())).flatMap(List::stream).collect(Collectors.toList()),
+//		e.getLongitude(), e.getLatitude())).forEach(f -> this.add(f));
+	allEntities.forEach(e -> schoolDaoService
+		.getGeneralSearchableInformation(e).stream().map(f -> new FinderEntity(e.getSchoolName(), f,
+			Arrays.asList(new FinderEntitySearchConstraint(f, "")), e.getLongitude(), e.getLatitude()))
+		.forEach(f -> this.add(f)));
+    }
+
+    @Override
+    public Stream<FinderEntity> stream() {
+	if (this.isEmpty()) {
+	    this.buildEntryList();
+	}
+	return super.stream();
+    }
+
+    @Override
+    public FinderEntity get(int index) {
+	if (this.isEmpty()) {
+	    this.buildEntryList();
+	}
+	return super.get(index);
     }
 
 }

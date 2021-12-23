@@ -21,6 +21,7 @@
  */
 package de.rathsolutions.util.osm.pojo;
 
+import java.util.List;
 import lombok.Data;
 
 @Data
@@ -29,6 +30,8 @@ public class FinderEntity {
     private final String primaryValue;
 
     private final String secondaryValue;
+
+    private final List<FinderEntitySearchConstraint> queryValues;
 
     private final double latVal;
 

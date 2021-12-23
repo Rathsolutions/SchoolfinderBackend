@@ -21,20 +21,17 @@
  */
 package de.rathsolutions.util.osm.generic;
 
+import de.rathsolutions.util.osm.pojo.FinderEntity;
+import de.rathsolutions.util.osm.pojo.FinderEntitySearchConstraint;
 import java.io.IOException;
-import java.util.List;
+import java.util.Arrays;
 import java.util.concurrent.ExecutionException;
-
 import javax.xml.parsers.ParserConfigurationException;
-
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
-
-import de.rathsolutions.util.osm.pojo.FinderEntity;
 
 @Slf4j
 public abstract class AbstractOsmPOIParser extends AbstractOsmPOIHandler {
@@ -44,30 +41,30 @@ public abstract class AbstractOsmPOIParser extends AbstractOsmPOIHandler {
      */
     @Override
     protected FinderEntity handleKeyFound(Element nodeItem, Element nameTag, Element overallItem) {
-        if (nameTag == null) {
-            return null;
-        }
-        String name = nameTag.getAttributes().getNamedItem("v").getTextContent();
-        String city = getSecondInformationForEntity(overallItem);
-        return new FinderEntity(name, city, Double.valueOf(nodeItem.getAttribute("lat")),
-                Double.valueOf(nodeItem.getAttribute("lon")));
+	if (nameTag == null) {
+	    return null;
+	}
+	String name = nameTag.getAttributes().getNamedItem("v").getTextContent();
+	String city = getSecondInformationForEntity(overallItem);
+	return new FinderEntity(name, city, Arrays.asList(new FinderEntitySearchConstraint(name, city)),
+		Double.valueOf(nodeItem.getAttribute("lat")), Double.valueOf(nodeItem.getAttribute("lon")));
     }
 
     protected abstract String getSecondInformationCriteriaAsString(Node currentNode);
 
     private String getSecondInformationForEntity(Element currentNodeElement) {
-        NodeList childNodes = currentNodeElement.getChildNodes();
-        for (int i = 0; i < childNodes.getLength(); i++) {
-            Node tagNode = childNodes.item(i);
-            if (tagNode != null && tagNode.getAttributes() != null
-                    && tagNode.getAttributes().getNamedItem("k") != null) {
-                String ret = getSecondInformationCriteriaAsString(tagNode);
-                if (!ret.isBlank()) {
-                    return ret;
-                }
-            }
-        }
-        return "";
+	NodeList childNodes = currentNodeElement.getChildNodes();
+	for (int i = 0; i < childNodes.getLength(); i++) {
+	    Node tagNode = childNodes.item(i);
+	    if (tagNode != null && tagNode.getAttributes() != null
+		    && tagNode.getAttributes().getNamedItem("k") != null) {
+		String ret = getSecondInformationCriteriaAsString(tagNode);
+		if (!ret.isBlank()) {
+		    return ret;
+		}
+	    }
+	}
+	return "";
     }
 
     /**
@@ -80,13 +77,13 @@ public abstract class AbstractOsmPOIParser extends AbstractOsmPOIHandler {
 
     @Override
     protected void init() {
-        try {
-            if (getCachedEntries().isEmpty()) {
-                buildWayCache();
-            }
-        } catch (ParserConfigurationException | SAXException | IOException | InterruptedException
-                | ExecutionException e) {
-            e.printStackTrace();
-        }
+	try {
+	    if (getCachedEntries().isEmpty()) {
+		buildWayCache();
+	    }
+	} catch (ParserConfigurationException | SAXException | IOException | InterruptedException
+		| ExecutionException e) {
+	    e.printStackTrace();
+	}
     }
 }

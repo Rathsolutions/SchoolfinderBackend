@@ -21,6 +21,15 @@
  */
 package de.rathsolutions.util.osm.specific;
 
+import de.rathsolutions.util.osm.generic.DocumentParser;
+import de.rathsolutions.util.osm.generic.HaversineUtils;
+import de.rathsolutions.util.osm.generic.LevenstheinDistanceUtil;
+import de.rathsolutions.util.osm.generic.NearestNodesComparator;
+import de.rathsolutions.util.osm.pojo.AbstractSearchEntity;
+import de.rathsolutions.util.osm.pojo.FinderEntity;
+import de.rathsolutions.util.osm.pojo.FinderEntitySearchConstraint;
+import de.rathsolutions.util.osm.pojo.OsmStreetPojo;
+import de.rathsolutions.util.structure.osm.OsmCityEntries;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -28,12 +37,12 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-
 import javax.naming.OperationNotSupportedException;
 import javax.xml.parsers.ParserConfigurationException;
-
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.context.annotation.ScopedProxyMode;
@@ -45,16 +54,6 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
-
-import de.rathsolutions.util.osm.generic.DocumentParser;
-import de.rathsolutions.util.osm.generic.HaversineUtils;
-import de.rathsolutions.util.osm.generic.LevenstheinDistanceUtil;
-import de.rathsolutions.util.osm.generic.NearestNodesComparator;
-import de.rathsolutions.util.osm.pojo.AbstractSearchEntity;
-import de.rathsolutions.util.osm.pojo.FinderEntity;
-import de.rathsolutions.util.osm.pojo.OsmStreetPojo;
-import de.rathsolutions.util.structure.osm.OsmCityEntries;
-import lombok.extern.slf4j.Slf4j;
 
 @Service
 @Scope(value = WebApplicationContext.SCOPE_REQUEST, proxyMode = ScopedProxyMode.TARGET_CLASS)
@@ -121,13 +120,19 @@ public class OsmStreetParser extends OsmPOICityOnlyParser {
 		for (int i = 0; i < size; i++) {
 		    OsmStreetPojo current = (OsmStreetPojo) in.readObject();
 		    if (current.getCity().isEmpty() || current.getCity() == null) {
-			waysWithoutMappedCity.add(new FinderEntity(current.getStreet(), current.getHousenumber(),
-				current.getLatitude(), current.getLongitude()));
+			waysWithoutMappedCity
+				.add(new FinderEntity(current.getStreet(), current.getHousenumber(),
+					Arrays.asList(new FinderEntitySearchConstraint(current.getStreet(),
+						current.getHousenumber())),
+					current.getLatitude(), current.getLongitude()));
 		    } else if (nearestEntityToUserCityInput.get(j).getPrimaryValue().equalsIgnoreCase(current.getCity())
 			    || nearestEntityToUserCityInput.get(j).getPrimaryValue()
 				    .equalsIgnoreCase(current.getSuburb())) {
-			entitiesToTraverse.add(new FinderEntity(current.getStreet(), current.getHousenumber(),
-				current.getLatitude(), current.getLongitude()));
+			entitiesToTraverse
+				.add(new FinderEntity(current.getStreet(), current.getHousenumber(),
+					Arrays.asList(new FinderEntitySearchConstraint(current.getStreet(),
+						current.getHousenumber())),
+					current.getLatitude(), current.getLongitude()));
 		    }
 		}
 		Collections.sort(waysWithoutMappedCity,

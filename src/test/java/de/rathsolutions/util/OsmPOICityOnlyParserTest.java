@@ -26,9 +26,11 @@ import static org.junit.Assert.assertEquals;
 import de.rathsolutions.SpringBootMain;
 import de.rathsolutions.util.osm.pojo.CitySearchEntity;
 import de.rathsolutions.util.osm.pojo.FinderEntity;
+import de.rathsolutions.util.osm.pojo.FinderEntitySearchConstraint;
 import de.rathsolutions.util.osm.specific.OsmPOICityOnlyParser;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import javassist.NotFoundException;
@@ -56,8 +58,8 @@ class OsmPOICityOnlyParserTest {
 	    InterruptedException, ExecutionException, OperationNotSupportedException {
 	List<FinderEntity> testObjects = OsmCityTestHelper.getInstance().getTestEntites();
 	for (FinderEntity e : testObjects) {
-	    List<FinderEntity> schoolByName = cut
-		    .processOsmFile(new CitySearchEntity(e.getPrimaryValue(), e.getSecondaryValue()), 1);
+	    List<FinderEntity> schoolByName = cut.find(new CitySearchEntity(e.getPrimaryValue(), e.getSecondaryValue()),
+		    1);
 	    OsmTestHelper.assertOsmPoiEqual(e, schoolByName.get(0));
 	}
     }
@@ -68,10 +70,12 @@ class OsmPOICityOnlyParserTest {
 	    InterruptedException, ExecutionException, OperationNotSupportedException {
 	List<FinderEntity> testObjects = new ArrayList<>();
 	String city = "Steinbach";
-	testObjects.add(new FinderEntity(city, city, 48.7288702, 8.1607982));
-	testObjects.add(new FinderEntity(city, city, 48.9575768, 9.4738062));
+	testObjects.add(new FinderEntity(city, city, Arrays.asList(new FinderEntitySearchConstraint(city, city)),
+		48.7288702, 8.1607982));
+	testObjects.add(new FinderEntity(city, city, Arrays.asList(new FinderEntitySearchConstraint(city, city)),
+		48.9575768, 9.4738062));
 	for (FinderEntity e : testObjects) {
-	    List<FinderEntity> schoolByName = cut.processOsmFile(new CitySearchEntity(e.getPrimaryValue()), 10);
+	    List<FinderEntity> schoolByName = cut.find(new CitySearchEntity(e.getPrimaryValue()), 10);
 	    long exactElementCount = schoolByName.stream().filter(f -> f.getPrimaryValue().equals(e.getPrimaryValue())
 		    && e.getLatVal() == f.getLatVal() && e.getLongVal() == f.getLongVal()).count();
 	    assertEquals(1, exactElementCount);

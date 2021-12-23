@@ -21,29 +21,26 @@
  */
 package de.rathsolutions.util;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import de.rathsolutions.SpringBootMain;
+import de.rathsolutions.util.osm.pojo.FinderEntity;
+import de.rathsolutions.util.osm.pojo.StreetCitySearchEntity;
+import de.rathsolutions.util.osm.specific.OsmStreetParser;
 import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
-
+import javassist.NotFoundException;
 import javax.naming.OperationNotSupportedException;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
-
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ContextConfiguration;
 import org.xml.sax.SAXException;
-
-import de.rathsolutions.SpringBootMain;
-import de.rathsolutions.util.osm.pojo.FinderEntity;
-import de.rathsolutions.util.osm.pojo.StreetCitySearchEntity;
-import de.rathsolutions.util.osm.specific.OsmStreetParser;
-import javassist.NotFoundException;
-import lombok.extern.slf4j.Slf4j;
 
 @SpringBootTest
 @ContextConfiguration(classes = SpringBootMain.class)
@@ -54,22 +51,22 @@ class OsmStreetParserTest {
     private OsmStreetParser cut;
 
     @Test
-    void testCityStreetSearch() throws OperationNotSupportedException, ParserConfigurationException, SAXException, IOException, NotFoundException, TransformerException, InterruptedException, ExecutionException {
-        List<FinderEntity> findStreetGeocodes
-                = cut.processOsmFile(new StreetCitySearchEntity("Rastatt", "Engelstraße", "21"), 1);
-        findStreetGeocodes.stream().forEach(e -> {
-            assertEquals(48.859834600000006, e.getLatVal());
-            assertEquals(8.201058, e.getLongVal());
-            System.out.println(e.getPrimaryValue());
-            System.out.println(e.getSecondaryValue());
-        });
+    void testCityStreetSearch() throws OperationNotSupportedException, ParserConfigurationException, SAXException,
+	    IOException, NotFoundException, TransformerException, InterruptedException, ExecutionException {
+	List<FinderEntity> findStreetGeocodes = cut.find(new StreetCitySearchEntity("Rastatt", "Engelstraße", "21"), 1);
+	findStreetGeocodes.stream().forEach(e -> {
+	    assertEquals(48.859834600000006, e.getLatVal());
+	    assertEquals(8.201058, e.getLongVal());
+	    System.out.println(e.getPrimaryValue());
+	    System.out.println(e.getSecondaryValue());
+	});
     }
 
     // Use this test to create the requried heap file for the city street search
     @Disabled
     @Test
     void writeHeapFile() {
-        cut.createStreetObjectsHeapFile();
+	cut.createStreetObjectsHeapFile();
     }
 
 }

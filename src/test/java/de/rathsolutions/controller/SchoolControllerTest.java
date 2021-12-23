@@ -43,6 +43,7 @@ import de.rathsolutions.util.exception.BadArgumentsException;
 import de.rathsolutions.util.exception.ResourceAlreadyExistingException;
 import de.rathsolutions.util.exception.ResourceNotFoundException;
 import de.rathsolutions.util.osm.pojo.FinderEntity;
+import de.rathsolutions.util.osm.pojo.FinderEntitySearchConstraint;
 import de.rathsolutions.util.osm.pojo.SchoolSearchEntity;
 import de.rathsolutions.util.osm.specific.OsmPOISchoolParser;
 import java.io.IOException;
@@ -117,9 +118,10 @@ public class SchoolControllerTest {
 	    throws ParserConfigurationException, SAXException, IOException, NotFoundException, TransformerException,
 	    InterruptedException, ExecutionException, OperationNotSupportedException {
 	List<FinderEntity> expectedReturnObject = new ArrayList<>();
-	expectedReturnObject.add(new FinderEntity("test", null, 1, 2));
-	when(osmParserMock.processOsmFile(Mockito.any(SchoolSearchEntity.class), anyInt()))
-		.thenReturn(expectedReturnObject);
+	List<FinderEntitySearchConstraint> constraints = new ArrayList<>();
+	constraints.add(new FinderEntitySearchConstraint("test", ""));
+	expectedReturnObject.add(new FinderEntity("test", null, constraints, 1, 2));
+	when(osmParserMock.find(Mockito.any(SchoolSearchEntity.class), anyInt())).thenReturn(expectedReturnObject);
 	ResponseEntity<List<FinderEntity>> notRegisteredSchoolsByName = cut
 		.findNotRegisteredSchoolsByNameAdmin("testSchool", "", 1);
 	assertEquals(expectedReturnObject, notRegisteredSchoolsByName.getBody());
@@ -129,8 +131,7 @@ public class SchoolControllerTest {
     void testFindNotRegisteredSchoolsByNameAdminWithNotValidName()
 	    throws ParserConfigurationException, SAXException, IOException, NotFoundException, TransformerException,
 	    InterruptedException, ExecutionException, OperationNotSupportedException {
-	when(osmParserMock.processOsmFile(Mockito.any(SchoolSearchEntity.class), anyInt()))
-		.thenThrow(NotFoundException.class);
+	when(osmParserMock.find(Mockito.any(SchoolSearchEntity.class), anyInt())).thenThrow(NotFoundException.class);
 	ResponseEntity<List<FinderEntity>> notRegisteredSchoolsByName = cut
 		.findNotRegisteredSchoolsByNameAdmin("testSchool", "", 1);
 	assertEquals(HttpStatus.NOT_FOUND, notRegisteredSchoolsByName.getStatusCode());

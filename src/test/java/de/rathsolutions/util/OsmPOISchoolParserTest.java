@@ -21,29 +21,23 @@
  */
 package de.rathsolutions.util;
 
-import static org.junit.jupiter.api.Assertions.*;
-
+import de.rathsolutions.SpringBootMain;
+import de.rathsolutions.util.osm.pojo.FinderEntity;
+import de.rathsolutions.util.osm.pojo.SchoolSearchEntity;
+import de.rathsolutions.util.osm.specific.OsmPOISchoolParser;
 import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
-
+import javassist.NotFoundException;
 import javax.naming.OperationNotSupportedException;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
-
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ContextConfiguration;
 import org.xml.sax.SAXException;
-
-import de.rathsolutions.SpringBootMain;
-import de.rathsolutions.util.osm.pojo.FinderEntity;
-import de.rathsolutions.util.osm.pojo.SchoolSearchEntity;
-import de.rathsolutions.util.osm.specific.OsmPOIReducer;
-import de.rathsolutions.util.osm.specific.OsmPOISchoolParser;
-import javassist.NotFoundException;
-import lombok.extern.slf4j.Slf4j;
 
 @SpringBootTest
 @ContextConfiguration(classes = SpringBootMain.class)
@@ -54,15 +48,15 @@ class OsmPOISchoolParserTest {
     private OsmPOISchoolParser cut;
 
     @Test
-    void testFindCorrectElementsInXmlFileWithFullName() throws ParserConfigurationException,
-            SAXException, IOException, NotFoundException, TransformerException,
-            InterruptedException, ExecutionException, OperationNotSupportedException {
-        List<FinderEntity> testObjects = OsmSchoolTestHelper.getInstance().getTestEntites();
-        for (FinderEntity e : testObjects) {
-            List<FinderEntity> schoolByName = cut.processOsmFile(
-                new SchoolSearchEntity(e.getPrimaryValue(), e.getSecondaryValue()), 1);
-            OsmTestHelper.assertOsmPoiEqual(e, schoolByName.get(0));
-        }
+    void testFindCorrectElementsInXmlFileWithFullName()
+	    throws ParserConfigurationException, SAXException, IOException, NotFoundException, TransformerException,
+	    InterruptedException, ExecutionException, OperationNotSupportedException {
+	List<FinderEntity> testObjects = OsmSchoolTestHelper.getInstance().getTestEntites();
+	for (FinderEntity e : testObjects) {
+	    List<FinderEntity> schoolByName = cut
+		    .find(new SchoolSearchEntity(e.getPrimaryValue(), e.getSecondaryValue()), 1);
+	    OsmTestHelper.assertOsmPoiEqual(e, schoolByName.get(0));
+	}
     }
 
 }
