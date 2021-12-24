@@ -19,17 +19,25 @@
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
  * #L%
  */
-package de.rathsolutions.util.osm.pojo;
+package de.rathsolutions.util.finder.specific;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
+import java.io.IOException;
+import java.util.List;
+import java.util.concurrent.ExecutionException;
 
-@Getter
-@AllArgsConstructor
-public class FinderEntitySearchConstraint {
+import javax.naming.OperationNotSupportedException;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerException;
 
-    private final String primaryValue;
+import org.xml.sax.SAXException;
 
-    private final String secondaryValue;
+import de.rathsolutions.util.finder.pojo.AbstractSearchEntity;
+import de.rathsolutions.util.finder.pojo.FinderEntity;
+import javassist.NotFoundException;
 
+public interface FinderService {
+
+    public List<FinderEntity> find(AbstractSearchEntity primaryValue, int amount)
+	    throws OperationNotSupportedException, ParserConfigurationException, SAXException, IOException,
+	    NotFoundException, TransformerException, InterruptedException, ExecutionException;
 }

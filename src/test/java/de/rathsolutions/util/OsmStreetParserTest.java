@@ -21,26 +21,29 @@
  */
 package de.rathsolutions.util;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.Assert.assertEquals;
 
-import de.rathsolutions.SpringBootMain;
-import de.rathsolutions.util.osm.pojo.FinderEntity;
-import de.rathsolutions.util.osm.pojo.StreetCitySearchEntity;
-import de.rathsolutions.util.osm.specific.OsmStreetParser;
 import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
-import javassist.NotFoundException;
+
 import javax.naming.OperationNotSupportedException;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
-import lombok.extern.slf4j.Slf4j;
+
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ContextConfiguration;
 import org.xml.sax.SAXException;
+
+import de.rathsolutions.SpringBootMain;
+import de.rathsolutions.util.finder.pojo.FinderEntity;
+import de.rathsolutions.util.finder.pojo.StreetCitySearchEntity;
+import de.rathsolutions.util.finder.specific.osm.OsmStreetParser;
+import javassist.NotFoundException;
+import lombok.extern.slf4j.Slf4j;
 
 @SpringBootTest
 @ContextConfiguration(classes = SpringBootMain.class)

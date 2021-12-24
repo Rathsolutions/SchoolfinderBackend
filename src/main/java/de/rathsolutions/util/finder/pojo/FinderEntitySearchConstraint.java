@@ -19,27 +19,17 @@
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
  * #L%
  */
-package de.rathsolutions.util.osm.generic;
+package de.rathsolutions.util.finder.pojo;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 
-public enum OsmTags {
+@Getter
+@AllArgsConstructor
+public class FinderEntitySearchConstraint {
 
-    NAME("name"), CITY("addr:city"), IS_IN("is_in"), WIKIPEDIA("wikipedia");
+    private final String primaryValue;
 
-    @Getter
-    private String value;
+    private final String secondaryValue;
 
-    private OsmTags(String value) {
-        this.value = value;
-    }
-
-    public static boolean isValidTag(String tagName) {
-        for (OsmTags e : OsmTags.values()) {
-            if (e.getValue().equals(tagName)) {
-                return true;
-            }
-        }
-        return false;
-    }
 }

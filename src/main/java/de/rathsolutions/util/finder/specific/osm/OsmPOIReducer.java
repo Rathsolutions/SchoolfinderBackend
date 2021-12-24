@@ -19,14 +19,8 @@
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
  * #L%
  */
-package de.rathsolutions.util.osm.specific;
+package de.rathsolutions.util.finder.specific.osm;
 
-import de.rathsolutions.util.osm.generic.AbstractOsmPOIHandler;
-import de.rathsolutions.util.osm.generic.OsmTags;
-import de.rathsolutions.util.osm.pojo.AbstractSearchEntity;
-import de.rathsolutions.util.osm.pojo.FinderEntity;
-import de.rathsolutions.util.osm.pojo.FinderEntitySearchConstraint;
-import de.rathsolutions.util.structure.AbstractEntries;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -34,6 +28,7 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.util.Arrays;
 import java.util.List;
+
 import javax.naming.OperationNotSupportedException;
 import javax.xml.XMLConstants;
 import javax.xml.transform.OutputKeys;
@@ -43,11 +38,19 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
+
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+
+import de.rathsolutions.util.finder.generic.OsmTags;
+import de.rathsolutions.util.finder.generic.osm.AbstractOsmPOIHandler;
+import de.rathsolutions.util.finder.pojo.AbstractSearchEntity;
+import de.rathsolutions.util.finder.pojo.FinderEntity;
+import de.rathsolutions.util.finder.pojo.FinderEntitySearchConstraint;
+import de.rathsolutions.util.structure.AbstractEntries;
 
 @Service
 @Scope("prototype")

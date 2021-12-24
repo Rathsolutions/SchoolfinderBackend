@@ -19,10 +19,8 @@
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
  * #L%
  */
-package de.rathsolutions.util.osm.generic;
+package de.rathsolutions.util.finder.generic;
 
-import de.rathsolutions.util.osm.pojo.FinderEntity;
-import de.rathsolutions.util.osm.pojo.FinderEntitySearchConstraint;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -33,7 +31,11 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.stream.Collectors;
+
 import org.springframework.stereotype.Service;
+
+import de.rathsolutions.util.finder.pojo.FinderEntity;
+import de.rathsolutions.util.finder.pojo.FinderEntitySearchConstraint;
 
 @Service
 public class LevenstheinDistanceUtil {
@@ -83,6 +85,11 @@ public class LevenstheinDistanceUtil {
 //	    });
 	    List<FinderEntity> toReturn = new ArrayList<>();
 	    Set<String> alreadyAdded = new HashSet<>();
+
+//	    collect.stream().sorted((e, f) -> e.getValue().compareTo(f.getValue())).forEach(e -> {
+//		System.out.println(e.getKey().getPrimaryValue() + ":" + e.getValue());
+//	    });
+
 	    collect.stream().sorted((e, f) -> e.getValue().compareTo(f.getValue())).map(e -> e.getKey())
 		    .map(e -> finderEntityDistanceMapping.get(e)).distinct().forEach(e -> {
 			if (!alreadyAdded.contains(e.getPrimaryValue())) {

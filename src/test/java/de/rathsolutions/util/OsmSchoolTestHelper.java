@@ -21,12 +21,13 @@
  */
 package de.rathsolutions.util;
 
-import de.rathsolutions.util.osm.pojo.FinderEntity;
-import de.rathsolutions.util.osm.pojo.FinderEntitySearchConstraint;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+
+import de.rathsolutions.util.finder.pojo.FinderEntity;
+import de.rathsolutions.util.finder.pojo.FinderEntitySearchConstraint;
 
 public class OsmSchoolTestHelper {
 

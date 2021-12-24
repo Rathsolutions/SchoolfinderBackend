@@ -19,7 +19,7 @@
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
  * #L%
  */
-package de.rathsolutions.util.osm.specific;
+package de.rathsolutions.util.finder.specific.osm;
 
 import java.util.List;
 
@@ -33,11 +33,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.context.WebApplicationContext;
 import org.w3c.dom.Node;
 
-import de.rathsolutions.util.osm.generic.AbstractOsmPOIParser;
-import de.rathsolutions.util.osm.generic.LevenstheinDistanceUtil;
-import de.rathsolutions.util.osm.generic.OsmTags;
-import de.rathsolutions.util.osm.pojo.AbstractSearchEntity;
-import de.rathsolutions.util.osm.pojo.FinderEntity;
+import de.rathsolutions.util.finder.generic.LevenstheinDistanceUtil;
+import de.rathsolutions.util.finder.generic.OsmTags;
+import de.rathsolutions.util.finder.generic.osm.AbstractOsmPOIParser;
+import de.rathsolutions.util.finder.pojo.AbstractSearchEntity;
+import de.rathsolutions.util.finder.pojo.FinderEntity;
 import de.rathsolutions.util.structure.AbstractEntries;
 import de.rathsolutions.util.structure.osm.OsmCityEntries;
 import lombok.extern.slf4j.Slf4j;

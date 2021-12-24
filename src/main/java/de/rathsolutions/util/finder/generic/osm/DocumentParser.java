@@ -19,7 +19,7 @@
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
  * #L%
  */
-package de.rathsolutions.util.osm.generic;
+package de.rathsolutions.util.finder.generic.osm;
 
 import java.io.IOException;
 
@@ -36,13 +36,11 @@ import org.xml.sax.SAXException;
 @Service
 @Scope("prototype")
 public class DocumentParser {
-    public Document readDocument(String fileName)
-            throws ParserConfigurationException, SAXException, IOException {
-        ClassPathResource allSchoolResource = new ClassPathResource(fileName);
-        DocumentBuilder xmlDocBuilder
-                = DocumentBuilderFactory.newDefaultInstance().newDocumentBuilder();
-        Document parsedXml = xmlDocBuilder.parse(allSchoolResource.getInputStream());
-        parsedXml.normalize();
-        return parsedXml;
+    public Document readDocument(String fileName) throws ParserConfigurationException, SAXException, IOException {
+	ClassPathResource allSchoolResource = new ClassPathResource(fileName);
+	DocumentBuilder xmlDocBuilder = DocumentBuilderFactory.newDefaultInstance().newDocumentBuilder();
+	Document parsedXml = xmlDocBuilder.parse(allSchoolResource.getInputStream());
+	parsedXml.normalize();
+	return parsedXml;
     }
 }

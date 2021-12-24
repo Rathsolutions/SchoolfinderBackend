@@ -23,7 +23,7 @@ package de.rathsolutions.util.structure;
 
 import java.util.ArrayList;
 
-import de.rathsolutions.util.osm.pojo.FinderEntity;
+import de.rathsolutions.util.finder.pojo.FinderEntity;
 
 public abstract class AbstractEntries extends ArrayList<FinderEntity> {
 

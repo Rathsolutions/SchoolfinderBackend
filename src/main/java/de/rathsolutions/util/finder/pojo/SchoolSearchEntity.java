@@ -19,29 +19,31 @@
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
  * #L%
  */
-package de.rathsolutions.util.osm.pojo;
+package de.rathsolutions.util.finder.pojo;
 
 import javax.naming.OperationNotSupportedException;
 
-public class InstitutionSearchEntity extends AbstractSearchEntity {
-    private static final String A_INSTITUTION_SEARCH_ENTITY_CANNOT_HAVE_A = "A InstitutionSearchEntity cannot have a ";
+public class SchoolSearchEntity extends AbstractSearchEntity {
 
-    public InstitutionSearchEntity(String name) {
+    private static final String A_SCHOOL_SEARCH_ENTITY_CANNOT_HAVE_A = "A SchoolSearchEntity cannot have a ";
+
+    public SchoolSearchEntity(String name, String city) {
 	this.name = name;
+	this.city = city;
     }
 
     @Override
     public String getHousenumber() throws OperationNotSupportedException {
-	throw new OperationNotSupportedException(A_INSTITUTION_SEARCH_ENTITY_CANNOT_HAVE_A + "housenumber!");
-    }
-
-    @Override
-    public String getCity() throws OperationNotSupportedException {
-	throw new OperationNotSupportedException(A_INSTITUTION_SEARCH_ENTITY_CANNOT_HAVE_A + "name!");
+	throw new OperationNotSupportedException(A_SCHOOL_SEARCH_ENTITY_CANNOT_HAVE_A + " housenumber!");
     }
 
     @Override
     public String getStreet() throws OperationNotSupportedException {
-	throw new OperationNotSupportedException(A_INSTITUTION_SEARCH_ENTITY_CANNOT_HAVE_A + "street!");
+	throw new OperationNotSupportedException(A_SCHOOL_SEARCH_ENTITY_CANNOT_HAVE_A + " street!");
+    }
+
+    @Override
+    public String getDistrict() throws OperationNotSupportedException {
+	throw new OperationNotSupportedException(A_SCHOOL_SEARCH_ENTITY_CANNOT_HAVE_A + " district!");
     }
 }

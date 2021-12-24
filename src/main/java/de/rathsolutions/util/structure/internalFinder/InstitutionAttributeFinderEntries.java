@@ -21,23 +21,24 @@
  */
 package de.rathsolutions.util.structure.internalFinder;
 
-import de.rathsolutions.jpa.entity.School;
-import de.rathsolutions.jpa.repo.SchoolRepo;
-import de.rathsolutions.jpa.service.SchoolDAOService;
-import de.rathsolutions.util.osm.pojo.FinderEntity;
-import de.rathsolutions.util.osm.pojo.FinderEntitySearchConstraint;
-import de.rathsolutions.util.structure.AbstractEntries;
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
+import de.rathsolutions.jpa.entity.School;
+import de.rathsolutions.jpa.repo.SchoolRepo;
+import de.rathsolutions.jpa.service.SchoolDAOService;
+import de.rathsolutions.util.finder.pojo.FinderEntity;
+import de.rathsolutions.util.finder.pojo.FinderEntitySearchConstraint;
+import de.rathsolutions.util.structure.AbstractEntries;
+
 @Service
 @Scope("singleton")
-public class InstitutionFinderEntries extends AbstractEntries {
+public class InstitutionAttributeFinderEntries extends AbstractEntries {
 
     private static final long serialVersionUID = 8979518050945610433L;
 
@@ -60,19 +61,9 @@ public class InstitutionFinderEntries extends AbstractEntries {
 		return new FinderEntity(e.getSchoolName(), f, Stream.of(f).map(g -> g.split(" "))
 			.map(g -> Stream.of(g).map(h -> new FinderEntitySearchConstraint(h, ""))
 				.collect(Collectors.toList()))
-			.flatMap(List::stream).collect(Collectors.toList()), e.getLatitude(), e.getLongitude());
+			.flatMap(List::stream).collect(Collectors.toList()), e.getLongitude(), e.getLatitude());
 	    }).forEach(f -> this.add(f));
 	});
-//
-//	allEntities.stream().map(e -> new FinderEntity(e.getSchoolName(), "",
-//		schoolDaoService.getAdditionalSearchableInformation(e).stream().map(f -> f.split(" ")).map(f -> Stream
-//			.of(f).map(g -> new FinderEntitySearchConstraint(g, Stream.of(f).collect(Collectors.joining())))
-//			.collect(Collectors.toList())).flatMap(List::stream).collect(Collectors.toList()),
-//		e.getLongitude(), e.getLatitude())).forEach(f -> this.add(f));
-	allEntities.forEach(e -> schoolDaoService
-		.getGeneralSearchableInformation(e).stream().map(f -> new FinderEntity(e.getSchoolName(), f,
-			Arrays.asList(new FinderEntitySearchConstraint(f, "")), e.getLongitude(), e.getLatitude()))
-		.forEach(f -> this.add(f)));
     }
 
     @Override

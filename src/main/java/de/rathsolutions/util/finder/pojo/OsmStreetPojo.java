@@ -19,25 +19,28 @@
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
  * #L%
  */
-package de.rathsolutions.util.osm.specific;
+package de.rathsolutions.util.finder.pojo;
 
-import java.io.IOException;
-import java.util.List;
-import java.util.concurrent.ExecutionException;
+import java.io.Serializable;
 
-import javax.naming.OperationNotSupportedException;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.TransformerException;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 
-import org.xml.sax.SAXException;
+@Getter
+@AllArgsConstructor
+public class OsmStreetPojo implements Serializable {
 
-import de.rathsolutions.util.osm.pojo.AbstractSearchEntity;
-import de.rathsolutions.util.osm.pojo.FinderEntity;
-import javassist.NotFoundException;
+    private static final long serialVersionUID = 5207600399100490835L;
 
-public interface FinderService {
+    private String city;
 
-    public List<FinderEntity> find(AbstractSearchEntity primaryValue, int amount)
-	    throws OperationNotSupportedException, ParserConfigurationException, SAXException, IOException,
-	    NotFoundException, TransformerException, InterruptedException, ExecutionException;
+    private String street;
+
+    private String housenumber;
+
+    private String suburb;
+
+    private double latitude;
+
+    private double longitude;
 }

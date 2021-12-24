@@ -1,8 +1,8 @@
 /*-
  * #%L
- * SchuglemapsBackend
+ * SchoolfinderBackend
  * %%
- * Copyright (C) 2020 Rathsolutions. <info@rathsolutions.de>
+ * Copyright (C) 2020 - 2021 Rathsolutions. <info@rathsolutions.de>
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
@@ -19,17 +19,19 @@
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
  * #L%
  */
-package de.rathsolutions.util;
+package de.rathsolutions.util.finder.generic;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+public final class HaversineUtils {
 
-import de.rathsolutions.util.finder.pojo.FinderEntity;
+    public static double calculateHaversine(double latOne, double longOne, double latTwo, double longTwo) {
+	double earthRadius = 6371000; // meters
+	double dLat = Math.toRadians(latTwo - latOne);
+	double dLng = Math.toRadians(longTwo - longOne);
+	double a = Math.sin(dLat / 2) * Math.sin(dLat / 2) + Math.cos(Math.toRadians(latOne))
+		* Math.cos(Math.toRadians(latTwo)) * Math.sin(dLng / 2) * Math.sin(dLng / 2);
+	double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+	float dist = (float) (earthRadius * c);
 
-public class OsmTestHelper {
-    public static void assertOsmPoiEqual(FinderEntity e, FinderEntity schoolByName) {
-	assertEquals(e.getLatVal(), schoolByName.getLatVal());
-	assertEquals(e.getLongVal(), schoolByName.getLongVal());
-	assertEquals(e.getPrimaryValue(), schoolByName.getPrimaryValue());
-	System.out.println(schoolByName.getPrimaryValue());
+	return dist;
     }
 }

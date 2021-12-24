@@ -19,17 +19,8 @@
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
  * #L%
  */
-package de.rathsolutions.util.osm.specific;
+package de.rathsolutions.util.finder.specific.osm;
 
-import de.rathsolutions.util.osm.generic.DocumentParser;
-import de.rathsolutions.util.osm.generic.HaversineUtils;
-import de.rathsolutions.util.osm.generic.LevenstheinDistanceUtil;
-import de.rathsolutions.util.osm.generic.NearestNodesComparator;
-import de.rathsolutions.util.osm.pojo.AbstractSearchEntity;
-import de.rathsolutions.util.osm.pojo.FinderEntity;
-import de.rathsolutions.util.osm.pojo.FinderEntitySearchConstraint;
-import de.rathsolutions.util.osm.pojo.OsmStreetPojo;
-import de.rathsolutions.util.structure.osm.OsmCityEntries;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -40,9 +31,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+
 import javax.naming.OperationNotSupportedException;
 import javax.xml.parsers.ParserConfigurationException;
-import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.context.annotation.ScopedProxyMode;
@@ -54,6 +46,17 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
+
+import de.rathsolutions.util.finder.generic.HaversineUtils;
+import de.rathsolutions.util.finder.generic.LevenstheinDistanceUtil;
+import de.rathsolutions.util.finder.generic.NearestNodesComparator;
+import de.rathsolutions.util.finder.generic.osm.DocumentParser;
+import de.rathsolutions.util.finder.pojo.AbstractSearchEntity;
+import de.rathsolutions.util.finder.pojo.FinderEntity;
+import de.rathsolutions.util.finder.pojo.FinderEntitySearchConstraint;
+import de.rathsolutions.util.finder.pojo.OsmStreetPojo;
+import de.rathsolutions.util.structure.osm.OsmCityEntries;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
 @Scope(value = WebApplicationContext.SCOPE_REQUEST, proxyMode = ScopedProxyMode.TARGET_CLASS)

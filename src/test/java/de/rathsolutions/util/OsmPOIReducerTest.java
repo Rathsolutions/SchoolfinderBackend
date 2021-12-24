@@ -21,21 +21,24 @@
  */
 package de.rathsolutions.util;
 
-import de.rathsolutions.SpringBootMain;
-import de.rathsolutions.util.osm.pojo.AbstractSearchEntity;
-import de.rathsolutions.util.osm.specific.OsmPOIReducer;
 import java.io.IOException;
 import java.util.concurrent.ExecutionException;
-import javassist.NotFoundException;
+
 import javax.naming.OperationNotSupportedException;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
+
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ContextConfiguration;
 import org.xml.sax.SAXException;
+
+import de.rathsolutions.SpringBootMain;
+import de.rathsolutions.util.finder.pojo.AbstractSearchEntity;
+import de.rathsolutions.util.finder.specific.osm.OsmPOIReducer;
+import javassist.NotFoundException;
 
 @SpringBootTest
 @ContextConfiguration(classes = SpringBootMain.class)

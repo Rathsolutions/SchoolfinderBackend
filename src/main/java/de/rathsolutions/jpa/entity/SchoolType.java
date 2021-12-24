@@ -21,17 +21,20 @@
  */
 package de.rathsolutions.jpa.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import de.rathsolutions.controller.postbody.SchoolTypeDTO;
-import de.rathsolutions.jpa.entity.converter.ColorConverter;
 import java.awt.Color;
 import java.util.List;
+
 import javax.persistence.Column;
 import javax.persistence.Convert;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import de.rathsolutions.controller.postbody.SchoolTypeDTO;
+import de.rathsolutions.jpa.entity.converter.ColorConverter;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -60,6 +63,7 @@ public class SchoolType {
 
     public SchoolTypeDTO convertToDto() {
 	SchoolTypeDTO dto = new SchoolTypeDTO();
+	dto.setId(id);
 	dto.setB(color.getBlue());
 	dto.setG(color.getGreen());
 	dto.setR(color.getRed());

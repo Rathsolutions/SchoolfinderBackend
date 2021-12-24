@@ -1,8 +1,8 @@
 /*-
  * #%L
- * SchoolfinderBackend
+ * SchuglemapsBackend
  * %%
- * Copyright (C) 2020 - 2021 Rathsolutions. <info@rathsolutions.de>
+ * Copyright (C) 2020 Rathsolutions. <info@rathsolutions.de>
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
@@ -19,28 +19,22 @@
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
  * #L%
  */
-package de.rathsolutions.util.osm.pojo;
+package de.rathsolutions.util.finder.pojo;
 
-import java.io.Serializable;
+import java.util.List;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
 
-@Getter
-@AllArgsConstructor
-public class OsmStreetPojo implements Serializable{
+@Data
+public class FinderEntity {
 
-    private static final long serialVersionUID = 5207600399100490835L;
+    private final String primaryValue;
 
-    private String city;
-    
-    private String street;
-    
-    private String housenumber;
-    
-    private String suburb;
-    
-    private double latitude;
-    
-    private double longitude;
+    private final String secondaryValue;
+
+    private final List<FinderEntitySearchConstraint> queryValues;
+
+    private final double latVal;
+
+    private final double longVal;
 }

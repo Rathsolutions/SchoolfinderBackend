@@ -19,7 +19,7 @@
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
  * #L%
  */
-package de.rathsolutions.util.osm.pojo;
+package de.rathsolutions.util.finder.pojo;
 
 import javax.naming.OperationNotSupportedException;
 

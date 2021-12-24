@@ -21,14 +21,19 @@
  */
 package de.rathsolutions.jpa.repo;
 
-import de.rathsolutions.jpa.entity.SchoolType;
-import de.rathsolutions.jpa.entity.SchoolTypeValue;
+import java.util.List;
 import java.util.Optional;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
+
+import de.rathsolutions.jpa.entity.SchoolType;
+import de.rathsolutions.jpa.entity.SchoolTypeValue;
 
 @Repository
 public interface SchoolTypeRepo extends JpaRepository<SchoolType, Integer> {
 
     public Optional<SchoolType> findOneBySchoolTypeValue(SchoolTypeValue schoolTypeValue);
+
+    public List<SchoolType> findAllByIdIn(List<Integer> criteriaIdList);
 }

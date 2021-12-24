@@ -73,9 +73,9 @@ import de.rathsolutions.util.GeometryUtils;
 import de.rathsolutions.util.exception.BadArgumentsException;
 import de.rathsolutions.util.exception.ResourceAlreadyExistingException;
 import de.rathsolutions.util.exception.ResourceNotFoundException;
-import de.rathsolutions.util.osm.pojo.FinderEntity;
-import de.rathsolutions.util.osm.pojo.SchoolSearchEntity;
-import de.rathsolutions.util.osm.specific.OsmPOISchoolParser;
+import de.rathsolutions.util.finder.pojo.FinderEntity;
+import de.rathsolutions.util.finder.pojo.SchoolSearchEntity;
+import de.rathsolutions.util.finder.specific.osm.OsmPOISchoolParser;
 import io.swagger.v3.oas.annotations.Operation;
 import javassist.NotFoundException;
 
@@ -166,38 +166,50 @@ public class SchoolController {
 	return schoolRepo.findAllByOrderBySchoolName().stream().map(e -> e.convertToDTO()).collect(Collectors.toList());
     }
 
-    @Operation(summary = "searches all school resources within latlong boundaries")
-    @GetMapping("/search/findAllSchoolsInBounds")
-    @Transactional
-    public List<SchoolDTO> findAllSchoolsByInBounds(String leftLatBound, String rightLatBound, String topLongBound,
-	    String bottomLongBound,
-	    @RequestParam(value = "criteriaNumbers", required = false) List<Long> criteriaNumbers,
-	    @RequestParam(value = "exclusiveSearch", required = false, defaultValue = "false") boolean exclusiveSearch) {
-	return findAllSchoolsByInBoundsInternal(leftLatBound, rightLatBound, topLongBound, bottomLongBound,
-		criteriaNumbers, exclusiveSearch).stream().map(e -> e.convertToDTO()).collect(Collectors.toList());
-    }
-
     private List<School> findAllSchoolsByInBoundsInternal(String leftLatBound, String rightLatBound,
-	    String topLongBound, String bottomLongBound,
-	    @RequestParam(value = "criteriaNumbers", required = false) List<Long> criteriaNumbers,
-	    @RequestParam(value = "exclusiveSearch", required = false, defaultValue = "false") boolean exclusiveSearch) {
+	    String topLongBound, String bottomLongBound, List<Long> criteriaNumbers, List<Integer> schoolTypeIds,
+	    boolean exclusiveSearch) {
 	Double leftLat = Double.valueOf(leftLatBound);
 	Double rightLat = Double.valueOf(rightLatBound);
 	Double topLong = Double.valueOf(topLongBound);
 	Double bottomLong = Double.valueOf(bottomLongBound);
-	if (criteriaNumbers != null && criteriaNumbers.size() > 0) {
-	    List<Criteria> criterias = criteriaRepo.findAllByIdIn(criteriaNumbers);
-	    List<School> allSchoolsMatching = schoolRepo
-		    .findDistinctByLatitudeBetweenAndLongitudeBetweenAndMatchingCriteriasIn(leftLat, rightLat, topLong,
-			    bottomLong, criterias);
-	    if (!exclusiveSearch) {
-		return allSchoolsMatching;
-	    } else {
-		return allSchoolsMatching.stream().filter(e -> e.getMatchingCriterias().containsAll(criterias))
-			.collect(Collectors.toList());
-	    }
+	List<SchoolType> schoolTypes = null;
+	if (schoolTypeIds != null && schoolTypeIds.size() > 0) {
+	    schoolTypes = schoolTypeRepo.findAllByIdIn(schoolTypeIds);
 	}
-	return schoolRepo.findAllByLatitudeBetweenAndLongitudeBetween(leftLat, rightLat, topLong, bottomLong);
+	List<Criteria> criterias = null;
+	if (criteriaNumbers != null && criteriaNumbers.size() > 0) {
+	    criterias = criteriaRepo.findAllByIdIn(criteriaNumbers);
+	}
+	final List<Criteria> finalCriterias = criterias;
+	List<School> allSchoolsMatching;
+	if (listConditionMet(schoolTypes) && listConditionMet(criterias)) {
+	    allSchoolsMatching = schoolRepo
+		    .findDistinctByLatitudeBetweenAndLongitudeBetweenAndMatchingCriteriasInAndTypeIn(leftLat, rightLat,
+			    topLong, bottomLong, criterias, schoolTypes);
+	    if (exclusiveSearch) {
+		allSchoolsMatching = allSchoolsMatching.stream()
+			.filter(e -> e.getMatchingCriterias().containsAll(finalCriterias)).collect(Collectors.toList());
+	    }
+	} else if (listConditionMet(schoolTypes) && !listConditionMet(criterias)) {
+	    allSchoolsMatching = schoolRepo.findDistinctByLatitudeBetweenAndLongitudeBetweenAndTypeIn(leftLat, rightLat,
+		    topLong, bottomLong, schoolTypes);
+	} else if (!listConditionMet(schoolTypes) && listConditionMet(criterias)) {
+	    allSchoolsMatching = schoolRepo.findDistinctByLatitudeBetweenAndLongitudeBetweenAndMatchingCriteriasIn(
+		    leftLat, rightLat, topLong, bottomLong, criterias);
+	    if (exclusiveSearch) {
+		allSchoolsMatching = allSchoolsMatching.stream()
+			.filter(e -> e.getMatchingCriterias().containsAll(finalCriterias)).collect(Collectors.toList());
+	    }
+	} else {
+	    allSchoolsMatching = schoolRepo.findAllByLatitudeBetweenAndLongitudeBetween(leftLat, rightLat, topLong,
+		    bottomLong);
+	}
+	return allSchoolsMatching;
+    }
+
+    private boolean listConditionMet(List schoolTypes) {
+	return schoolTypes != null && !schoolTypes.isEmpty();
     }
 
     @Operation(summary = "searches all school resources within latlong boundaries")
@@ -207,9 +219,10 @@ public class SchoolController {
 	    String rightLatBound, String topLongBound, String bottomLongBound,
 	    @RequestParam(value = "projectId", required = false) Long projectId,
 	    @RequestParam(value = "criteriaNumbers", required = false) List<Long> criteriaNumbers,
+	    @RequestParam(value = "schoolTypeIds", required = false) List<Integer> schoolTypeIds,
 	    @RequestParam(value = "exclusiveSearch", required = false, defaultValue = "false") boolean exclusiveSearch) {
 	List<School> matchingSchools = this.findAllSchoolsByInBoundsInternal(leftLatBound, rightLatBound, topLongBound,
-		bottomLongBound, criteriaNumbers, exclusiveSearch);
+		bottomLongBound, criteriaNumbers, schoolTypeIds, exclusiveSearch);
 	if (projectId == null) {
 	    return ResponseEntity.ok(matchingSchools.stream().map(e -> e.convertToDTO()).collect(Collectors.toList()));
 	}

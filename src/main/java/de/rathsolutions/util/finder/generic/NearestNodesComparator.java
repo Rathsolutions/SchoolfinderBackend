@@ -19,11 +19,11 @@
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
  * #L%
  */
-package de.rathsolutions.util.osm.generic;
+package de.rathsolutions.util.finder.generic;
 
 import java.util.Comparator;
 
-import de.rathsolutions.util.osm.pojo.FinderEntity;
+import de.rathsolutions.util.finder.pojo.FinderEntity;
 
 public class NearestNodesComparator implements Comparator<FinderEntity> {
 
@@ -31,25 +31,25 @@ public class NearestNodesComparator implements Comparator<FinderEntity> {
     private FinderEntity nodeToCompare;
 
     public NearestNodesComparator(FinderEntity n) {
-        this.nodeToCompare = n;
+	this.nodeToCompare = n;
     }
 
     @Override
     public int compare(FinderEntity o1, FinderEntity o2) {
-        double firstDistance = HaversineUtils.calculateHaversine(nodeToCompare.getLatVal(),
-            nodeToCompare.getLongVal(), o1.getLatVal(), o1.getLongVal());
-        double secondDistance = HaversineUtils.calculateHaversine(nodeToCompare.getLatVal(),
-            nodeToCompare.getLongVal(), o2.getLatVal(), o2.getLongVal());
-        if(firstDistance-secondDistance == 0) {
-            return 0;
-        }
-        if (firstDistance - secondDistance > COMPARISON_DELTA) {
-            return 1;
-        } else if (firstDistance - secondDistance < COMPARISON_DELTA) {
-            return -1;
-        } else {
-            return 0;
-        }
+	double firstDistance = HaversineUtils.calculateHaversine(nodeToCompare.getLatVal(), nodeToCompare.getLongVal(),
+		o1.getLatVal(), o1.getLongVal());
+	double secondDistance = HaversineUtils.calculateHaversine(nodeToCompare.getLatVal(), nodeToCompare.getLongVal(),
+		o2.getLatVal(), o2.getLongVal());
+	if (firstDistance - secondDistance == 0) {
+	    return 0;
+	}
+	if (firstDistance - secondDistance > COMPARISON_DELTA) {
+	    return 1;
+	} else if (firstDistance - secondDistance < COMPARISON_DELTA) {
+	    return -1;
+	} else {
+	    return 0;
+	}
     }
 
 }

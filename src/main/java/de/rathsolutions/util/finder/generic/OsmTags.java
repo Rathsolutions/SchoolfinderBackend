@@ -19,21 +19,27 @@
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
  * #L%
  */
-package de.rathsolutions.util.osm.generic;
+package de.rathsolutions.util.finder.generic;
 
-public final class HaversineUtils {
+import lombok.Getter;
 
-    public static double calculateHaversine(double latOne, double longOne, double latTwo,
-            double longTwo) {
-        double earthRadius = 6371000; //meters
-        double dLat = Math.toRadians(latTwo-latOne);
-        double dLng = Math.toRadians(longTwo-longOne);
-        double a = Math.sin(dLat/2) * Math.sin(dLat/2) +
-                   Math.cos(Math.toRadians(latOne)) * Math.cos(Math.toRadians(latTwo)) *
-                   Math.sin(dLng/2) * Math.sin(dLng/2);
-        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-        float dist = (float) (earthRadius * c);
+public enum OsmTags {
 
-        return dist;
+    NAME("name"), CITY("addr:city"), IS_IN("is_in"), WIKIPEDIA("wikipedia");
+
+    @Getter
+    private String value;
+
+    private OsmTags(String value) {
+	this.value = value;
+    }
+
+    public static boolean isValidTag(String tagName) {
+	for (OsmTags e : OsmTags.values()) {
+	    if (e.getValue().equals(tagName)) {
+		return true;
+	    }
+	}
+	return false;
     }
 }

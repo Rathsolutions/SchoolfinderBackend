@@ -19,28 +19,36 @@
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
  * #L%
  */
-package de.rathsolutions.util.osm.specific;
+package de.rathsolutions.util.finder.specific;
 
-import de.rathsolutions.util.osm.generic.LevenstheinDistanceUtil;
-import de.rathsolutions.util.osm.pojo.AbstractSearchEntity;
-import de.rathsolutions.util.osm.pojo.FinderEntity;
-import de.rathsolutions.util.structure.internalFinder.InstitutionFinderEntries;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ExecutionException;
-import javassist.NotFoundException;
+import java.util.stream.Collectors;
+
 import javax.naming.OperationNotSupportedException;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.xml.sax.SAXException;
+
+import de.rathsolutions.util.finder.generic.LevenstheinDistanceUtil;
+import de.rathsolutions.util.finder.pojo.AbstractSearchEntity;
+import de.rathsolutions.util.finder.pojo.FinderEntity;
+import de.rathsolutions.util.structure.internalFinder.InstitutionAttributeFinderEntries;
+import javassist.NotFoundException;
 
 @Service
 public class InstitutionFinder implements FinderService {
 
     @Autowired
-    private InstitutionFinderEntries cachedEntries;
+    private InstitutionAttributeFinderEntries cachedEntries;
 
     @Autowired
     private LevenstheinDistanceUtil distanceUtil;
@@ -53,7 +61,32 @@ public class InstitutionFinder implements FinderService {
     public List<FinderEntity> find(AbstractSearchEntity primaryValue, int amount)
 	    throws OperationNotSupportedException, ParserConfigurationException, SAXException, IOException,
 	    NotFoundException, TransformerException, InterruptedException, ExecutionException {
-	return distanceUtil.computeLevenstheinDistance(primaryValue.getName(), cachedEntries, amount, false, false);
+	String queryValue = primaryValue.getName();
+	String[] splittedOnSpace = queryValue.split(" ");
+	if (splittedOnSpace.length == 1) {
+	    return distanceUtil.computeLevenstheinDistance(queryValue, cachedEntries, amount, false, false);
+	} else {
+	    Map<FinderEntity, Integer> cumulatedElements = new HashMap<>();
+	    for (int i = 0; i < splittedOnSpace.length; i++) {
+		List<FinderEntity> resultList = distanceUtil.computeLevenstheinDistance(splittedOnSpace[i],
+			cachedEntries, amount, false, false);
+		resultList.forEach(e -> {
+		    cumulatedElements.put(e, cumulatedElements.containsKey(e) ? cumulatedElements.get(e) + 1 : 1);
+		});
+	    }
+	    List<FinderEntity> resultList = cumulatedElements.entrySet().stream()
+		    .sorted((e, f) -> f.getValue().compareTo(e.getValue())).map(e -> e.getKey())
+		    .collect(Collectors.toList());
+	    Set<String> foundValue = new HashSet<>();
+	    resultList.removeIf(e -> {
+		if (!foundValue.contains(e.getPrimaryValue())) {
+		    foundValue.add(e.getPrimaryValue());
+		    return false;
+		}
+		return true;
+	    });
+	    return resultList;
+	}
     }
 
 }
