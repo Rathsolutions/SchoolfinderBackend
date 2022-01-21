@@ -36,4 +36,8 @@ public interface SchoolTypeRepo extends JpaRepository<SchoolType, Integer> {
     public Optional<SchoolType> findOneBySchoolTypeValue(SchoolTypeValue schoolTypeValue);
 
     public List<SchoolType> findAllByIdIn(List<Integer> criteriaIdList);
+
+    public List<SchoolType> findAllByAllSchoolsProjectsId(long projectId);
+
+    public List<SchoolType> findAllByAllSchoolsNotEmpty();
 }

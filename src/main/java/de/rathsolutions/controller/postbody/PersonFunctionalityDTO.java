@@ -21,9 +21,6 @@
  */
 package de.rathsolutions.controller.postbody;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 import de.rathsolutions.jpa.entity.Functionality;
 import de.rathsolutions.jpa.entity.Person;
 import lombok.Getter;
@@ -39,23 +36,10 @@ public class PersonFunctionalityDTO {
 
     private Person person;
 
+    private String institutionalFunctionality;
+
     private Functionality functionality;
 
     private String description;
 
-    @JsonFormat(with = JsonFormat.Feature.ACCEPT_CASE_INSENSITIVE_PROPERTIES)
-    public enum PersonFunctionality {
-	@JsonProperty("XR")
-	@JsonFormat(with = JsonFormat.Feature.ACCEPT_CASE_INSENSITIVE_PROPERTIES)
-	XR("XR"), @JsonProperty("MAKERSPACE")
-	@JsonFormat(with = JsonFormat.Feature.ACCEPT_CASE_INSENSITIVE_PROPERTIES)
-	MAKERSPACE("MAKERSPACE");
-
-	@Setter
-	private String value;
-
-	private PersonFunctionality(String value) {
-	    this.value = value;
-	}
-    }
 }

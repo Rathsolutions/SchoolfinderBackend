@@ -79,7 +79,7 @@ public class AreaController {
 
     @PatchMapping(value = "/edit")
     public ResponseEntity<AreaDTO> edit(@RequestBody AreaDTO dto) {
-	Optional<Area> areaByName = repository.findOneByNameIgnoreCase(dto.getName());
+	Optional<Area> areaByName = repository.findById(dto.getId());
 	if (areaByName.isEmpty()) {
 	    return ResponseEntity.notFound().build();
 	}

@@ -25,9 +25,9 @@ import lombok.Getter;
 
 public enum SchoolTypeValue {
 
-    GYMNASIUM("Gymnasium"), REALSCHULE("Realschule"), BERUFLICHES_GYMNASIUM("Berufliches Gymnasium"),
-    WALDORFSCHULE("Waldorfschule"), GRUNDSCHULE("Grundschule"), FOERDERSCHULE("Förderschule"),
-    HAUPTSCHULE("Hauptschule"), GEMEINSCHAFTSSCHULE("Gemeinschaftsschule");
+    GYMNASIUM("Gymnasium"), REALSCHULE("Realschule"), BERUFLICHE_SCHULE("Berufliche Schule"),
+    WALDORFSCHULE("Waldorfschule"), GRUNDSCHULE("Grundschule"), SBBZ("SBBZ"),
+    GEMEINSCHAFTSSCHULE("Gemeinschaftsschule"), WERKREALSCHULE("(Werk)realschule");
 
     @Getter
     private String value;

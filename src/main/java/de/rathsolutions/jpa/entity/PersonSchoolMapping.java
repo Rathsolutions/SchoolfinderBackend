@@ -68,12 +68,15 @@ public class PersonSchoolMapping {
     @Type(type = "text")
     private String description;
 
+    private String institutionalFunctionality;
+
     public PersonFunctionalityDTO convertToDTO() {
 	PersonFunctionalityDTO personFunctionalityDTO = new PersonFunctionalityDTO();
 	personFunctionalityDTO.setFunctionality(this.functionality);
 	personFunctionalityDTO.setMappingId(this.id);
 	personFunctionalityDTO.setPerson(this.person);
 	personFunctionalityDTO.setDescription(this.description);
+	personFunctionalityDTO.setInstitutionalFunctionality(institutionalFunctionality);
 	return personFunctionalityDTO;
     }
 

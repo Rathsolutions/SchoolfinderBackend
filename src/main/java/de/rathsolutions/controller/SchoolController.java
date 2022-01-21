@@ -383,6 +383,7 @@ public class SchoolController {
 	    PersonSchoolMapping personSchoolMapping = new PersonSchoolMapping(personById.get(), matchingSchool,
 		    matchingFunctionalityOptional.get());
 	    personSchoolMapping.setDescription(e.getDescription());
+	    personSchoolMapping.setInstitutionalFunctionality(e.getInstitutionalFunctionality());
 	    matchingSchool.getPersonSchoolMapping().add(personSchoolMapping);
 	});
     }

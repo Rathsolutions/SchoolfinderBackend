@@ -73,7 +73,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
 	http.authorizeRequests()
 		.antMatchers("/api/v1/finder/search/**", "/api/v1/schools/search/**", "/api/v1/schools",
-			"/api/v1/criterias/search/getAllAvailableCriterias/**", "/api/v1/*/search/findAll")
+			"/api/v1/criterias/search/getAllAvailableCriterias/**", "/api/v1/*/search/findAll",
+			"/api/v1/schoolType/search/**", "/api/v1/project/*")
 		.permitAll().antMatchers("/actuator/**").authenticated().antMatchers("/**").authenticated().and()
 		.httpBasic().and().csrf().disable().cors();
 	http.headers().frameOptions().sameOrigin();

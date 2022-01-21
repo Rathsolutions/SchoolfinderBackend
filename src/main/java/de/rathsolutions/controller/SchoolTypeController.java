@@ -21,15 +21,11 @@
  */
 package de.rathsolutions.controller;
 
-import de.rathsolutions.controller.postbody.SchoolTypeDTO;
-import de.rathsolutions.jpa.entity.SchoolType;
-import de.rathsolutions.jpa.entity.SchoolTypeValue;
-import de.rathsolutions.jpa.repo.SchoolTypeRepo;
-import io.swagger.v3.oas.annotations.Operation;
 import java.awt.Color;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -38,6 +34,12 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import de.rathsolutions.controller.postbody.SchoolTypeDTO;
+import de.rathsolutions.jpa.entity.SchoolType;
+import de.rathsolutions.jpa.entity.SchoolTypeValue;
+import de.rathsolutions.jpa.repo.SchoolTypeRepo;
+import io.swagger.v3.oas.annotations.Operation;
 
 @RestController()
 @RequestMapping("/api/v1/schoolType")
@@ -72,5 +74,19 @@ public class SchoolTypeController {
     public ResponseEntity<List<SchoolTypeDTO>> getAllTypes() {
 	return ResponseEntity
 		.ok(schoolTypeRepo.findAll().stream().map(e -> e.convertToDto()).collect(Collectors.toList()));
+    }
+
+    @Operation(summary = "retrieves all known school types")
+    @GetMapping("/search/findAllTypesUsedAtLeastOnce")
+    public ResponseEntity<List<SchoolTypeDTO>> getAllTypesUsedAtLeastOnce() {
+	return ResponseEntity.ok(schoolTypeRepo.findAllByAllSchoolsNotEmpty().stream().map(e -> e.convertToDto())
+		.collect(Collectors.toList()));
+    }
+
+    @Operation(summary = "retrieves all known school types for the given project")
+    @GetMapping("/search/findAllUsedTypesInProject")
+    public ResponseEntity<List<SchoolTypeDTO>> getAllUsedTypesInProject(long projectId) {
+	return ResponseEntity.ok(schoolTypeRepo.findAllByAllSchoolsProjectsId(projectId).stream().distinct()
+		.map(e -> e.convertToDto()).collect(Collectors.toList()));
     }
 }
