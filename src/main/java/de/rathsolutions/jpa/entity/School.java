@@ -21,11 +21,9 @@
  */
 package de.rathsolutions.jpa.entity;
 
-import de.rathsolutions.controller.postbody.AdditionalInformationDTO;
-import de.rathsolutions.controller.postbody.SchoolDTO;
-import de.rathsolutions.jpa.entity.additional.AdditionalInformation;
 import java.util.ArrayList;
 import java.util.List;
+
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -37,12 +35,16 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+
+import org.hibernate.annotations.Type;
+
+import de.rathsolutions.controller.postbody.SchoolDTO;
+import de.rathsolutions.jpa.entity.additional.AdditionalInformation;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
-import org.hibernate.annotations.Type;
 
 @Entity
 @Getter
@@ -119,8 +121,7 @@ public class School {
 	    dto.getProjects().add(e.convertToDto());
 	});
 	this.additionalInformation.forEach(e -> {
-	    dto.getAdditionalInformation()
-		    .add(new AdditionalInformationDTO(e.getId(), e.getValue(), e.getType().getValue()));
+	    dto.getAdditionalInformation().add(e.convertToDTO());
 	});
 	dto.setPrimaryProject(this.primaryProject.convertToDto());
 	dto.setSchoolName(this.schoolName);

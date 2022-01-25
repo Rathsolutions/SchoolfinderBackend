@@ -24,17 +24,25 @@ package de.rathsolutions.controller.postbody;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
 @Getter
 @Setter
 @NoArgsConstructor
+@RequiredArgsConstructor
 @AllArgsConstructor
 public class AdditionalInformationDTO {
 
+    @NonNull
     private int id;
 
+    @NonNull
     private String value;
 
+    @NonNull
     private String type;
+
+    private String homepage;
 }

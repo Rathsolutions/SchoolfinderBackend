@@ -33,4 +33,7 @@ import de.rathsolutions.jpa.entity.additional.InformationType;
 public interface AdditionalInformationRepo extends JpaRepository<AdditionalInformation, Integer> {
 
     public Optional<AdditionalInformation> findOneByValueAndType(String value, InformationType type);
+
+    public Optional<AdditionalInformation> findOneByValueAndTypeAndHomepage(String value, InformationType type,
+	    String homepage);
 }

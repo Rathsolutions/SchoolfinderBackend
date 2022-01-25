@@ -58,8 +58,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
 	final CorsConfiguration configuration = new CorsConfiguration();
-	configuration
-		.setAllowedOrigins(Arrays.asList("https://schoolfindernew.rathsolutions.de", "http://localhost:4200"));
+	configuration.setAllowedOrigins(
+		Arrays.asList("https://schoolfindernew.rathsolutions.de", "http://localhost:4200", "*"));
 	configuration.setAllowedHeaders(Collections.singletonList("*"));
 	configuration.addExposedHeader("Authorization");
 	configuration.setAllowCredentials(true);

@@ -422,13 +422,20 @@ public class SchoolController {
 	    if (informationTypeOptional.isEmpty()) {
 		throw new BadArgumentsException("One of the additional information types could not be found!");
 	    }
-	    Optional<AdditionalInformation> additionalInformationOptional = additionalInformationRepo
-		    .findOneByValueAndType(e.getValue(), informationTypeOptional.get());
+	    Optional<AdditionalInformation> additionalInformationOptional;
+	    if (e.getHomepage() != null && !e.getHomepage().isBlank()) {
+		additionalInformationOptional = additionalInformationRepo.findOneByValueAndTypeAndHomepage(e.getValue(),
+			informationTypeOptional.get(), e.getHomepage());
+	    } else {
+		additionalInformationOptional = additionalInformationRepo.findOneByValueAndType(e.getValue(),
+			informationTypeOptional.get());
+	    }
 	    AdditionalInformation toAdd = null;
 	    if (additionalInformationOptional.isEmpty()) {
 		toAdd = new AdditionalInformation();
 		toAdd.setType(informationTypeOptional.get());
 		toAdd.setValue(e.getValue());
+		toAdd.setHomepage(e.getHomepage());
 		toAdd = additionalInformationRepo.save(toAdd);
 	    } else {
 		toAdd = additionalInformationOptional.get();
