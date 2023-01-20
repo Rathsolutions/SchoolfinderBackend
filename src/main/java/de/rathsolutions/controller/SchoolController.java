@@ -125,7 +125,7 @@ public class SchoolController {
 
     @Operation(summary = "searches all school resources within latlong boundaries")
     @GetMapping("/search/findAllSchoolsInBounds")
-//    @Transactional
+    @Transactional(readOnly = true)
     public List<School> findAllSchoolsByInBounds(String leftLatBound, String rightLatBound, String topLongBound,
 	    String bottomLongBound,
 	    @RequestParam(value = "criteriaNumbers", required = false) List<Long> criteriaNumbers,

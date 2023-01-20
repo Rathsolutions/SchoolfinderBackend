@@ -1,3 +1,9 @@
+DELETE FROM person_school_mapping;
+DELETE FROM school_criteria_mapping;
+DELETE FROM Criteria;
+DELETE FROM Person;
+DELETE FROM School;
+
 INSERT INTO Criteria (id,criteria_name) VALUES (0,'test');
 INSERT INTO Criteria (id,criteria_name) VALUES (1,'test1');
 INSERT INTO Criteria (id,criteria_name) VALUES (2,'test2');

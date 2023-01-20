@@ -34,6 +34,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -45,6 +46,7 @@ import de.rathsolutions.jpa.entity.Criteria;
 @SpringBootTest
 @ContextConfiguration(classes = SpringBootMain.class)
 @Transactional
+@Sql(scripts = "classpath:data-import.sql")
 class CriteriaControllerTest {
 
     @Autowired

@@ -29,12 +29,11 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
-import javassist.NotFoundException;
 
-import javax.annotation.PostConstruct;
 import javax.naming.OperationNotSupportedException;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.w3c.dom.Document;
@@ -46,7 +45,7 @@ import org.xml.sax.SAXException;
 
 import de.rathsolutions.util.osm.pojo.AbstractSearchEntity;
 import de.rathsolutions.util.osm.pojo.OsmPOIEntity;
-import de.rathsolutions.util.structure.OsmEntries;
+import javassist.NotFoundException;
 
 public abstract class AbstractOsmPOIHandler {
 
