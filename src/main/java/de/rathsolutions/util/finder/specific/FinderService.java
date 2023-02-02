@@ -29,11 +29,11 @@ import javax.naming.OperationNotSupportedException;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 
+import org.webjars.NotFoundException;
 import org.xml.sax.SAXException;
 
 import de.rathsolutions.util.finder.pojo.AbstractSearchEntity;
 import de.rathsolutions.util.finder.pojo.FinderEntity;
-import javassist.NotFoundException;
 
 public interface FinderService {
 

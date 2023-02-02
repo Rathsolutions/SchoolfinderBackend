@@ -42,8 +42,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @SpringBootTest
 @ContextConfiguration(classes = SpringBootMain.class)
-@Sql(scripts = "../../../data.sql")
-@DirtiesContext(classMode = ClassMode.BEFORE_EACH_TEST_METHOD)
+@Sql(scripts = "../../../data-init.sql")
 @Transactional
 public class ProjectControllerTest {
 

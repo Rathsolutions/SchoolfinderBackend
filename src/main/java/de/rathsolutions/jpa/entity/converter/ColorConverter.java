@@ -22,8 +22,9 @@
 package de.rathsolutions.jpa.entity.converter;
 
 import java.awt.Color;
-import javax.persistence.AttributeConverter;
-import javax.persistence.Converter;
+
+import jakarta.persistence.AttributeConverter;
+import jakarta.persistence.Converter;
 
 @Converter
 public class ColorConverter implements AttributeConverter<Color, Integer> {

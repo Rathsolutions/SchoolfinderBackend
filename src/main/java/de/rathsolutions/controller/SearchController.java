@@ -35,6 +35,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.webjars.NotFoundException;
 import org.xml.sax.SAXException;
 
 import de.rathsolutions.util.finder.pojo.CitySearchEntity;
@@ -45,7 +46,6 @@ import de.rathsolutions.util.finder.specific.InstitutionFinder;
 import de.rathsolutions.util.finder.specific.osm.OsmPOICityOnlyParser;
 import de.rathsolutions.util.finder.specific.osm.OsmStreetParser;
 import io.swagger.v3.oas.annotations.Operation;
-import javassist.NotFoundException;
 import lombok.extern.slf4j.Slf4j;
 
 @RestController

@@ -24,22 +24,24 @@ package de.rathsolutions.jpa.entity;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-
+import org.hibernate.annotations.Parameter;
 import org.hibernate.annotations.Type;
+import org.hibernate.usertype.UserTypeLegacyBridge;
 
 import de.rathsolutions.controller.postbody.SchoolDTO;
 import de.rathsolutions.jpa.entity.additional.AdditionalInformation;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.Lob;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
@@ -54,89 +56,89 @@ import lombok.Setter;
 
 public class School {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long id;
 
-    private String shortSchoolName;
+	private String shortSchoolName;
 
-    @NonNull
-    private String schoolName;
-    @NonNull
-    private Double latitude;
-    @NonNull
-    private Double longitude;
+	@NonNull
+	private String schoolName;
+	@NonNull
+	private Double latitude;
+	@NonNull
+	private Double longitude;
 
-    private byte[] schoolPicture;
-    @Type(type = "text")
-    private String alternativePictureText;
-    @OneToMany(cascade = { CascadeType.ALL }, fetch = FetchType.LAZY, mappedBy = "school", orphanRemoval = true)
-    private List<PersonSchoolMapping> personSchoolMapping = new ArrayList<>();
-    @NonNull
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(name = "school_criteria_mapping", joinColumns = @JoinColumn(name = "school_id"), inverseJoinColumns = @JoinColumn(name = "criteria_id"))
-    private List<Criteria> matchingCriterias;
+	private byte[] schoolPicture;
+	@Type(value = UserTypeLegacyBridge.class, parameters = @Parameter(name = UserTypeLegacyBridge.TYPE_NAME_PARAM_KEY, value = "text"))
+	private String alternativePictureText;
+	@OneToMany(cascade = { CascadeType.ALL }, fetch = FetchType.LAZY, mappedBy = "school", orphanRemoval = true)
+	private List<PersonSchoolMapping> personSchoolMapping = new ArrayList<>();
+	@NonNull
+	@ManyToMany(fetch = FetchType.LAZY)
+	@JoinTable(name = "school_criteria_mapping", joinColumns = @JoinColumn(name = "school_id"), inverseJoinColumns = @JoinColumn(name = "criteria_id"))
+	private List<Criteria> matchingCriterias;
 
-    @ManyToMany(fetch = FetchType.LAZY)
-    private List<Project> projects = new ArrayList<>();
+	@ManyToMany(fetch = FetchType.LAZY)
+	private List<Project> projects = new ArrayList<>();
 
-    @ManyToOne(optional = false)
-    private Project primaryProject;
+	@ManyToOne(optional = false)
+	private Project primaryProject;
 
-    @ManyToOne()
-    private SchoolType type;
+	@ManyToOne()
+	private SchoolType type;
 
-    @ManyToMany
-    @JoinTable(name = "additional_information_mapping", joinColumns = @JoinColumn(name = "school_id"), inverseJoinColumns = @JoinColumn(name = "additional_information_id"))
-    private List<AdditionalInformation> additionalInformation = new ArrayList<>();
+	@ManyToMany
+	@JoinTable(name = "additional_information_mapping", joinColumns = @JoinColumn(name = "school_id"), inverseJoinColumns = @JoinColumn(name = "additional_information_id"))
+	private List<AdditionalInformation> additionalInformation = new ArrayList<>();
 
-    private String generalEmail;
+	private String generalEmail;
 
-    private String generalPhoneNumber;
+	private String generalPhoneNumber;
 
-    private String address;
+	private String address;
 
-    private String homepage;
+	private String homepage;
 
-    public School(String shortSchoolName, String schoolName, Double latitude, Double longitude,
-	    List<Criteria> matchingCriterias) {
-	this.shortSchoolName = shortSchoolName;
-	this.schoolName = schoolName;
-	this.latitude = latitude;
-	this.longitude = longitude;
-	this.matchingCriterias = matchingCriterias;
-    }
-
-    public SchoolDTO convertToDTO() {
-	SchoolDTO dto = new SchoolDTO();
-	dto.setAlternativePictureText(this.alternativePictureText);
-	dto.setId(this.id);
-	dto.setLatitude(this.latitude);
-	dto.setLongitude(this.longitude);
-	dto.setMatchingCriterias(getMatchingCriterias());
-	this.personSchoolMapping.forEach(e -> {
-	    dto.getPersonSchoolMapping().add(e.convertToDTO());
-	});
-	this.projects.forEach(e -> {
-	    dto.getProjects().add(e.convertToDto());
-	});
-	this.additionalInformation.forEach(e -> {
-	    dto.getAdditionalInformation().add(e.convertToDTO());
-	});
-	dto.setPrimaryProject(this.primaryProject.convertToDto());
-	dto.setSchoolName(this.schoolName);
-	if (this.schoolPicture != null) {
-	    dto.setSchoolPicture(new String(this.schoolPicture));
+	public School(String shortSchoolName, String schoolName, Double latitude, Double longitude,
+			List<Criteria> matchingCriterias) {
+		this.shortSchoolName = shortSchoolName;
+		this.schoolName = schoolName;
+		this.latitude = latitude;
+		this.longitude = longitude;
+		this.matchingCriterias = matchingCriterias;
 	}
-	dto.setShortSchoolName(this.shortSchoolName);
-	dto.setAddress(this.address);
-	dto.setHomepage(this.homepage);
-	dto.setGeneralEmail(this.generalEmail);
-	dto.setGeneralPhoneNumber(this.generalPhoneNumber);
-	if (this.type != null) {
-	    dto.setSchoolType(this.type.convertToDto());
+
+	public SchoolDTO convertToDTO() {
+		SchoolDTO dto = new SchoolDTO();
+		dto.setAlternativePictureText(this.alternativePictureText);
+		dto.setId(this.id);
+		dto.setLatitude(this.latitude);
+		dto.setLongitude(this.longitude);
+		dto.setMatchingCriterias(getMatchingCriterias());
+		this.personSchoolMapping.forEach(e -> {
+			dto.getPersonSchoolMapping().add(e.convertToDTO());
+		});
+		this.projects.forEach(e -> {
+			dto.getProjects().add(e.convertToDto());
+		});
+		this.additionalInformation.forEach(e -> {
+			dto.getAdditionalInformation().add(e.convertToDTO());
+		});
+		dto.setPrimaryProject(this.primaryProject.convertToDto());
+		dto.setSchoolName(this.schoolName);
+		if (this.schoolPicture != null) {
+			dto.setSchoolPicture(new String(this.schoolPicture));
+		}
+		dto.setShortSchoolName(this.shortSchoolName);
+		dto.setAddress(this.address);
+		dto.setHomepage(this.homepage);
+		dto.setGeneralEmail(this.generalEmail);
+		dto.setGeneralPhoneNumber(this.generalPhoneNumber);
+		if (this.type != null) {
+			dto.setSchoolType(this.type.convertToDto());
+		}
+		return dto;
 	}
-	return dto;
-    }
 
 }

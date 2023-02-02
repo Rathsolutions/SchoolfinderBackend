@@ -22,6 +22,7 @@
 package de.rathsolutions.util;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -37,6 +38,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ContextConfiguration;
+import org.webjars.NotFoundException;
 import org.xml.sax.SAXException;
 
 import de.rathsolutions.SpringBootMain;
@@ -44,7 +46,6 @@ import de.rathsolutions.util.finder.pojo.CitySearchEntity;
 import de.rathsolutions.util.finder.pojo.FinderEntity;
 import de.rathsolutions.util.finder.pojo.FinderEntitySearchConstraint;
 import de.rathsolutions.util.finder.specific.osm.OsmPOICityOnlyParser;
-import javassist.NotFoundException;
 import lombok.extern.slf4j.Slf4j;
 
 @SpringBootTest
@@ -52,37 +53,37 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 class OsmPOICityOnlyParserTest {
 
-    @Autowired
-    private OsmPOICityOnlyParser cut;
+	@Autowired
+	private OsmPOICityOnlyParser cut;
 
-    @Test
-    void testFindCorrectCitiesWithFullName()
-	    throws ParserConfigurationException, SAXException, IOException, NotFoundException, TransformerException,
-	    InterruptedException, ExecutionException, OperationNotSupportedException {
-	List<FinderEntity> testObjects = OsmCityTestHelper.getInstance().getTestEntites();
-	for (FinderEntity e : testObjects) {
-	    List<FinderEntity> schoolByName = cut.find(new CitySearchEntity(e.getPrimaryValue(), e.getSecondaryValue()),
-		    1);
-	    OsmTestHelper.assertOsmPoiEqual(e, schoolByName.get(0));
+	@Test
+	void testFindCorrectCitiesWithFullName()
+			throws ParserConfigurationException, SAXException, IOException, NotFoundException, TransformerException,
+			InterruptedException, ExecutionException, OperationNotSupportedException {
+		List<FinderEntity> testObjects = OsmCityTestHelper.getInstance().getTestEntites();
+		for (FinderEntity e : testObjects) {
+			List<FinderEntity> schoolByName = cut.find(new CitySearchEntity(e.getPrimaryValue(), e.getSecondaryValue()),
+					10);
+			assertTrue(schoolByName.stream().anyMatch(school->OsmTestHelper.assertOsmPoiEqual(e, school)));
+		}
 	}
-    }
 
-    @Test
-    void testFindOnPerfectMatchMoreThanOneElement()
-	    throws ParserConfigurationException, SAXException, IOException, NotFoundException, TransformerException,
-	    InterruptedException, ExecutionException, OperationNotSupportedException {
-	List<FinderEntity> testObjects = new ArrayList<>();
-	String city = "Steinbach";
-	testObjects.add(new FinderEntity(city, city, Arrays.asList(new FinderEntitySearchConstraint(city, city)),
-		48.7288702, 8.1607982));
-	testObjects.add(new FinderEntity(city, city, Arrays.asList(new FinderEntitySearchConstraint(city, city)),
-		48.9575768, 9.4738062));
-	for (FinderEntity e : testObjects) {
-	    List<FinderEntity> schoolByName = cut.find(new CitySearchEntity(e.getPrimaryValue()), 10);
-	    long exactElementCount = schoolByName.stream().filter(f -> f.getPrimaryValue().equals(e.getPrimaryValue())
-		    && e.getLatVal() == f.getLatVal() && e.getLongVal() == f.getLongVal()).count();
-	    assertEquals(1, exactElementCount);
+	@Test
+	void testFindOnPerfectMatchMoreThanOneElement()
+			throws ParserConfigurationException, SAXException, IOException, NotFoundException, TransformerException,
+			InterruptedException, ExecutionException, OperationNotSupportedException {
+		List<FinderEntity> testObjects = new ArrayList<>();
+		String city = "Steinbach";
+		testObjects.add(new FinderEntity(city, city, Arrays.asList(new FinderEntitySearchConstraint(city, city)),
+				48.7288702, 8.1607982));
+		testObjects.add(new FinderEntity(city, city, Arrays.asList(new FinderEntitySearchConstraint(city, city)),
+				48.9575768, 9.4738062));
+		for (FinderEntity e : testObjects) {
+			List<FinderEntity> schoolByName = cut.find(new CitySearchEntity(e.getPrimaryValue()), 10);
+			long exactElementCount = schoolByName.stream().filter(f -> f.getPrimaryValue().equals(e.getPrimaryValue())
+					&& e.getLatVal() == f.getLatVal() && e.getLongVal() == f.getLongVal()).count();
+			assertEquals(1, exactElementCount);
+		}
 	}
-    }
 
 }

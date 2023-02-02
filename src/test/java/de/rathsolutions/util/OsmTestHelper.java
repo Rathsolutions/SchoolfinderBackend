@@ -21,15 +21,18 @@
  */
 package de.rathsolutions.util;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
 import de.rathsolutions.util.finder.pojo.FinderEntity;
 
 public class OsmTestHelper {
-    public static void assertOsmPoiEqual(FinderEntity e, FinderEntity schoolByName) {
-	assertEquals(e.getLatVal(), schoolByName.getLatVal());
-	assertEquals(e.getLongVal(), schoolByName.getLongVal());
-	assertEquals(e.getPrimaryValue(), schoolByName.getPrimaryValue());
-	System.out.println(schoolByName.getPrimaryValue());
-    }
+	public static boolean assertOsmPoiEqual(FinderEntity e, FinderEntity schoolByName) {
+		System.out.println(schoolByName.getPrimaryValue());
+		System.out.println(e.getLatVal() + "/" + e.getLongVal());
+		return assertEquals(e.getLatVal(), schoolByName.getLatVal())
+				&& assertEquals(e.getLongVal(), schoolByName.getLongVal())
+				&& assertEquals(e.getPrimaryValue(), schoolByName.getPrimaryValue());
+	}
+
+	private static boolean assertEquals(Object first, Object scnd) {
+		return first.equals(scnd);
+	}
 }

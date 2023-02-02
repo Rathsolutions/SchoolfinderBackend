@@ -4,9 +4,9 @@ spring:
     username: postgres
     password: schoolfinder123
   jpa:
-    database-platform: org.hibernate.spatial.dialect.postgis.PostgisPG9Dialect
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
-      ddl-auto: update
+      ddl-auto: create-drop
     defer-datasource-initialization: true
   sql:
     init:

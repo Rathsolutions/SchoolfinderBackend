@@ -21,6 +21,8 @@
  */
 package de.rathsolutions.util;
 
+import static org.junit.Assert.assertTrue;
+
 import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -33,13 +35,13 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ContextConfiguration;
+import org.webjars.NotFoundException;
 import org.xml.sax.SAXException;
 
 import de.rathsolutions.SpringBootMain;
 import de.rathsolutions.util.finder.pojo.FinderEntity;
 import de.rathsolutions.util.finder.pojo.SchoolSearchEntity;
 import de.rathsolutions.util.finder.specific.osm.OsmPOISchoolParser;
-import javassist.NotFoundException;
 import lombok.extern.slf4j.Slf4j;
 
 @SpringBootTest
@@ -47,19 +49,19 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 class OsmPOISchoolParserTest {
 
-    @Autowired
-    private OsmPOISchoolParser cut;
+	@Autowired
+	private OsmPOISchoolParser cut;
 
-    @Test
-    void testFindCorrectElementsInXmlFileWithFullName()
-	    throws ParserConfigurationException, SAXException, IOException, NotFoundException, TransformerException,
-	    InterruptedException, ExecutionException, OperationNotSupportedException {
-	List<FinderEntity> testObjects = OsmSchoolTestHelper.getInstance().getTestEntites();
-	for (FinderEntity e : testObjects) {
-	    List<FinderEntity> schoolByName = cut
-		    .find(new SchoolSearchEntity(e.getPrimaryValue(), e.getSecondaryValue()), 1);
-	    OsmTestHelper.assertOsmPoiEqual(e, schoolByName.get(0));
+	@Test
+	void testFindCorrectElementsInXmlFileWithFullName()
+			throws ParserConfigurationException, SAXException, IOException, NotFoundException, TransformerException,
+			InterruptedException, ExecutionException, OperationNotSupportedException {
+		List<FinderEntity> testObjects = OsmSchoolTestHelper.getInstance().getTestEntites();
+		for (FinderEntity e : testObjects) {
+			List<FinderEntity> schoolByName = cut
+					.find(new SchoolSearchEntity(e.getPrimaryValue(), e.getSecondaryValue()), 1);
+			assertTrue(OsmTestHelper.assertOsmPoiEqual(e, schoolByName.get(0)));
+		}
 	}
-    }
 
 }

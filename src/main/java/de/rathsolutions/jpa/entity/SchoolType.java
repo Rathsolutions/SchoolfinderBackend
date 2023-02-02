@@ -24,17 +24,16 @@ package de.rathsolutions.jpa.entity;
 import java.awt.Color;
 import java.util.List;
 
-import javax.persistence.Column;
-import javax.persistence.Convert;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.OneToMany;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import de.rathsolutions.controller.postbody.SchoolTypeDTO;
 import de.rathsolutions.jpa.entity.converter.ColorConverter;
+import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -47,27 +46,27 @@ import lombok.Setter;
 @NoArgsConstructor
 public class SchoolType {
 
-    @Id
-    @GeneratedValue
-    private int id;
+	@Id
+	@GeneratedValue
+	private int id;
 
-    @Column(unique = true)
-    private SchoolTypeValue schoolTypeValue;
+	@Column(unique = true)
+	private SchoolTypeValue schoolTypeValue;
 
-    @Convert(converter = ColorConverter.class)
-    private Color color;
+	@Convert(converter = ColorConverter.class)
+	private Color color;
 
-    @JsonIgnore
-    @OneToMany(mappedBy = "type")
-    private List<School> allSchools;
+	@JsonIgnore
+	@OneToMany(mappedBy = "type")
+	private List<School> allSchools;
 
-    public SchoolTypeDTO convertToDto() {
-	SchoolTypeDTO dto = new SchoolTypeDTO();
-	dto.setId(id);
-	dto.setB(color.getBlue());
-	dto.setG(color.getGreen());
-	dto.setR(color.getRed());
-	dto.setSchoolTypeValue(schoolTypeValue.getValue());
-	return dto;
-    }
+	public SchoolTypeDTO convertToDto() {
+		SchoolTypeDTO dto = new SchoolTypeDTO();
+		dto.setId(id);
+		dto.setB(color.getBlue());
+		dto.setG(color.getGreen());
+		dto.setR(color.getRed());
+		dto.setSchoolTypeValue(schoolTypeValue.getValue());
+		return dto;
+	}
 }

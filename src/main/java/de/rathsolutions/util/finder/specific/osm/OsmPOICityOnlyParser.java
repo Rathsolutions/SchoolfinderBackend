@@ -48,60 +48,60 @@ import lombok.extern.slf4j.Slf4j;
 @Primary
 public class OsmPOICityOnlyParser extends AbstractOsmPOIParser {
 
-    @Autowired
-    private OsmCityEntries osmCityEntries;
+	@Autowired
+	private OsmCityEntries osmCityEntries;
 
-    @Autowired
-    private LevenstheinDistanceUtil levenstheinDistanceUtil;
+	@Autowired
+	private LevenstheinDistanceUtil levenstheinDistanceUtil;
 
-    @Override
-    protected List<FinderEntity> generateResult(List<FinderEntity> resultList, AbstractSearchEntity searchEntity,
-	    int amount) throws OperationNotSupportedException {
-	if (resultList.isEmpty()) {
-	    return null;
+	@Override
+	protected List<FinderEntity> generateResult(List<FinderEntity> resultList, AbstractSearchEntity searchEntity,
+			int amount) throws OperationNotSupportedException {
+		if (resultList.isEmpty()) {
+			return null;
+		}
+		String city = searchEntity.getCity().replaceAll("-", "").replaceAll("\\s+", "").toLowerCase()
+				+ (searchEntity.getDistrict() != null ? searchEntity.getDistrict() : "");
+		List<FinderEntity> nearest = levenstheinDistanceUtil.computeLevenstheinDistance(city, resultList, amount,
+				searchEntity.getDistrict() != null, true);
+		log.debug("Final entity: " + nearest.toString());
+		return nearest;
 	}
-	String city = searchEntity.getCity().replaceAll("-", "").replaceAll("\\s+", "").toLowerCase()
-		+ (searchEntity.getDistrict() != null ? searchEntity.getDistrict() : "");
-	List<FinderEntity> nearest = levenstheinDistanceUtil.computeLevenstheinDistance(city, resultList, amount,
-		searchEntity.getDistrict() != null, true);
-	log.debug("Final entity: " + nearest.toString());
-	return nearest;
-    }
 
-    @Override
-    protected String getOsmFileName() {
-	return "filteredCities.xml";
-    }
-
-    /**
-     * Stub with nothing to do in this implementation
-     */
-    @Override
-    protected void cleanup() {
-
-    }
-
-    @Override
-    protected String getSecondInformationCriteriaAsString(Node currentNode) {
-	String key = currentNode.getAttributes().getNamedItem("k").getTextContent();
-	String val = currentNode.getAttributes().getNamedItem("v").getTextContent();
-	if (OsmTags.IS_IN.getValue().equals(key)) {
-	    // Removing not needed information after second ','
-	    String[] splittedVal = val.split(",");
-	    if (splittedVal.length >= 2) {
-		return splittedVal[0] + " - " + splittedVal[1];
-	    } else {
-		return val;
-	    }
-	} else if (OsmTags.WIKIPEDIA.getValue().equals(key)) {
-	    // Removing ':de'
-	    return val.substring(3);
+	@Override
+	protected String getOsmFileName() {
+		return "filteredCities.xml";
 	}
-	return "";
-    }
 
-    @Override
-    protected AbstractEntries getCachedEntries() {
-	return this.osmCityEntries;
-    }
+	/**
+	 * Stub with nothing to do in this implementation
+	 */
+	@Override
+	protected void cleanup() {
+
+	}
+
+	@Override
+	protected String getSecondInformationCriteriaAsString(Node currentNode) {
+		String key = currentNode.getAttributes().getNamedItem("k").getTextContent();
+		String val = currentNode.getAttributes().getNamedItem("v").getTextContent();
+		if (OsmTags.IS_IN.getValue().equals(key)) {
+			// Removing not needed information after second ','
+			String[] splittedVal = val.split(",");
+			if (splittedVal.length >= 2) {
+				return splittedVal[0] + " - " + splittedVal[1];
+			} else {
+				return val;
+			}
+		} else if (OsmTags.WIKIPEDIA.getValue().equals(key)) {
+			// Removing ':de'
+			return val.substring(3);
+		}
+		return "";
+	}
+
+	@Override
+	protected AbstractEntries getCachedEntries() {
+		return this.osmCityEntries;
+	}
 }

@@ -33,12 +33,12 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ContextConfiguration;
+import org.webjars.NotFoundException;
 import org.xml.sax.SAXException;
 
 import de.rathsolutions.SpringBootMain;
 import de.rathsolutions.util.finder.pojo.AbstractSearchEntity;
 import de.rathsolutions.util.finder.specific.osm.OsmPOIReducer;
-import javassist.NotFoundException;
 
 @SpringBootTest
 @ContextConfiguration(classes = SpringBootMain.class)

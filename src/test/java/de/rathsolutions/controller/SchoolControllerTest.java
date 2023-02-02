@@ -52,16 +52,19 @@ import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.transaction.annotation.Transactional;
+import org.webjars.NotFoundException;
 import org.xml.sax.SAXException;
 
 import de.rathsolutions.SpringBootMain;
 import de.rathsolutions.controller.postbody.PersonFunctionalityDTO;
 import de.rathsolutions.controller.postbody.ProjectDTO;
 import de.rathsolutions.controller.postbody.SchoolDTO;
+import de.rathsolutions.controller.postbody.SchoolTypeDTO;
 import de.rathsolutions.jpa.entity.Criteria;
 import de.rathsolutions.jpa.entity.Functionality;
 import de.rathsolutions.jpa.entity.Person;
 import de.rathsolutions.jpa.entity.School;
+import de.rathsolutions.jpa.entity.SchoolTypeValue;
 import de.rathsolutions.jpa.repo.CriteriaRepo;
 import de.rathsolutions.jpa.repo.SchoolRepo;
 import de.rathsolutions.util.exception.BadArgumentsException;
@@ -71,66 +74,67 @@ import de.rathsolutions.util.finder.pojo.FinderEntity;
 import de.rathsolutions.util.finder.pojo.FinderEntitySearchConstraint;
 import de.rathsolutions.util.finder.pojo.SchoolSearchEntity;
 import de.rathsolutions.util.finder.specific.osm.OsmPOISchoolParser;
-import javassist.NotFoundException;
 
 @SpringBootTest
 @ContextConfiguration(classes = SpringBootMain.class)
-@Sql(scripts = "../../../data.sql")
-@DirtiesContext(classMode = ClassMode.BEFORE_EACH_TEST_METHOD)
+@Sql(scripts = "../../../data-init.sql")
 public class SchoolControllerTest {
 
-    private static final int SCHOOL_MOCK_ID = -5;
+	private static final SchoolTypeDTO SCHOOL_TYPE = new SchoolTypeDTO();
 
-    private static final Functionality FUNCTIONALITY_ONE = new Functionality();
+	private static final int SCHOOL_MOCK_ID = -5;
 
-    private static final String TESTSCHOOL5 = "testschool5";
+	private static final Functionality FUNCTIONALITY_ONE = new Functionality();
 
-    private static final String SHORT_NOT_EXISTING = "shortNotExisting";
+	private static final String TESTSCHOOL5 = "testschool5";
 
-    private static final String TESTSCHOOL = "testschool";
+	private static final String SHORT_NOT_EXISTING = "shortNotExisting";
 
-    private static final String SHORT_TESTSCHOOL = "shortTestschool";
+	private static final String TESTSCHOOL = "testschool";
 
-    @Autowired
-    private SchoolController cut;
+	private static final String SHORT_TESTSCHOOL = "shortTestschool";
 
-    @Autowired
-    private CriteriaRepo criteriaRepo;
+	@Autowired
+	private SchoolController cut;
 
-    @Autowired
-    private SchoolRepo schoolRepo;
+	@Autowired
+	private CriteriaRepo criteriaRepo;
 
-    @MockBean
-    private OsmPOISchoolParser osmParserMock;
+	@Autowired
+	private SchoolRepo schoolRepo;
 
-    private static final ProjectDTO PRIMARY_PROJECT = new ProjectDTO();
+	@MockBean
+	private OsmPOISchoolParser osmParserMock;
 
-    private static final List<ProjectDTO> DEFAULT_PROJECT_LIST = new ArrayList<>();
+	private static final ProjectDTO PRIMARY_PROJECT = new ProjectDTO();
 
-    @BeforeAll
-    public static void init() {
-	PRIMARY_PROJECT.setId(-1);
-	DEFAULT_PROJECT_LIST.add(PRIMARY_PROJECT);
-	FUNCTIONALITY_ONE.setName("testfunc1");
-	FUNCTIONALITY_ONE.setId(-1);
+	private static final List<ProjectDTO> DEFAULT_PROJECT_LIST = new ArrayList<>();
 
-    }
+	@BeforeAll
+	public static void init() {
+		PRIMARY_PROJECT.setId(-1);
+		DEFAULT_PROJECT_LIST.add(PRIMARY_PROJECT);
+		FUNCTIONALITY_ONE.setName("testfunc1");
+		FUNCTIONALITY_ONE.setId(-1L);
+		SCHOOL_TYPE.setSchoolTypeValue(SchoolTypeValue.GYMNASIUM.getValue());
 
-    @Test
-    void testFindNotRegisteredSchoolsByNameAdminWithValidName()
-	    throws ParserConfigurationException, SAXException, IOException, NotFoundException, TransformerException,
-	    InterruptedException, ExecutionException, OperationNotSupportedException {
-	List<FinderEntity> expectedReturnObject = new ArrayList<>();
-	List<FinderEntitySearchConstraint> constraints = new ArrayList<>();
-	constraints.add(new FinderEntitySearchConstraint("test", ""));
-	expectedReturnObject.add(new FinderEntity("test", null, constraints, 1, 2));
-	when(osmParserMock.find(Mockito.any(SchoolSearchEntity.class), anyInt())).thenReturn(expectedReturnObject);
-	ResponseEntity<List<FinderEntity>> notRegisteredSchoolsByName = cut
-		.findNotRegisteredSchoolsByNameAdmin("testSchool", "", 1);
-	assertEquals(expectedReturnObject, notRegisteredSchoolsByName.getBody());
-    }
+	}
 
-    @Test
+	@Test
+	void testFindNotRegisteredSchoolsByNameAdminWithValidName()
+			throws ParserConfigurationException, SAXException, IOException, NotFoundException, TransformerException,
+			InterruptedException, ExecutionException, OperationNotSupportedException {
+		List<FinderEntity> expectedReturnObject = new ArrayList<>();
+		List<FinderEntitySearchConstraint> constraints = new ArrayList<>();
+		constraints.add(new FinderEntitySearchConstraint("test", ""));
+		expectedReturnObject.add(new FinderEntity("test", null, constraints, 1, 2));
+		when(osmParserMock.find(Mockito.any(SchoolSearchEntity.class), anyInt())).thenReturn(expectedReturnObject);
+		ResponseEntity<List<FinderEntity>> notRegisteredSchoolsByName = cut
+				.findNotRegisteredSchoolsByNameAdmin("testSchool", "", 1);
+		assertEquals(expectedReturnObject, notRegisteredSchoolsByName.getBody());
+	}
+
+	@Test
     void testFindNotRegisteredSchoolsByNameAdminWithNotValidName()
 	    throws ParserConfigurationException, SAXException, IOException, NotFoundException, TransformerException,
 	    InterruptedException, ExecutionException, OperationNotSupportedException {
@@ -141,56 +145,56 @@ public class SchoolControllerTest {
 	assertNull(notRegisteredSchoolsByName.getBody());
     }
 
-    @Test
-    @Transactional
-    void testFindSchoolsByCriteriaExisting() {
-	List<Criteria> criterias = new ArrayList<>();
-	criterias.add(new Criteria("test"));
-	List<SchoolDTO> schoolsByCriteria = cut.findSchoolsByCriteria(criterias);
-	assertEquals(2, schoolsByCriteria.size());
-	assertFirstSchool(schoolsByCriteria.get(1));
-	assertThirdSchool(schoolsByCriteria.get(0));
-    }
+	@Test
+	@Transactional
+	void testFindSchoolsByCriteriaExisting() {
+		List<Criteria> criterias = new ArrayList<>();
+		criterias.add(new Criteria("test"));
+		List<SchoolDTO> schoolsByCriteria = cut.findSchoolsByCriteria(criterias);
+		assertEquals(2, schoolsByCriteria.size());
+		assertFirstSchool(schoolsByCriteria.get(1));
+		assertThirdSchool(schoolsByCriteria.get(0));
+	}
 
-    @Test
-    void testFindSchoolsByCriteriaNotExisting() {
-	List<Criteria> criterias = new ArrayList<>();
-	criterias.add(new Criteria("test3"));
-	List<SchoolDTO> schoolsByCriteria = cut.findSchoolsByCriteria(criterias);
-	assertEquals(0, schoolsByCriteria.size());
-    }
+	@Test
+	void testFindSchoolsByCriteriaNotExisting() {
+		List<Criteria> criterias = new ArrayList<>();
+		criterias.add(new Criteria("test3"));
+		List<SchoolDTO> schoolsByCriteria = cut.findSchoolsByCriteria(criterias);
+		assertEquals(0, schoolsByCriteria.size());
+	}
 
-    @Test
-    @Transactional
-    void testFindSchoolsByMultipleCriteriasExisting() {
-	List<Criteria> criterias = new ArrayList<>();
-	criterias.add(new Criteria("test"));
-	criterias.add(new Criteria("test1"));
-	List<SchoolDTO> schoolsByCriteria = cut.findSchoolsByCriteria(criterias);
-	assertEquals(3, schoolsByCriteria.size());
-	assertFirstSchool(schoolsByCriteria.get(2));
-	assertSecondSchool(schoolsByCriteria.get(1));
-	assertThirdSchool(schoolsByCriteria.get(0));
-    }
+	@Test
+	@Transactional
+	void testFindSchoolsByMultipleCriteriasExisting() {
+		List<Criteria> criterias = new ArrayList<>();
+		criterias.add(new Criteria("test"));
+		criterias.add(new Criteria("test1"));
+		List<SchoolDTO> schoolsByCriteria = cut.findSchoolsByCriteria(criterias);
+		assertEquals(3, schoolsByCriteria.size());
+		assertFirstSchool(schoolsByCriteria.get(2));
+		assertSecondSchool(schoolsByCriteria.get(1));
+		assertThirdSchool(schoolsByCriteria.get(0));
+	}
 
-    @Test
-    @Transactional
-    void testFindSchoolsByMultipleCriteriasOnlyOneExisting() {
-	List<Criteria> criterias = new ArrayList<>();
-	criterias.add(new Criteria("test"));
-	criterias.add(new Criteria("test12"));
-	List<SchoolDTO> schoolsByCriteria = cut.findSchoolsByCriteria(criterias);
-	assertEquals(2, schoolsByCriteria.size());
-	assertFirstSchool(schoolsByCriteria.get(1));
-	assertThirdSchool(schoolsByCriteria.get(0));
-    }
+	@Test
+	@Transactional
+	void testFindSchoolsByMultipleCriteriasOnlyOneExisting() {
+		List<Criteria> criterias = new ArrayList<>();
+		criterias.add(new Criteria("test"));
+		criterias.add(new Criteria("test12"));
+		List<SchoolDTO> schoolsByCriteria = cut.findSchoolsByCriteria(criterias);
+		assertEquals(2, schoolsByCriteria.size());
+		assertFirstSchool(schoolsByCriteria.get(1));
+		assertThirdSchool(schoolsByCriteria.get(0));
+	}
 
-    @Test
-    @Transactional
-    void testFindAllSchools() {
-	List<SchoolDTO> allSchools = cut.findAllSchools();
-	assertEquals(3, allSchools.size());
-    }
+	@Test
+	@Transactional
+	void testFindAllSchools() {
+		List<SchoolDTO> allSchools = cut.findAllSchools();
+		assertEquals(3, allSchools.size());
+	}
 
 //    @Test
 //    void testFindAllSchoolsByInBoundsWrongCriteriaRightBounds() {
@@ -288,405 +292,408 @@ public class SchoolControllerTest {
 //	assertFirstSchool(allSchoolsByInBounds.get(0));
 //    }
 
-    @Test
-    @Transactional
-    void testFindSchoolDetails() {
-	ResponseEntity<SchoolDTO> findFirstSchoolDetails = cut.findSchoolDetails(-1);
-	assertFirstSchool(findFirstSchoolDetails.getBody());
-    }
+	@Test
+	@Transactional
+	void testFindSchoolDetails() {
+		ResponseEntity<SchoolDTO> findFirstSchoolDetails = cut.findSchoolDetails(-1);
+		assertFirstSchool(findFirstSchoolDetails.getBody());
+	}
 
-    @Test
-    void testFindSchoolDetailsNoSchoolFound() {
-	ResponseEntity<SchoolDTO> findFirstSchoolDetails = cut.findSchoolDetails(5);
-	assertEquals(HttpStatus.NOT_FOUND, findFirstSchoolDetails.getStatusCode());
-	assertNull(findFirstSchoolDetails.getBody());
-    }
+	@Test
+	void testFindSchoolDetailsNoSchoolFound() {
+		ResponseEntity<SchoolDTO> findFirstSchoolDetails = cut.findSchoolDetails(5);
+		assertEquals(HttpStatus.NOT_FOUND, findFirstSchoolDetails.getStatusCode());
+		assertNull(findFirstSchoolDetails.getBody());
+	}
 
-    @Test
-    @Transactional
-    void testAddNewSchoolAlreadyExisting() {
-	SchoolDTO newSchool = new SchoolDTO(SCHOOL_MOCK_ID, SHORT_TESTSCHOOL, TESTSCHOOL, 21, 12, "", "", null, null,
-		null, null, "", null, null, null, null, null, null);
-	assertThrows(ResourceAlreadyExistingException.class, () -> {
-	    cut.addNewSchool(newSchool);
-	});
-	assertFirstSchool(schoolRepo.getOne(-1L).convertToDTO());
-    }
+	@Test
+	@Transactional
+	void testAddNewSchoolAlreadyExisting() {
+		SchoolDTO newSchool = new SchoolDTO(SCHOOL_MOCK_ID, SHORT_TESTSCHOOL, TESTSCHOOL, 21, 12, "", "", null, null,
+				null, null, "", null, null, null, null, null, null);
+		assertThrows(ResourceAlreadyExistingException.class, () -> {
+			cut.addNewSchool(newSchool);
+		});
+		assertFirstSchool(schoolRepo.getOne(-1L).convertToDTO());
+	}
 
-    @Test
-    @Transactional
-    void testAlterSchoolNotExisting() {
-	SchoolDTO newSchool = new SchoolDTO(4, SHORT_NOT_EXISTING, TESTSCHOOL5, 21, 12, "", "", null, null, null, null,
-		"", null, null, null, null, null, null);
-	assertThrows(ResourceNotFoundException.class, () -> {
-	    cut.alterSchool(newSchool);
-	});
-	assertFirstSchool(schoolRepo.getOne(-1L).convertToDTO());
-    }
+	@Test
+	@Transactional
+	void testAlterSchoolNotExisting() {
+		SchoolDTO newSchool = new SchoolDTO(4, SHORT_NOT_EXISTING, TESTSCHOOL5, 21, 12, "", "", null, null, null, null,
+				"", null, null, null, null, null, null);
+		assertThrows(ResourceNotFoundException.class, () -> {
+			cut.alterSchool(newSchool);
+		});
+		assertFirstSchool(schoolRepo.getOne(-1L).convertToDTO());
+	}
 
-    @Test
-    void testAddNewSchoolNullPersonsNullCriterias() {
-	SchoolDTO newSchool = new SchoolDTO(SCHOOL_MOCK_ID, SHORT_NOT_EXISTING, TESTSCHOOL5, 21, 12, "", "", null, null,
-		null, null, "", null, null, null, null, null, null);
-	assertThrows(BadArgumentsException.class, () -> {
-	    cut.addNewSchool(newSchool);
-	});
-    }
+	@Test
+	void testAddNewSchoolNullPersonsNullCriterias() {
+		SchoolDTO newSchool = new SchoolDTO(SCHOOL_MOCK_ID, SHORT_NOT_EXISTING, TESTSCHOOL5, 21, 12, "", "", null, null,
+				null, null, "", null, null, null, null, null, null);
+		assertThrows(BadArgumentsException.class, () -> {
+			cut.addNewSchool(newSchool);
+		});
+	}
 
-    @Test
-    void testAlterSchoolNullPersonsNullCriterias() {
-	SchoolDTO newSchool = new SchoolDTO(-2, SHORT_NOT_EXISTING, TESTSCHOOL5, 21, 12, "", "", null, null, null, null,
-		"", null, null, null, null, null, null);
-	assertThrows(BadArgumentsException.class, () -> {
-	    cut.alterSchool(newSchool);
-	});
-    }
+	@Test
+	void testAlterSchoolNullPersonsNullCriterias() {
+		SchoolDTO newSchool = new SchoolDTO(-2, SHORT_NOT_EXISTING, TESTSCHOOL5, 21, 12, "", "", null, null, null, null,
+				"", null, null, null, null, null, null);
+		assertThrows(BadArgumentsException.class, () -> {
+			cut.alterSchool(newSchool);
+		});
+	}
 
-    @Test
-    void testAddNewSchoolNullColor() {
-	SchoolDTO newSchool = new SchoolDTO(SCHOOL_MOCK_ID, SHORT_NOT_EXISTING, TESTSCHOOL5, 21, 12, "", "", null, null,
-		null, null, "", null, null, null, null, null, null);
-	assertThrows(BadArgumentsException.class, () -> {
-	    cut.addNewSchool(newSchool);
-	});
-    }
+	@Test
+	void testAddNewSchoolNullColor() {
+		SchoolDTO newSchool = new SchoolDTO(SCHOOL_MOCK_ID, SHORT_NOT_EXISTING, TESTSCHOOL5, 21, 12, "", "", null, null,
+				null, null, "", null, null, null, null, null, null);
+		assertThrows(BadArgumentsException.class, () -> {
+			cut.addNewSchool(newSchool);
+		});
+	}
 
-    @Test
-    void testAddNewSchoolEmptyColor() {
-	SchoolDTO newSchool = new SchoolDTO(SCHOOL_MOCK_ID, SHORT_NOT_EXISTING, TESTSCHOOL5, 21, 12, "", "", null, null,
-		null, null, "", null, null, null, null, null, null);
-	assertThrows(BadArgumentsException.class, () -> {
-	    cut.addNewSchool(newSchool);
-	});
-    }
+	@Test
+	void testAddNewSchoolEmptyColor() {
+		SchoolDTO newSchool = new SchoolDTO(SCHOOL_MOCK_ID, SHORT_NOT_EXISTING, TESTSCHOOL5, 21, 12, "", "", null, null,
+				null, null, "", null, null, null, null, null, null);
+		assertThrows(BadArgumentsException.class, () -> {
+			cut.addNewSchool(newSchool);
+		});
+	}
 
-    @Test
-    void testAddNewSchoolColorNotMatchingRegex() {
-	SchoolDTO newSchool = new SchoolDTO(SCHOOL_MOCK_ID, SHORT_NOT_EXISTING, TESTSCHOOL5, 21, 12, "", "", null, null,
-		null, null, "", null, null, null, null, null, null);
-	assertThrows(BadArgumentsException.class, () -> {
-	    cut.addNewSchool(newSchool);
-	});
-    }
+	@Test
+	void testAddNewSchoolColorNotMatchingRegex() {
+		SchoolDTO newSchool = new SchoolDTO(SCHOOL_MOCK_ID, SHORT_NOT_EXISTING, TESTSCHOOL5, 21, 12, "", "", null, null,
+				null, null, "", null, null, null, null, null, null);
+		assertThrows(BadArgumentsException.class, () -> {
+			cut.addNewSchool(newSchool);
+		});
+	}
 
-    @Test
-    void testAddNewSchoolNullPersonsNotNullCriterias() {
-	List<Criteria> criterias = new ArrayList<>();
-	String testcriteria = "test5";
-	criterias.add(new Criteria(testcriteria));
-	SchoolDTO newSchool = new SchoolDTO(SCHOOL_MOCK_ID, SHORT_NOT_EXISTING, TESTSCHOOL5, 21, 12, "", "", null,
-		criterias, null, null, "", null, null, testcriteria, testcriteria, testcriteria, testcriteria);
-	assertThrows(BadArgumentsException.class, () -> {
-	    cut.addNewSchool(newSchool);
-	});
-	List<Criteria> allCriterias = criteriaRepo.findAll();
-	assertFalse(allCriterias.stream().anyMatch(e -> e.getCriteriaName().equals(testcriteria)));
-    }
+	@Test
+	void testAddNewSchoolNullPersonsNotNullCriterias() {
+		List<Criteria> criterias = new ArrayList<>();
+		String testcriteria = "test5";
+		criterias.add(new Criteria(testcriteria));
+		SchoolDTO newSchool = new SchoolDTO(SCHOOL_MOCK_ID, SHORT_NOT_EXISTING, TESTSCHOOL5, 21, 12, "", "", null,
+				criterias, null, null, "", null, null, testcriteria, testcriteria, testcriteria, testcriteria);
+		assertThrows(BadArgumentsException.class, () -> {
+			cut.addNewSchool(newSchool);
+		});
+		List<Criteria> allCriterias = criteriaRepo.findAll();
+		assertFalse(allCriterias.stream().anyMatch(e -> e.getCriteriaName().equals(testcriteria)));
+	}
 
-    @Test
-    void testAlterSchoolNullPersonsNotNullCriterias() {
-	List<Criteria> criterias = new ArrayList<>();
-	String testcriteria = "test5";
-	criterias.add(new Criteria(testcriteria));
-	SchoolDTO newSchool = new SchoolDTO(-1, SHORT_TESTSCHOOL, TESTSCHOOL, 21, 12, "", "", null, criterias,
-		DEFAULT_PROJECT_LIST, PRIMARY_PROJECT, "", null, null, testcriteria, testcriteria, testcriteria,
-		testcriteria);
-	assertThrows(BadArgumentsException.class, () -> {
-	    cut.alterSchool(newSchool);
-	});
-	List<Criteria> allCriterias = criteriaRepo.findAll();
-	assertFalse(allCriterias.stream().anyMatch(e -> e.getCriteriaName().equals(testcriteria)));
-    }
+	@Test
+	void testAlterSchoolNullPersonsNotNullCriterias() {
+		List<Criteria> criterias = new ArrayList<>();
+		String testcriteria = "test5";
+		criterias.add(new Criteria(testcriteria));
+		SchoolDTO newSchool = new SchoolDTO(-1, SHORT_TESTSCHOOL, TESTSCHOOL, 21, 12, "", "", null, criterias,
+				DEFAULT_PROJECT_LIST, PRIMARY_PROJECT, "", null, null, testcriteria, testcriteria, testcriteria,
+				testcriteria);
+		assertThrows(BadArgumentsException.class, () -> {
+			cut.alterSchool(newSchool);
+		});
+		List<Criteria> allCriterias = criteriaRepo.findAll();
+		assertFalse(allCriterias.stream().anyMatch(e -> e.getCriteriaName().equals(testcriteria)));
+	}
 
-    @Test
-    void testAddNewSchoolNotNullNotExistingPersonNotNullCriterias() {
-	List<PersonFunctionalityDTO> personFuncList = new ArrayList<>();
-	List<Criteria> criterias = new ArrayList<>();
-	String testcriteria = "test5";
-	criterias.add(new Criteria(testcriteria));
-	String testschool = TESTSCHOOL5;
-	PersonFunctionalityDTO personFunctionalityEntity = new PersonFunctionalityDTO();
-	Person person = new Person();
-	person.setId(5L);
-	personFunctionalityEntity.setPerson(person);
-	personFuncList.add(personFunctionalityEntity);
-	SchoolDTO newSchool = new SchoolDTO(SCHOOL_MOCK_ID, SHORT_TESTSCHOOL, testschool, 21, 12, "", "",
-		personFuncList, criterias, DEFAULT_PROJECT_LIST, PRIMARY_PROJECT, "", null, null, testschool,
-		testschool, testschool, testschool);
-	assertThrows(ResourceNotFoundException.class, () -> {
-	    cut.addNewSchool(newSchool);
-	});
-	List<Criteria> allCriterias = criteriaRepo.findAll();
-	List<School> allSchools = schoolRepo.findAll();
-	assertFalse(allCriterias.stream().anyMatch(e -> e.getCriteriaName().equals(testcriteria)));
-	assertFalse(allSchools.stream().anyMatch(e -> e.getSchoolName().equals(testschool)));
-    }
+	@Test
+	void testAddNewSchoolNotNullNotExistingPersonNotNullCriterias() {
+		List<PersonFunctionalityDTO> personFuncList = new ArrayList<>();
+		List<Criteria> criterias = new ArrayList<>();
+		String testcriteria = "test5";
+		criterias.add(new Criteria(testcriteria));
+		String testschool = TESTSCHOOL5;
+		PersonFunctionalityDTO personFunctionalityEntity = new PersonFunctionalityDTO();
+		Person person = new Person();
+		person.setId(5L);
+		personFunctionalityEntity.setPerson(person);
+		personFuncList.add(personFunctionalityEntity);
+		SchoolDTO newSchool = new SchoolDTO(SCHOOL_MOCK_ID, SHORT_TESTSCHOOL, testschool, 21, 12, "", "",
+				personFuncList, criterias, DEFAULT_PROJECT_LIST, PRIMARY_PROJECT, "", null, SCHOOL_TYPE, testschool,
+				testschool, testschool, testschool);
+		assertThrows(ResourceNotFoundException.class, () -> {
+			cut.addNewSchool(newSchool);
+		});
+		List<Criteria> allCriterias = criteriaRepo.findAll();
+		List<School> allSchools = schoolRepo.findAll();
+		assertFalse(allCriterias.stream().anyMatch(e -> e.getCriteriaName().equals(testcriteria)));
+		assertFalse(allSchools.stream().anyMatch(e -> e.getSchoolName().equals(testschool)));
+	}
 
-    @Test
-    void testAlterSchoolNotNullNotExistingPersonNotNullCriterias() {
-	List<PersonFunctionalityDTO> personFuncList = new ArrayList<>();
-	List<Criteria> criterias = new ArrayList<>();
-	String testcriteria = "test5";
-	criterias.add(new Criteria(testcriteria));
-	String testschool = TESTSCHOOL5;
-	PersonFunctionalityDTO personFunctionalityEntity = new PersonFunctionalityDTO();
-	Person person = new Person();
-	person.setId(5L);
-	personFunctionalityEntity.setPerson(person);
-	personFuncList.add(personFunctionalityEntity);
-	SchoolDTO newSchool = new SchoolDTO(-2, SHORT_TESTSCHOOL, testschool, 21, 12, "", "", personFuncList, criterias,
-		DEFAULT_PROJECT_LIST, PRIMARY_PROJECT, "", null, null, testschool, testschool, testschool, testschool);
-	assertThrows(ResourceNotFoundException.class, () -> {
-	    cut.alterSchool(newSchool);
-	});
-	List<Criteria> allCriterias = criteriaRepo.findAll();
-	List<School> allSchools = schoolRepo.findAll();
-	assertFalse(allCriterias.stream().anyMatch(e -> e.getCriteriaName().equals(testcriteria)));
-	assertFalse(allSchools.stream().anyMatch(e -> e.getSchoolName().equals(testschool)));
-    }
+	@Test
+	void testAlterSchoolNotNullNotExistingPersonNotNullCriterias() {
+		List<PersonFunctionalityDTO> personFuncList = new ArrayList<>();
+		List<Criteria> criterias = new ArrayList<>();
+		String testcriteria = "test5";
+		criterias.add(new Criteria(testcriteria));
+		String testschool = TESTSCHOOL5;
+		PersonFunctionalityDTO personFunctionalityEntity = new PersonFunctionalityDTO();
+		Person person = new Person();
+		person.setId(5L);
+		personFunctionalityEntity.setPerson(person);
+		personFuncList.add(personFunctionalityEntity);
+		SchoolDTO newSchool = new SchoolDTO(-2, SHORT_TESTSCHOOL, testschool, 21, 12, "", "", personFuncList, criterias,
+				DEFAULT_PROJECT_LIST, PRIMARY_PROJECT, "", null, SCHOOL_TYPE, testschool, testschool, testschool,
+				testschool);
+		assertThrows(ResourceNotFoundException.class, () -> {
+			cut.alterSchool(newSchool);
+		});
+		List<Criteria> allCriterias = criteriaRepo.findAll();
+		List<School> allSchools = schoolRepo.findAll();
+		assertFalse(allCriterias.stream().anyMatch(e -> e.getCriteriaName().equals(testcriteria)));
+		assertFalse(allSchools.stream().anyMatch(e -> e.getSchoolName().equals(testschool)));
+	}
 
-    @Test
-    @Transactional
-    void testAddNewSchoolNotNullExistingPersonNotEmptyFunctionalityNotNullCriterias() {
-	List<PersonFunctionalityDTO> personFuncList = new ArrayList<>();
-	List<Criteria> criterias = new ArrayList<>();
-	String testcriteria = "test5";
-	criterias.add(new Criteria(testcriteria));
-	String testschool = TESTSCHOOL5;
-	PersonFunctionalityDTO personFunctionalityEntity = new PersonFunctionalityDTO();
-	Person person = new Person();
-	person.setId(-1L);
-	personFunctionalityEntity.setPerson(person);
-	personFunctionalityEntity.setFunctionality(FUNCTIONALITY_ONE);
-	personFuncList.add(personFunctionalityEntity);
-	SchoolDTO newSchool = new SchoolDTO(SCHOOL_MOCK_ID, SHORT_TESTSCHOOL, testschool, 21, 12, "", "",
-		personFuncList, criterias, DEFAULT_PROJECT_LIST, PRIMARY_PROJECT, "", null, null, testschool,
-		testschool, testschool, testschool);
-	ResponseEntity<SchoolDTO> responseEntity = cut.addNewSchool(newSchool);
-	List<Criteria> allCriterias = criteriaRepo.findAll();
-	List<School> allSchools = schoolRepo.findAll();
-	assertTrue(allCriterias.stream().anyMatch(e -> e.getCriteriaName().equals(testcriteria)));
-	Stream<School> schoolInDB = findMatchingSchool(testschool, allSchools);
-	assertEquals(1, schoolInDB.count());
-	schoolInDB = findMatchingSchool(testschool, allSchools);
-	School schoolObject = schoolInDB.findFirst().get();
-	assertEquals(-1L, schoolObject.getPersonSchoolMapping().get(0).getPerson().getId().longValue());
-	assertEquals(FUNCTIONALITY_ONE.getId(),
-		schoolObject.getPersonSchoolMapping().get(0).getFunctionality().getId());
-	assertSchoolEquals(responseEntity.getBody(), newSchool);
-    }
+	@Test
+	@Transactional
+	void testAddNewSchoolNotNullExistingPersonNotEmptyFunctionalityNotNullCriterias() {
+		List<PersonFunctionalityDTO> personFuncList = new ArrayList<>();
+		List<Criteria> criterias = new ArrayList<>();
+		String testcriteria = "test5";
+		criterias.add(new Criteria(testcriteria));
+		String testschool = TESTSCHOOL5;
+		PersonFunctionalityDTO personFunctionalityEntity = new PersonFunctionalityDTO();
+		Person person = new Person();
+		person.setId(-1L);
+		personFunctionalityEntity.setPerson(person);
+		personFunctionalityEntity.setFunctionality(FUNCTIONALITY_ONE);
+		personFuncList.add(personFunctionalityEntity);
+		SchoolDTO newSchool = new SchoolDTO(SCHOOL_MOCK_ID, SHORT_TESTSCHOOL, testschool, 21, 12, "", "",
+				personFuncList, criterias, DEFAULT_PROJECT_LIST, PRIMARY_PROJECT, "", null, SCHOOL_TYPE, testschool,
+				testschool, testschool, testschool);
+		ResponseEntity<SchoolDTO> responseEntity = cut.addNewSchool(newSchool);
+		List<Criteria> allCriterias = criteriaRepo.findAll();
+		List<School> allSchools = schoolRepo.findAll();
+		assertTrue(allCriterias.stream().anyMatch(e -> e.getCriteriaName().equals(testcriteria)));
+		Stream<School> schoolInDB = findMatchingSchool(testschool, allSchools);
+		assertEquals(1, schoolInDB.count());
+		schoolInDB = findMatchingSchool(testschool, allSchools);
+		School schoolObject = schoolInDB.findFirst().get();
+		assertEquals(-1L, schoolObject.getPersonSchoolMapping().get(0).getPerson().getId().longValue());
+		assertEquals(FUNCTIONALITY_ONE.getId(),
+				schoolObject.getPersonSchoolMapping().get(0).getFunctionality().getId());
+		assertSchoolEquals(responseEntity.getBody(), newSchool);
+	}
 
-    @Test
-    @Transactional
-    void testAddNewSchoolNoPrimaryProjectSet() {
-	List<PersonFunctionalityDTO> personFuncList = new ArrayList<>();
-	List<Criteria> criterias = new ArrayList<>();
-	String testcriteria = "test5";
-	criterias.add(new Criteria(testcriteria));
-	String testschool = TESTSCHOOL5;
-	PersonFunctionalityDTO personFunctionalityEntity = new PersonFunctionalityDTO();
-	Person person = new Person();
-	person.setId(-1L);
-	personFunctionalityEntity.setPerson(person);
-	personFunctionalityEntity.setFunctionality(FUNCTIONALITY_ONE);
-	personFuncList.add(personFunctionalityEntity);
-	SchoolDTO newSchool = new SchoolDTO(SCHOOL_MOCK_ID, SHORT_TESTSCHOOL, testschool, 21, 12, "", "",
-		personFuncList, criterias, DEFAULT_PROJECT_LIST, null, "", null, null, testschool, testschool,
-		testschool, testschool);
-	assertThrows(BadArgumentsException.class, () -> {
-	    cut.addNewSchool(newSchool);
-	});
-	newSchool.setId(-1);
-	assertThrows(BadArgumentsException.class, () -> {
-	    cut.alterSchool(newSchool);
-	});
-    }
+	@Test
+	@Transactional
+	void testAddNewSchoolNoPrimaryProjectSet() {
+		List<PersonFunctionalityDTO> personFuncList = new ArrayList<>();
+		List<Criteria> criterias = new ArrayList<>();
+		String testcriteria = "test5";
+		criterias.add(new Criteria(testcriteria));
+		String testschool = TESTSCHOOL5;
+		PersonFunctionalityDTO personFunctionalityEntity = new PersonFunctionalityDTO();
+		Person person = new Person();
+		person.setId(-1L);
+		personFunctionalityEntity.setPerson(person);
+		personFunctionalityEntity.setFunctionality(FUNCTIONALITY_ONE);
+		personFuncList.add(personFunctionalityEntity);
+		SchoolDTO newSchool = new SchoolDTO(SCHOOL_MOCK_ID, SHORT_TESTSCHOOL, testschool, 21, 12, "", "",
+				personFuncList, criterias, DEFAULT_PROJECT_LIST, null, "", null, null, testschool, testschool,
+				testschool, testschool);
+		assertThrows(BadArgumentsException.class, () -> {
+			cut.addNewSchool(newSchool);
+		});
+		newSchool.setId(-1);
+		assertThrows(BadArgumentsException.class, () -> {
+			cut.alterSchool(newSchool);
+		});
+	}
 
-    @Test
-    @Transactional
-    void testAddNewSchoolPrimaryProjectSetNoGeneralProjectsSet() {
-	List<PersonFunctionalityDTO> personFuncList = new ArrayList<>();
-	List<Criteria> criterias = new ArrayList<>();
-	String testcriteria = "test5";
-	criterias.add(new Criteria(testcriteria));
-	String testschool = TESTSCHOOL5;
-	PersonFunctionalityDTO personFunctionalityEntity = new PersonFunctionalityDTO();
-	Person person = new Person();
-	person.setId(-1L);
-	personFunctionalityEntity.setPerson(person);
-	personFunctionalityEntity.setFunctionality(FUNCTIONALITY_ONE);
-	personFuncList.add(personFunctionalityEntity);
-	SchoolDTO newSchool = new SchoolDTO(SCHOOL_MOCK_ID, SHORT_TESTSCHOOL, testschool, 21, 12, "", "",
-		personFuncList, criterias, null, PRIMARY_PROJECT, "", null, null, testschool, testschool, testschool,
-		testschool);
-	assertThrows(BadArgumentsException.class, () -> {
-	    cut.addNewSchool(newSchool);
-	});
-	newSchool.setId(-1);
-	assertThrows(BadArgumentsException.class, () -> {
-	    cut.alterSchool(newSchool);
-	});
-    }
+	@Test
+	@Transactional
+	void testAddNewSchoolPrimaryProjectSetNoGeneralProjectsSet() {
+		List<PersonFunctionalityDTO> personFuncList = new ArrayList<>();
+		List<Criteria> criterias = new ArrayList<>();
+		String testcriteria = "test5";
+		criterias.add(new Criteria(testcriteria));
+		String testschool = TESTSCHOOL5;
+		PersonFunctionalityDTO personFunctionalityEntity = new PersonFunctionalityDTO();
+		Person person = new Person();
+		person.setId(-1L);
+		personFunctionalityEntity.setPerson(person);
+		personFunctionalityEntity.setFunctionality(FUNCTIONALITY_ONE);
+		personFuncList.add(personFunctionalityEntity);
+		SchoolDTO newSchool = new SchoolDTO(SCHOOL_MOCK_ID, SHORT_TESTSCHOOL, testschool, 21, 12, "", "",
+				personFuncList, criterias, null, PRIMARY_PROJECT, "", null, null, testschool, testschool, testschool,
+				testschool);
+		assertThrows(BadArgumentsException.class, () -> {
+			cut.addNewSchool(newSchool);
+		});
+		newSchool.setId(-1);
+		assertThrows(BadArgumentsException.class, () -> {
+			cut.alterSchool(newSchool);
+		});
+	}
 
-    @Test
-    @Transactional
-    void testAlterSchoolNotNullExistingPersonAndAlreadyAddedPersonNotEmptyFunctionalityNotNullCriterias() {
-	List<PersonFunctionalityDTO> personFuncList = new ArrayList<>();
-	List<Criteria> criterias = new ArrayList<>();
-	String testcriteria = "test5";
-	criterias.add(new Criteria(testcriteria));
-	String testschool = TESTSCHOOL5;
-	PersonFunctionalityDTO personFunctionalityEntity = new PersonFunctionalityDTO();
-	Person person = new Person();
-	person.setId(-1L);
-	personFunctionalityEntity.setPerson(person);
-	personFunctionalityEntity.setFunctionality(FUNCTIONALITY_ONE);
-	personFuncList.add(personFunctionalityEntity);
-	SchoolDTO newSchool = new SchoolDTO(-3, SHORT_TESTSCHOOL, testschool, 1, 2, "1", "", personFuncList, criterias,
-		DEFAULT_PROJECT_LIST, PRIMARY_PROJECT, "", null, null, testschool, testschool, testschool, testschool);
-	ResponseEntity<SchoolDTO> responseEntity = cut.alterSchool(newSchool);
-	List<Criteria> allCriterias = criteriaRepo.findAll();
-	List<School> allSchools = schoolRepo.findAll();
-	assertTrue(allCriterias.stream().anyMatch(e -> e.getCriteriaName().equals(testcriteria)));
-	Stream<School> schoolInDB = findMatchingSchool(testschool, allSchools);
-	assertEquals(1, schoolInDB.count());
-	schoolInDB = findMatchingSchool(testschool, allSchools);
-	School schoolObject = schoolInDB.findFirst().get();
-	assertEquals(-1L, schoolObject.getPersonSchoolMapping().get(0).getPerson().getId().longValue());
-	assertEquals(FUNCTIONALITY_ONE.getId(),
-		schoolObject.getPersonSchoolMapping().get(0).getFunctionality().getId());
-	assertEquals(testschool, schoolObject.getSchoolName());
-	assertEquals(3.333, schoolObject.getLatitude().doubleValue(), 0.000001);
-	assertEquals(4.444, schoolObject.getLongitude().doubleValue(), 0.000001);
-	assertEquals("1", new String(schoolObject.getSchoolPicture()));
-	assertEquals(SHORT_TESTSCHOOL, schoolObject.getShortSchoolName());
-    }
+	@Test
+	@Transactional
+	void testAlterSchoolNotNullExistingPersonAndAlreadyAddedPersonNotEmptyFunctionalityNotNullCriterias() {
+		List<PersonFunctionalityDTO> personFuncList = new ArrayList<>();
+		List<Criteria> criterias = new ArrayList<>();
+		String testcriteria = "test5";
+		criterias.add(new Criteria(testcriteria));
+		String testschool = TESTSCHOOL5;
+		PersonFunctionalityDTO personFunctionalityEntity = new PersonFunctionalityDTO();
+		Person person = new Person();
+		person.setId(-1L);
+		personFunctionalityEntity.setPerson(person);
+		personFunctionalityEntity.setFunctionality(FUNCTIONALITY_ONE);
+		personFuncList.add(personFunctionalityEntity);
+		SchoolDTO newSchool = new SchoolDTO(-3, SHORT_TESTSCHOOL, testschool, 1, 2, "1", "", personFuncList, criterias,
+				DEFAULT_PROJECT_LIST, PRIMARY_PROJECT, "", null, SCHOOL_TYPE, testschool, testschool, testschool,
+				testschool);
+		ResponseEntity<SchoolDTO> responseEntity = cut.alterSchool(newSchool);
+		List<Criteria> allCriterias = criteriaRepo.findAll();
+		List<School> allSchools = schoolRepo.findAll();
+		assertTrue(allCriterias.stream().anyMatch(e -> e.getCriteriaName().equals(testcriteria)));
+		Stream<School> schoolInDB = findMatchingSchool(testschool, allSchools);
+		assertEquals(1, schoolInDB.count());
+		schoolInDB = findMatchingSchool(testschool, allSchools);
+		School schoolObject = schoolInDB.findFirst().get();
+		assertEquals(-1L, schoolObject.getPersonSchoolMapping().get(0).getPerson().getId().longValue());
+		assertEquals(FUNCTIONALITY_ONE.getId(),
+				schoolObject.getPersonSchoolMapping().get(0).getFunctionality().getId());
+		assertEquals(testschool, schoolObject.getSchoolName());
+		assertEquals(3.333, schoolObject.getLatitude().doubleValue(), 0.000001);
+		assertEquals(4.444, schoolObject.getLongitude().doubleValue(), 0.000001);
+		assertEquals("1", new String(schoolObject.getSchoolPicture()));
+		assertEquals(SHORT_TESTSCHOOL, schoolObject.getShortSchoolName());
+	}
 
-    @Test
-    @Transactional
-    void testAlterSchoolNotNullExistingPersonNotEmptyFunctionalityNotNullCriterias() {
-	List<PersonFunctionalityDTO> personFuncList = new ArrayList<>();
-	List<Criteria> criterias = new ArrayList<>();
-	String testcriteria = "test5";
-	criterias.add(new Criteria(testcriteria));
-	String testschool = TESTSCHOOL5;
-	PersonFunctionalityDTO personFunctionalityEntity = new PersonFunctionalityDTO();
-	Person person = new Person();
-	person.setId(-2L);
-	personFunctionalityEntity.setPerson(person);
-	personFunctionalityEntity.setFunctionality(FUNCTIONALITY_ONE);
-	personFuncList.add(personFunctionalityEntity);
-	SchoolDTO newSchool = new SchoolDTO(-3, SHORT_TESTSCHOOL, testschool, 1, 2, "1", "", personFuncList, criterias,
-		DEFAULT_PROJECT_LIST, PRIMARY_PROJECT, "", null, null, testschool, testschool, testschool, testschool);
-	ResponseEntity<SchoolDTO> responseEntity = cut.alterSchool(newSchool);
-	List<Criteria> allCriterias = criteriaRepo.findAll();
-	List<School> allSchools = schoolRepo.findAll();
-	assertTrue(allCriterias.stream().anyMatch(e -> e.getCriteriaName().equals(testcriteria)));
-	Stream<School> schoolInDB = findMatchingSchool(testschool, allSchools);
-	assertEquals(1, schoolInDB.count());
-	schoolInDB = findMatchingSchool(testschool, allSchools);
-	School schoolObject = schoolInDB.findFirst().get();
-	assertEquals(-2L, schoolObject.getPersonSchoolMapping().get(0).getPerson().getId().longValue());
-	assertEquals(FUNCTIONALITY_ONE.getId(),
-		schoolObject.getPersonSchoolMapping().get(0).getFunctionality().getId());
-	assertEquals(testschool, schoolObject.getSchoolName());
-	assertEquals(3.333, schoolObject.getLatitude().doubleValue(), 0.000001);
-	assertEquals(4.444, schoolObject.getLongitude().doubleValue(), 0.000001);
-	assertEquals("1", new String(schoolObject.getSchoolPicture()));
-	assertEquals(SHORT_TESTSCHOOL, schoolObject.getShortSchoolName());
+	@Test
+	@Transactional
+	void testAlterSchoolNotNullExistingPersonNotEmptyFunctionalityNotNullCriterias() {
+		List<PersonFunctionalityDTO> personFuncList = new ArrayList<>();
+		List<Criteria> criterias = new ArrayList<>();
+		String testcriteria = "test5";
+		criterias.add(new Criteria(testcriteria));
+		String testschool = TESTSCHOOL5;
+		PersonFunctionalityDTO personFunctionalityEntity = new PersonFunctionalityDTO();
+		Person person = new Person();
+		person.setId(-2L);
+		personFunctionalityEntity.setPerson(person);
+		personFunctionalityEntity.setFunctionality(FUNCTIONALITY_ONE);
+		personFuncList.add(personFunctionalityEntity);
+		SchoolDTO newSchool = new SchoolDTO(-3, SHORT_TESTSCHOOL, testschool, 1, 2, "1", "", personFuncList, criterias,
+				DEFAULT_PROJECT_LIST, PRIMARY_PROJECT, "", null, SCHOOL_TYPE, testschool, testschool, testschool,
+				testschool);
+		ResponseEntity<SchoolDTO> responseEntity = cut.alterSchool(newSchool);
+		List<Criteria> allCriterias = criteriaRepo.findAll();
+		List<School> allSchools = schoolRepo.findAll();
+		assertTrue(allCriterias.stream().anyMatch(e -> e.getCriteriaName().equals(testcriteria)));
+		Stream<School> schoolInDB = findMatchingSchool(testschool, allSchools);
+		assertEquals(1, schoolInDB.count());
+		schoolInDB = findMatchingSchool(testschool, allSchools);
+		School schoolObject = schoolInDB.findFirst().get();
+		assertEquals(-2L, schoolObject.getPersonSchoolMapping().get(0).getPerson().getId().longValue());
+		assertEquals(FUNCTIONALITY_ONE.getId(),
+				schoolObject.getPersonSchoolMapping().get(0).getFunctionality().getId());
+		assertEquals(testschool, schoolObject.getSchoolName());
+		assertEquals(3.333, schoolObject.getLatitude().doubleValue(), 0.000001);
+		assertEquals(4.444, schoolObject.getLongitude().doubleValue(), 0.000001);
+		assertEquals("1", new String(schoolObject.getSchoolPicture()));
+		assertEquals(SHORT_TESTSCHOOL, schoolObject.getShortSchoolName());
 
-    }
+	}
 
-    @Test
-    void testAddNewSchoolNotNullExistingPersonEmptyFunctionalityNotNullCriterias() {
-	List<PersonFunctionalityDTO> personFuncList = new ArrayList<>();
-	List<Criteria> criterias = new ArrayList<>();
-	String testcriteria = "test5";
-	criterias.add(new Criteria(testcriteria));
-	String testschool = TESTSCHOOL5;
-	PersonFunctionalityDTO personFunctionalityEntity = new PersonFunctionalityDTO();
-	Person person = new Person();
-	person.setId(-1L);
-	personFunctionalityEntity.setPerson(person);
-	personFuncList.add(personFunctionalityEntity);
-	SchoolDTO newSchool = new SchoolDTO(SCHOOL_MOCK_ID, SHORT_TESTSCHOOL, testschool, 21, 12, "", "",
-		personFuncList, criterias, DEFAULT_PROJECT_LIST, PRIMARY_PROJECT, "", null, null, null, null, null,
-		null);
-	assertThrows(BadArgumentsException.class, () -> {
-	    cut.addNewSchool(newSchool);
-	});
-	List<Criteria> allCriterias = criteriaRepo.findAll();
-	List<School> allSchools = schoolRepo.findAll();
-	assertFalse(allCriterias.stream().anyMatch(e -> e.getCriteriaName().equals(testcriteria)));
-	assertFalse(allSchools.stream().anyMatch(e -> e.getSchoolName().equals(testschool)));
+	@Test
+	void testAddNewSchoolNotNullExistingPersonEmptyFunctionalityNotNullCriterias() {
+		List<PersonFunctionalityDTO> personFuncList = new ArrayList<>();
+		List<Criteria> criterias = new ArrayList<>();
+		String testcriteria = "test5";
+		criterias.add(new Criteria(testcriteria));
+		String testschool = TESTSCHOOL5;
+		PersonFunctionalityDTO personFunctionalityEntity = new PersonFunctionalityDTO();
+		Person person = new Person();
+		person.setId(-1L);
+		personFunctionalityEntity.setPerson(person);
+		personFuncList.add(personFunctionalityEntity);
+		SchoolDTO newSchool = new SchoolDTO(SCHOOL_MOCK_ID, SHORT_TESTSCHOOL, testschool, 21, 12, "", "",
+				personFuncList, criterias, DEFAULT_PROJECT_LIST, PRIMARY_PROJECT, "", null, null, null, null, null,
+				null);
+		assertThrows(BadArgumentsException.class, () -> {
+			cut.addNewSchool(newSchool);
+		});
+		List<Criteria> allCriterias = criteriaRepo.findAll();
+		List<School> allSchools = schoolRepo.findAll();
+		assertFalse(allCriterias.stream().anyMatch(e -> e.getCriteriaName().equals(testcriteria)));
+		assertFalse(allSchools.stream().anyMatch(e -> e.getSchoolName().equals(testschool)));
 
-    }
+	}
 
-    @Test
-    void testAlterSchoolNotNullExistingPersonEmptyFunctionalityNotNullCriterias() {
-	List<PersonFunctionalityDTO> personFuncList = new ArrayList<>();
-	List<Criteria> criterias = new ArrayList<>();
-	String testcriteria = "test5";
-	criterias.add(new Criteria(testcriteria));
-	String testschool = TESTSCHOOL5;
-	PersonFunctionalityDTO personFunctionalityEntity = new PersonFunctionalityDTO();
-	Person person = new Person();
-	person.setId(-1L);
-	personFunctionalityEntity.setPerson(person);
-	personFuncList.add(personFunctionalityEntity);
-	SchoolDTO newSchool = new SchoolDTO(-3, SHORT_TESTSCHOOL, testschool, 1, 2, "1", "", personFuncList, criterias,
-		DEFAULT_PROJECT_LIST, PRIMARY_PROJECT, "", null, null, testschool, testschool, testschool, testschool);
-	assertThrows(BadArgumentsException.class, () -> {
-	    cut.alterSchool(newSchool);
-	});
-	List<Criteria> allCriterias = criteriaRepo.findAll();
-	List<School> allSchools = schoolRepo.findAll();
-	assertFalse(allCriterias.stream().anyMatch(e -> e.getCriteriaName().equals(testcriteria)));
-	assertFalse(allSchools.stream().anyMatch(e -> e.getSchoolName().equals(testschool)));
-    }
+	@Test
+	void testAlterSchoolNotNullExistingPersonEmptyFunctionalityNotNullCriterias() {
+		List<PersonFunctionalityDTO> personFuncList = new ArrayList<>();
+		List<Criteria> criterias = new ArrayList<>();
+		String testcriteria = "test5";
+		criterias.add(new Criteria(testcriteria));
+		String testschool = TESTSCHOOL5;
+		PersonFunctionalityDTO personFunctionalityEntity = new PersonFunctionalityDTO();
+		Person person = new Person();
+		person.setId(-1L);
+		personFunctionalityEntity.setPerson(person);
+		personFuncList.add(personFunctionalityEntity);
+		SchoolDTO newSchool = new SchoolDTO(-3, SHORT_TESTSCHOOL, testschool, 1, 2, "1", "", personFuncList, criterias,
+				DEFAULT_PROJECT_LIST, PRIMARY_PROJECT, "", null, null, testschool, testschool, testschool, testschool);
+		assertThrows(BadArgumentsException.class, () -> {
+			cut.alterSchool(newSchool);
+		});
+		List<Criteria> allCriterias = criteriaRepo.findAll();
+		List<School> allSchools = schoolRepo.findAll();
+		assertFalse(allCriterias.stream().anyMatch(e -> e.getCriteriaName().equals(testcriteria)));
+		assertFalse(allSchools.stream().anyMatch(e -> e.getSchoolName().equals(testschool)));
+	}
 
-    private Stream<School> findMatchingSchool(String testschool, List<School> allSchools) {
-	return allSchools.stream().filter(e -> (e.getSchoolName().equals(testschool)));
-    }
+	private Stream<School> findMatchingSchool(String testschool, List<School> allSchools) {
+		return allSchools.stream().filter(e -> (e.getSchoolName().equals(testschool)));
+	}
 
-    private void assertFirstSchool(SchoolDTO school) {
-	assertEquals(TESTSCHOOL, school.getSchoolName());
-	assertEquals(SHORT_TESTSCHOOL, school.getShortSchoolName());
-	assertEquals(1.111, school.getLatitude(), 0.001);
-	assertEquals(2.222, school.getLongitude(), 0.001);
-	assertEquals("image1", school.getSchoolPicture());
-	assertEquals("text1", school.getAlternativePictureText());
-	assertEquals(-1, school.getPrimaryProject().getId());
-    }
+	private void assertFirstSchool(SchoolDTO school) {
+		assertEquals(TESTSCHOOL, school.getSchoolName());
+		assertEquals(SHORT_TESTSCHOOL, school.getShortSchoolName());
+		assertEquals(1.111, school.getLatitude(), 0.001);
+		assertEquals(2.222, school.getLongitude(), 0.001);
+		assertEquals("image1", school.getSchoolPicture());
+		assertEquals("text1", school.getAlternativePictureText());
+		assertEquals(-1, school.getPrimaryProject().getId());
+	}
 
-    private void assertSchoolEquals(SchoolDTO school, SchoolDTO postbody) {
-	assertEquals(postbody.getSchoolName(), school.getSchoolName());
-	assertEquals(postbody.getShortSchoolName(), school.getShortSchoolName());
-	assertEquals(postbody.getLatitude(), school.getLatitude(), 0.001);
-	assertEquals(postbody.getLongitude(), school.getLongitude(), 0.001);
-	assertEquals(postbody.getSchoolPicture(), school.getSchoolPicture());
-	assertEquals(postbody.getAlternativePictureText(), school.getAlternativePictureText());
-    }
+	private void assertSchoolEquals(SchoolDTO school, SchoolDTO postbody) {
+		assertEquals(postbody.getSchoolName(), school.getSchoolName());
+		assertEquals(postbody.getShortSchoolName(), school.getShortSchoolName());
+		assertEquals(postbody.getLatitude(), school.getLatitude(), 0.001);
+		assertEquals(postbody.getLongitude(), school.getLongitude(), 0.001);
+		assertEquals(postbody.getSchoolPicture(), school.getSchoolPicture());
+		assertEquals(postbody.getAlternativePictureText(), school.getAlternativePictureText());
+	}
 
-    private void assertSecondSchool(SchoolDTO school) {
-	assertEquals("testschool2", school.getSchoolName());
-	assertEquals("shortTestschool2", school.getShortSchoolName());
-	assertEquals(2.222, school.getLatitude(), 0.001);
-	assertEquals(1.111, school.getLongitude(), 0.001);
-	assertEquals("text2", school.getAlternativePictureText());
-	assertEquals("image2", school.getSchoolPicture());
-	assertEquals(-1, school.getPrimaryProject().getId());
+	private void assertSecondSchool(SchoolDTO school) {
+		assertEquals("testschool2", school.getSchoolName());
+		assertEquals("shortTestschool2", school.getShortSchoolName());
+		assertEquals(2.222, school.getLatitude(), 0.001);
+		assertEquals(1.111, school.getLongitude(), 0.001);
+		assertEquals("text2", school.getAlternativePictureText());
+		assertEquals("image2", school.getSchoolPicture());
+		assertEquals(-1, school.getPrimaryProject().getId());
 
-    }
+	}
 
-    private void assertThirdSchool(SchoolDTO school) {
-	assertEquals("testschool3", school.getSchoolName());
-	assertEquals("shortTestschool3", school.getShortSchoolName());
-	assertEquals(3.333, school.getLatitude(), 0.001);
-	assertEquals(4.444, school.getLongitude(), 0.001);
-	assertEquals("image3", school.getSchoolPicture());
-	assertEquals("text3", school.getAlternativePictureText());
-	assertEquals(-2, school.getPrimaryProject().getId());
+	private void assertThirdSchool(SchoolDTO school) {
+		assertEquals("testschool3", school.getSchoolName());
+		assertEquals("shortTestschool3", school.getShortSchoolName());
+		assertEquals(3.333, school.getLatitude(), 0.001);
+		assertEquals(4.444, school.getLongitude(), 0.001);
+		assertEquals("image3", school.getSchoolPicture());
+		assertEquals("text3", school.getAlternativePictureText());
+		assertEquals(-2, school.getPrimaryProject().getId());
 
-    }
+	}
 }

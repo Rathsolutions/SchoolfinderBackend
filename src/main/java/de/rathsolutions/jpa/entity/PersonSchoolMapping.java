@@ -21,17 +21,21 @@
  */
 package de.rathsolutions.jpa.entity;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.ManyToOne;
-
+import org.hibernate.annotations.Parameter;
 import org.hibernate.annotations.Type;
+import org.hibernate.usertype.UserTypeLegacyBridge;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import de.rathsolutions.controller.postbody.PersonFunctionalityDTO;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.Lob;
+import jakarta.persistence.ManyToOne;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
@@ -50,34 +54,34 @@ public class PersonSchoolMapping {
 //    @EmbeddedId
 //    private PersonSchoolMappingKey id = new PersonSchoolMappingKey();
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long id;
 
-    @NonNull
-    @ManyToOne
-    private Person person;
-    @NonNull
-    @ManyToOne
-    @JsonIgnore
-    private School school;
-    @NonNull
-    @ManyToOne
-    private Functionality functionality;
+	@NonNull
+	@ManyToOne
+	private Person person;
+	@NonNull
+	@ManyToOne
+	@JsonIgnore
+	private School school;
+	@NonNull
+	@ManyToOne()
+	private Functionality functionality;
 
-    @Type(type = "text")
-    private String description;
+	@Type(value = UserTypeLegacyBridge.class, parameters = @Parameter(name = UserTypeLegacyBridge.TYPE_NAME_PARAM_KEY, value = "text"))
+	private String description;
 
-    private String institutionalFunctionality;
+	private String institutionalFunctionality;
 
-    public PersonFunctionalityDTO convertToDTO() {
-	PersonFunctionalityDTO personFunctionalityDTO = new PersonFunctionalityDTO();
-	personFunctionalityDTO.setFunctionality(this.functionality);
-	personFunctionalityDTO.setMappingId(this.id);
-	personFunctionalityDTO.setPerson(this.person);
-	personFunctionalityDTO.setDescription(this.description);
-	personFunctionalityDTO.setInstitutionalFunctionality(institutionalFunctionality);
-	return personFunctionalityDTO;
-    }
+	public PersonFunctionalityDTO convertToDTO() {
+		PersonFunctionalityDTO personFunctionalityDTO = new PersonFunctionalityDTO();
+		personFunctionalityDTO.setFunctionality(this.functionality);
+		personFunctionalityDTO.setMappingId(this.id);
+		personFunctionalityDTO.setPerson(this.person);
+		personFunctionalityDTO.setDescription(this.description);
+		personFunctionalityDTO.setInstitutionalFunctionality(institutionalFunctionality);
+		return personFunctionalityDTO;
+	}
 
 }

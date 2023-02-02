@@ -31,23 +31,23 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class SchoolDAOService {
 
-    public List<String> getGeneralSearchableInformation(School entity) {
-	List<String> toReturn = new ArrayList<>();
-	toReturn.add(entity.getAddress());
-	toReturn.add(entity.getHomepage());
-	toReturn.add(entity.getGeneralEmail());
-	toReturn.add(entity.getGeneralPhoneNumber());
-	toReturn.add(entity.getSchoolName());
-	toReturn.add(entity.getShortSchoolName());
-	toReturn.removeIf(e -> e == null || e.isEmpty() || e.isBlank());
-	return toReturn;
-    }
+	public List<String> getGeneralSearchableInformation(School entity) {
+		List<String> toReturn = new ArrayList<>();
+		toReturn.add(entity.getAddress());
+		toReturn.add(entity.getHomepage());
+		toReturn.add(entity.getGeneralEmail());
+		toReturn.add(entity.getGeneralPhoneNumber());
+		toReturn.add(entity.getSchoolName());
+		toReturn.add(entity.getShortSchoolName());
+		toReturn.removeIf(e -> e == null || e.isEmpty() || e.isBlank());
+		return toReturn;
+	}
 
-    @Transactional
-    public List<String> getAdditionalSearchableInformation(School entity) {
-	List<String> toReturn = entity.getAdditionalInformation().stream().map(e -> e.getValue())
-		.collect(Collectors.toList());
-	toReturn.removeIf(e -> e == null || e.isEmpty() || e.isBlank());
-	return toReturn;
-    }
+	@Transactional
+	public List<String> getAdditionalSearchableInformation(School entity) {
+		List<String> toReturn = entity.getAdditionalInformation().stream().map(e -> e.getValue())
+				.collect(Collectors.toList());
+		toReturn.removeIf(e -> e == null || e.isEmpty() || e.isBlank());
+		return toReturn;
+	}
 }

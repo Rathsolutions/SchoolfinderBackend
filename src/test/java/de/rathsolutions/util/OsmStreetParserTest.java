@@ -36,13 +36,13 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ContextConfiguration;
+import org.webjars.NotFoundException;
 import org.xml.sax.SAXException;
 
 import de.rathsolutions.SpringBootMain;
 import de.rathsolutions.util.finder.pojo.FinderEntity;
 import de.rathsolutions.util.finder.pojo.StreetCitySearchEntity;
 import de.rathsolutions.util.finder.specific.osm.OsmStreetParser;
-import javassist.NotFoundException;
 import lombok.extern.slf4j.Slf4j;
 
 @SpringBootTest
@@ -50,26 +50,26 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 class OsmStreetParserTest {
 
-    @Autowired
-    private OsmStreetParser cut;
+	@Autowired
+	private OsmStreetParser cut;
 
-    @Test
-    void testCityStreetSearch() throws OperationNotSupportedException, ParserConfigurationException, SAXException,
-	    IOException, NotFoundException, TransformerException, InterruptedException, ExecutionException {
-	List<FinderEntity> findStreetGeocodes = cut.find(new StreetCitySearchEntity("Rastatt", "Engelstraße", "21"), 1);
-	findStreetGeocodes.stream().forEach(e -> {
-	    assertEquals(48.859834600000006, e.getLatVal());
-	    assertEquals(8.201058, e.getLongVal());
-	    System.out.println(e.getPrimaryValue());
-	    System.out.println(e.getSecondaryValue());
-	});
-    }
+	@Test
+	void testCityStreetSearch() throws OperationNotSupportedException, ParserConfigurationException, SAXException,
+			IOException, NotFoundException, TransformerException, InterruptedException, ExecutionException {
+		List<FinderEntity> findStreetGeocodes = cut.find(new StreetCitySearchEntity("Rastatt", "Engelstraße", "21"), 1);
+		findStreetGeocodes.stream().forEach(e -> {
+			assertEquals(48.859834600000006, e.getLatVal(), 0.0000001);
+			assertEquals(8.201058, e.getLongVal(), 0.0000001);
+			System.out.println(e.getPrimaryValue());
+			System.out.println(e.getSecondaryValue());
+		});
+	}
 
-    // Use this test to create the requried heap file for the city street search
-//    @Disabled
-    @Test
-    void writeHeapFile() {
-	cut.createStreetObjectsHeapFile();
-    }
+	// Use this test to create the requried heap file for the city street search
+	@Disabled
+	@Test
+	void writeHeapFile() {
+		cut.createStreetObjectsHeapFile();
+	}
 
 }

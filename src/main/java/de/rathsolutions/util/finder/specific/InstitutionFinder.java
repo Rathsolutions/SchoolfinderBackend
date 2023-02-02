@@ -36,13 +36,13 @@ import javax.xml.transform.TransformerException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.webjars.NotFoundException;
 import org.xml.sax.SAXException;
 
 import de.rathsolutions.util.finder.generic.LevenstheinDistanceUtil;
 import de.rathsolutions.util.finder.pojo.AbstractSearchEntity;
 import de.rathsolutions.util.finder.pojo.FinderEntity;
 import de.rathsolutions.util.structure.internalFinder.InstitutionAttributeFinderEntries;
-import javassist.NotFoundException;
 
 @Service
 public class InstitutionFinder implements FinderService {

@@ -26,34 +26,66 @@ import java.util.Collections;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 @Configuration
 @EnableWebSecurity
-public class SecurityConfig extends WebSecurityConfigurerAdapter {
+public class SecurityConfig {
 
-    private static final String CSRF_TOKEN = "X-XSRF-TOKEN";
+	private static final String CSRF_TOKEN = "X-XSRF-TOKEN";
 
-    private final UserDetailsService userDetailsService;
-    private final PasswordEncoder passwordEncoder;
+	private final UserDetailsService userDetailsService;
+	private final PasswordEncoder passwordEncoder;
 
-    public SecurityConfig(UserDetailsService userDetailsService, PasswordEncoder passwordEncoder) {
-	this.userDetailsService = userDetailsService;
-	this.passwordEncoder = passwordEncoder;
-    }
+	public SecurityConfig(UserDetailsService userDetailsService, PasswordEncoder passwordEncoder) {
+		this.userDetailsService = userDetailsService;
+		this.passwordEncoder = passwordEncoder;
+	}
 
-    @Override
-    public void configure(AuthenticationManagerBuilder auth) throws Exception {
-	auth.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder);
-    }
+	@Bean
+	SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+		//@formatter:off
+		http.authorizeHttpRequests(req->req.requestMatchers(
+				"/api/v1/finder/search/**", 
+				"/api/v1/schools/search/**", 
+				"/api/v1/schools",
+				"/api/v1/criterias/search/getAllAvailableCriterias/**", 
+				"/api/v1/*/search/findAll",
+				"/api/v1/schoolType/search/**", 
+				"/api/v1/project/*")
+				.permitAll()
+				.requestMatchers("/actuator/**")
+					.authenticated()
+				.requestMatchers("/**")
+					.authenticated())
+				.httpBasic()
+				.and()
+				.csrf()
+					.disable()
+				.cors()
+				.and()
+					.authenticationProvider(this.authenticationProvider());
+		http.headers().frameOptions().sameOrigin();
+		//@formatter:off
+		return http.build();
+	}
+    
+	@Bean
+	AuthenticationProvider authenticationProvider() {
+		DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider();
+		authenticationProvider.setUserDetailsService(this.userDetailsService);
+		authenticationProvider.setPasswordEncoder(this.passwordEncoder);
+		return authenticationProvider;
+	}
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
@@ -69,16 +101,5 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 	return source;
     }
 
-    @Override
-    protected void configure(HttpSecurity http) throws Exception {
-	http.authorizeRequests()
-		.antMatchers("/api/v1/finder/search/**", "/api/v1/schools/search/**", "/api/v1/schools",
-			"/api/v1/criterias/search/getAllAvailableCriterias/**", "/api/v1/*/search/findAll",
-			"/api/v1/schoolType/search/**", "/api/v1/project/*")
-		.permitAll().antMatchers("/actuator/**").authenticated().antMatchers("/**").authenticated().and()
-		.httpBasic().and().csrf().disable().cors();
-	http.headers().frameOptions().sameOrigin();
-
-    }
 
 }
