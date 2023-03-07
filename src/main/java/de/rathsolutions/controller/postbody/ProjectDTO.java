@@ -41,4 +41,10 @@ public class ProjectDTO {
     private String icon;
 
     private Double scaling = 0.03;
+    
+    public ProjectDTO convertToShrinkedDto() {
+    	ProjectDTO dto = new ProjectDTO(id, name, icon, scaling);
+    	dto.icon = "";
+    	return dto;
+    }
 }

@@ -22,7 +22,7 @@
 	</licenses>
 	<inceptionYear>2020</inceptionYear>
 	<properties>
-		<java.version>11</java.version>
+		<java.version>17</java.version>
 	</properties>
 	<dependencies>
 		<dependency>

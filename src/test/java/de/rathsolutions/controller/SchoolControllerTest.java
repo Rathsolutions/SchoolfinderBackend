@@ -119,7 +119,7 @@ public class SchoolControllerTest {
 		SCHOOL_TYPE.setSchoolTypeValue(SchoolTypeValue.GYMNASIUM.getValue());
 
 	}
-
+	
 	@Test
 	void testFindNotRegisteredSchoolsByNameAdminWithValidName()
 			throws ParserConfigurationException, SAXException, IOException, NotFoundException, TransformerException,

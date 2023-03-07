@@ -214,7 +214,7 @@ public class SchoolController {
 
 	@Operation(summary = "searches all school resources within latlong boundaries")
 	@GetMapping("/search/findAllSchoolsInBoundsHavingCriteriasAndProject")
-	@Transactional
+	@Transactional(readOnly = true)
 	public ResponseEntity<List<SchoolDTO>> findAllSchoolsInBoundsHavingCriteriasAndProject(String leftLatBound,
 			String rightLatBound, String topLongBound, String bottomLongBound,
 			@RequestParam(value = "projectId", required = false) Long projectId,
@@ -224,11 +224,49 @@ public class SchoolController {
 		List<School> matchingSchools = this.findAllSchoolsByInBoundsInternal(leftLatBound, rightLatBound, topLongBound,
 				bottomLongBound, criteriaNumbers, schoolTypeIds, exclusiveSearch);
 		if (projectId == null) {
-			return ResponseEntity.ok(matchingSchools.stream().map(e -> e.convertToDTO()).collect(Collectors.toList()));
+			return ResponseEntity
+					.ok(matchingSchools.stream().map(e -> e.convertToShrinkedDTO()).collect(Collectors.toList()));
 		}
 		return ResponseEntity.ok(matchingSchools.stream()
 				.filter(e -> e.getProjects().stream().anyMatch(f -> f.getId() == projectId.longValue()))
-				.map(e -> e.convertToDTO()).collect(Collectors.toList()));
+				.map(e -> e.convertToShrinkedDTO()).collect(Collectors.toList()));
+	}
+
+	/**
+	 * This method acts as a wrapper for the parent method which resolves all
+	 * schools for the angular frontend. To reduce the transfered data amount, the
+	 * project icons are removed as they should only be fetched once and added by
+	 * the frontend
+	 * 
+	 * @param leftLatBound
+	 * @param rightLatBound
+	 * @param topLongBound
+	 * @param bottomLongBound
+	 * @param projectId
+	 * @param criteriaNumbers
+	 * @param schoolTypeIds
+	 * @param exclusiveSearch
+	 * @return
+	 */
+	@Operation(summary = "searches all school resources within latlong boundaries")
+	@GetMapping("/search/findAllSchoolsInBoundsHavingCriteriasAndProjectWithoutProjectIconInResponse")
+	@Transactional(readOnly = true)
+	public ResponseEntity<List<SchoolDTO>> findAllSchoolsInBoundsHavingCriteriasAndProjectWithoutProjectIconInResponse(
+			String leftLatBound, String rightLatBound, String topLongBound, String bottomLongBound,
+			@RequestParam(value = "projectId", required = false) Long projectId,
+			@RequestParam(value = "criteriaNumbers", required = false) List<Long> criteriaNumbers,
+			@RequestParam(value = "schoolTypeIds", required = false) List<Integer> schoolTypeIds,
+			@RequestParam(value = "exclusiveSearch", required = false, defaultValue = "false") boolean exclusiveSearch) {
+		ResponseEntity<List<SchoolDTO>> findAllSchoolsInBoundsHavingCriteriasAndProject = findAllSchoolsInBoundsHavingCriteriasAndProject(
+				leftLatBound, rightLatBound, topLongBound, bottomLongBound, projectId, criteriaNumbers, schoolTypeIds,
+				exclusiveSearch);
+		List<SchoolDTO> schoolDtoBody = findAllSchoolsInBoundsHavingCriteriasAndProject.getBody();
+		schoolDtoBody.forEach(e -> {
+			e.setPrimaryProject(e.getPrimaryProject().convertToShrinkedDto());
+			e.setProjects(e.getProjects().stream().map(project -> project.convertToShrinkedDto())
+					.collect(Collectors.toList()));
+		});
+		return findAllSchoolsInBoundsHavingCriteriasAndProject;
 	}
 
 	@Operation(summary = "searches a school resource by id with all details")

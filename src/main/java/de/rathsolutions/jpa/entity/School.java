@@ -140,5 +140,11 @@ public class School {
 		}
 		return dto;
 	}
+	
+	public SchoolDTO convertToShrinkedDTO() {
+		SchoolDTO fullDto = this.convertToDTO();
+		fullDto.setSchoolPicture(null);
+		return fullDto;
+	}
 
 }

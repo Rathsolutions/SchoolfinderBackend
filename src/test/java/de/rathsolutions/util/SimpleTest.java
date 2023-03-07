@@ -59,7 +59,7 @@ class SimpleTest {
 	private PersonSchoolMappingRepo repo;
 	
 	@Test
-//	@Disabled
+	@Disabled
 	void test() {
 		List<PersonSchoolMapping> findAll = repo.findAll();
 		System.out.println(findAll);

@@ -33,6 +33,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -67,11 +68,12 @@ public class SecurityConfig {
 					.authenticated()
 				.requestMatchers("/**")
 					.authenticated())
-				.httpBasic()
+					.httpBasic()
 				.and()
-				.csrf()
-					.disable()
-				.cors()
+//				.csrf()
+//					.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+//				.and()
+					.cors()
 				.and()
 					.authenticationProvider(this.authenticationProvider());
 		http.headers().frameOptions().sameOrigin();
@@ -91,7 +93,7 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
 	final CorsConfiguration configuration = new CorsConfiguration();
 	configuration.setAllowedOrigins(
-		Arrays.asList("https://schoolfindernew.rathsolutions.de", "http://localhost:4200"));
+		Arrays.asList("https://schoolfindernew.rathsolutions.de", "http://localhost:4200", "https://schoolfinder.rathsolutions.de"));
 	configuration.setAllowedHeaders(Collections.singletonList("*"));
 	configuration.addExposedHeader("Authorization");
 	configuration.setAllowCredentials(true);
