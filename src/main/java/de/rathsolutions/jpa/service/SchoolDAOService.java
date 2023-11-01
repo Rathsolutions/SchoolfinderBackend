@@ -39,6 +39,9 @@ public class SchoolDAOService {
 		toReturn.add(entity.getGeneralPhoneNumber());
 		toReturn.add(entity.getSchoolName());
 		toReturn.add(entity.getShortSchoolName());
+		entity.getMatchingCriterias().forEach(e -> {
+			toReturn.add(e.getCriteriaName());
+		});
 		toReturn.removeIf(e -> e == null || e.isEmpty() || e.isBlank());
 		return toReturn;
 	}

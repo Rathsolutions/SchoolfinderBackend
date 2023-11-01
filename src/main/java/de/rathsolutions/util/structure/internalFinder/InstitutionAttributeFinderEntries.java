@@ -21,6 +21,7 @@
  */
 package de.rathsolutions.util.structure.internalFinder;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -35,51 +36,68 @@ import de.rathsolutions.jpa.service.SchoolDAOService;
 import de.rathsolutions.util.finder.pojo.FinderEntity;
 import de.rathsolutions.util.finder.pojo.FinderEntitySearchConstraint;
 import de.rathsolutions.util.structure.AbstractEntries;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
 @Scope("singleton")
+@Slf4j
 public class InstitutionAttributeFinderEntries extends AbstractEntries {
 
-    private static final long serialVersionUID = 8979518050945610433L;
+	private static final long serialVersionUID = 8979518050945610433L;
 
-    @Autowired
-    private SchoolRepo schoolRepo;
+	@Autowired
+	private SchoolRepo schoolRepo;
 
-    @Autowired
-    private SchoolDAOService schoolDaoService;
+	@Autowired
+	private SchoolDAOService schoolDaoService;
 
-    /**
-     * Builds the internal entry list with all searchable information from
-     * institutions
-     */
-    public void buildEntryList() {
-	List<School> allEntities = schoolRepo.findAll();
+	/**
+	 * Builds the internal entry list with all searchable information from
+	 * institutions
+	 */
+	public void buildEntryList() {
+		log.info("Updating entry list");
+		List<School> allEntities = schoolRepo.findAll();
 
-	allEntities.stream().forEach(e -> {
-	    List<String> additionalSearchableInformation = schoolDaoService.getAdditionalSearchableInformation(e);
-	    additionalSearchableInformation.stream().map(f -> {
-		return new FinderEntity(e.getSchoolName(), f, Stream.of(f).map(g -> g.split(" "))
-			.map(g -> Stream.of(g).map(h -> new FinderEntitySearchConstraint(h, ""))
-				.collect(Collectors.toList()))
-			.flatMap(List::stream).collect(Collectors.toList()), e.getLongitude(), e.getLatitude());
-	    }).forEach(f -> this.add(f));
-	});
-    }
+		allEntities.stream().forEach(e -> {
+			List<String> additionalSearchableInformation = schoolDaoService.getAdditionalSearchableInformation(e);
+			additionalSearchableInformation.addAll(schoolDaoService.getGeneralSearchableInformation(e));
+			additionalSearchableInformation.stream().map(f -> {
+				return new FinderEntity(e.getSchoolName(), f, Stream.of(f).map(g -> {
+					String[] splitString = g.split(" ");
+					List<String> resultsFinal = new ArrayList<>();
+					for(String s : splitString) {
+						String[] splittedByDash = s.split("-");
+						for(String splittedDash : splittedByDash) {
+							resultsFinal.add(splittedDash);
+						}
+						resultsFinal.add(s);
+						
+					}
+					String[] toReturn = new String[resultsFinal.size()];
+					toReturn = resultsFinal.toArray(toReturn);
+					return toReturn;
+				}).map(g -> Stream.of(g).map(h -> new FinderEntitySearchConstraint(h, "")).collect(Collectors.toList()))
+						.flatMap(List::stream).collect(Collectors.toList()), e.getLongitude(), e.getLatitude());
+			}).forEach(f -> this.add(f));
+		});
 
-    @Override
-    public Stream<FinderEntity> stream() {
-	if (this.isEmpty()) {
-	    this.buildEntryList();
 	}
-	return super.stream();
-    }
 
-    @Override
-    public FinderEntity get(int index) {
-	if (this.isEmpty()) {
-	    this.buildEntryList();
+	@Override
+	public Stream<FinderEntity> stream() {
+		if (this.isEmpty()) {
+			this.buildEntryList();
+		}
+		return super.stream();
 	}
-	return super.get(index);
-    }
+
+	@Override
+	public FinderEntity get(int index) {
+		if (this.isEmpty()) {
+			this.buildEntryList();
+		}
+		return super.get(index);
+	}
 
 }

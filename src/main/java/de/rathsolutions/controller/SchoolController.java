@@ -77,6 +77,7 @@ import de.rathsolutions.util.exception.ResourceNotFoundException;
 import de.rathsolutions.util.finder.pojo.FinderEntity;
 import de.rathsolutions.util.finder.pojo.SchoolSearchEntity;
 import de.rathsolutions.util.finder.specific.osm.OsmPOISchoolParser;
+import de.rathsolutions.util.structure.internalFinder.InstitutionAttributeFinderEntries;
 import io.swagger.v3.oas.annotations.Operation;
 
 @RestController
@@ -117,6 +118,9 @@ public class SchoolController {
 
 	@Autowired
 	private SchoolTypeRepo schoolTypeRepo;
+	
+	@Autowired
+	private InstitutionAttributeFinderEntries finderEntries;
 
 	@Operation(summary = "searches non-registered school resources by their name in an osm document. This schools must not be registered within the application")
 	@GetMapping("/search/findNotRegisteredSchoolsByName")
@@ -163,7 +167,7 @@ public class SchoolController {
 	@Operation(summary = "searches all school resources ordered by their name")
 	@GetMapping("/search/findAllSchoolsOrderedByName")
 	public List<SchoolDTO> findAllSchoolsOrderByName() {
-		return schoolRepo.findAllByOrderBySchoolName().stream().map(e -> e.convertToDTO()).collect(Collectors.toList());
+		return schoolRepo.findAllByOrderBySchoolName().stream().map(e -> e.convertToShrinkedDTO()).collect(Collectors.toList());
 	}
 
 	private List<School> findAllSchoolsByInBoundsInternal(String leftLatBound, String rightLatBound,
@@ -302,7 +306,10 @@ public class SchoolController {
 		school.setLongitude(addNewSchoolPostbody.getLongitude());
 		fillSchoolPostbodyWithAllInformation(addNewSchoolPostbody, school, allFoundProjects,
 				allMatchingSchoolCriterias);
-		return ResponseEntity.ok(schoolRepo.save(school).convertToDTO());
+		School savedSchool = schoolRepo.save(school);
+		finderEntries.clear();
+		finderEntries.buildEntryList();
+		return ResponseEntity.ok(savedSchool.convertToDTO());
 	}
 
 	@Operation(summary = "alterates an already existing school resource")
@@ -325,7 +332,10 @@ public class SchoolController {
 				alterSchoolPostbody);
 		fillSchoolPostbodyWithAllInformation(alterSchoolPostbody, matchingSchool, allFoundProjects,
 				allMatchingSchoolCriterias);
-		return ResponseEntity.ok(schoolRepo.save(matchingSchool).convertToDTO());
+		School updatedSchool = schoolRepo.save(matchingSchool);
+		finderEntries.clear();
+		finderEntries.buildEntryList();
+		return ResponseEntity.ok(updatedSchool.convertToDTO());
 	}
 
 	private void fillSchoolPostbodyWithAllInformation(SchoolDTO schoolPostbody, School schoolEntity,
@@ -406,6 +416,8 @@ public class SchoolController {
 	@DeleteMapping("/delete/deleteSchool")
 	public ResponseEntity<SchoolDTO> deleteSchool(long schoolId) {
 		schoolRepo.deleteById(schoolId);
+		finderEntries.clear();
+		finderEntries.buildEntryList();
 		return ResponseEntity.ok().build();
 	}
 

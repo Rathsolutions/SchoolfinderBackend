@@ -52,55 +52,55 @@ import lombok.extern.slf4j.Slf4j;
 @RequestMapping("/api/v1/finder")
 @Slf4j
 public class SearchController {
-    @Autowired
-    private OsmPOICityOnlyParser osmCityParser;
+	@Autowired
+	private OsmPOICityOnlyParser osmCityParser;
 
-    @Autowired
-    private OsmStreetParser osmStreetParser;
+	@Autowired
+	private OsmStreetParser osmStreetParser;
 
-    @Autowired
-    private InstitutionFinder institutionFinder;
+	@Autowired
+	private InstitutionFinder institutionFinder;
 
-    @Operation(summary = "searches institutions by their content in database")
-    @GetMapping("/search/findGeneralInstitutionContentInDatabase")
-    public ResponseEntity<List<FinderEntity>> findGeneralInstitutionContentInDatabase(
-	    @RequestParam(defaultValue = "") String query, @RequestParam(defaultValue = "1") int amount) {
-	try {
-	    return ResponseEntity.ok(institutionFinder.find(new InstitutionSearchEntity(query), amount));
-	} catch (OperationNotSupportedException | ParserConfigurationException | SAXException | IOException
-		| NotFoundException | TransformerException | InterruptedException | ExecutionException e) {
-	    log.error(e.getMessage());
-	    return ResponseEntity.notFound().build();
+	@Operation(summary = "searches institutions by their content in database")
+	@GetMapping("/search/findGeneralInstitutionContentInDatabase")
+	public ResponseEntity<List<FinderEntity>> findGeneralInstitutionContentInDatabase(
+			@RequestParam(defaultValue = "") String query, @RequestParam(defaultValue = "1") int amount) {
+		try {
+			return ResponseEntity.ok(institutionFinder.find(new InstitutionSearchEntity(query), amount));
+		} catch (OperationNotSupportedException | ParserConfigurationException | SAXException | IOException
+				| NotFoundException | TransformerException | InterruptedException | ExecutionException e) {
+			log.error(e.getMessage());
+			return ResponseEntity.notFound().build();
+		}
 	}
-    }
 
-    @Operation(summary = "searches cities by their names")
-    @GetMapping("/search/findCityByName")
-    public ResponseEntity<List<FinderEntity>> findCityByName(@RequestParam(defaultValue = "") String name,
-	    @RequestParam(defaultValue = "1") int amount) {
-	try {
-	    List<FinderEntity> resultsByName = osmCityParser.find(new CitySearchEntity(name), amount);
-	    return ResponseEntity.ok().header("Copyright", "This list was generated using Open Street Maps Data")
-		    .body(resultsByName);
-	} catch (ParserConfigurationException | SAXException | IOException | NotFoundException | TransformerException
-		| InterruptedException | ExecutionException | OperationNotSupportedException e) {
-	    log.error(e.getMessage());
-	    return ResponseEntity.notFound().build();
+	@Operation(summary = "searches cities by their names")
+	@GetMapping("/search/findCityByName")
+	public ResponseEntity<List<FinderEntity>> findCityByName(@RequestParam(defaultValue = "") String name,
+			@RequestParam(defaultValue = "1") int amount) {
+		try {
+			List<FinderEntity> resultsByName = osmCityParser.find(new CitySearchEntity(name), amount);
+			return ResponseEntity.ok().header("Copyright", "This list was generated using Open Street Maps Data")
+					.body(resultsByName);
+		} catch (ParserConfigurationException | SAXException | IOException | NotFoundException | TransformerException
+				| InterruptedException | ExecutionException | OperationNotSupportedException e) {
+			log.error(e.getMessage());
+			return ResponseEntity.notFound().build();
+		}
 	}
-    }
 
-    @Operation(summary = "searches for streets in cities by their names")
-    @GetMapping("/search/findCityStreetPositionByName")
-    public ResponseEntity<List<FinderEntity>> findCityStreetPositionByName(@RequestParam(defaultValue = "") String city,
-	    @RequestParam(defaultValue = "") String street, @RequestParam(required = false) String housenumber,
-	    @RequestParam(defaultValue = "1") int amount) {
-	try {
-	    return ResponseEntity.ok().header("Copyright", "This list was generated using Open Street Maps Data")
-		    .body(osmStreetParser.find(new StreetCitySearchEntity(city, street, housenumber), amount));
-	} catch (OperationNotSupportedException | ParserConfigurationException | SAXException | IOException
-		| NotFoundException | TransformerException | InterruptedException | ExecutionException e) {
-	    log.error(e.getMessage());
-	    return ResponseEntity.notFound().build();
+	@Operation(summary = "searches for streets in cities by their names")
+	@GetMapping("/search/findCityStreetPositionByName")
+	public ResponseEntity<List<FinderEntity>> findCityStreetPositionByName(@RequestParam(defaultValue = "") String city,
+			@RequestParam(defaultValue = "") String street, @RequestParam(required = false) String housenumber,
+			@RequestParam(defaultValue = "1") int amount) {
+		try {
+			return ResponseEntity.ok().header("Copyright", "This list was generated using Open Street Maps Data")
+					.body(osmStreetParser.find(new StreetCitySearchEntity(city, street, housenumber), amount));
+		} catch (OperationNotSupportedException | ParserConfigurationException | SAXException | IOException
+				| NotFoundException | TransformerException | InterruptedException | ExecutionException e) {
+			log.error(e.getMessage());
+			return ResponseEntity.notFound().build();
+		}
 	}
-    }
 }

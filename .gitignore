@@ -14,3 +14,4 @@ src/test/resources/filtered.xml
 src/test/resources/allSchools.xml
 src/main/resources/application.yml
 src/test/resources/streetObjects.smaps
+build-and-push-against-registry.sh

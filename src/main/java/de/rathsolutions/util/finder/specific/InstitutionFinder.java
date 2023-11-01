@@ -47,46 +47,46 @@ import de.rathsolutions.util.structure.internalFinder.InstitutionAttributeFinder
 @Service
 public class InstitutionFinder implements FinderService {
 
-    @Autowired
-    private InstitutionAttributeFinderEntries cachedEntries;
+	@Autowired
+	private InstitutionAttributeFinderEntries cachedEntries;
 
-    @Autowired
-    private LevenstheinDistanceUtil distanceUtil;
+	@Autowired
+	private LevenstheinDistanceUtil distanceUtil;
 
-    /**
-     * Idea: Use a Trie Data structure for every single word and match all the
-     * different words with levenstheins distance.
-     */
-    @Override
-    public List<FinderEntity> find(AbstractSearchEntity primaryValue, int amount)
-	    throws OperationNotSupportedException, ParserConfigurationException, SAXException, IOException,
-	    NotFoundException, TransformerException, InterruptedException, ExecutionException {
-	String queryValue = primaryValue.getName();
-	String[] splittedOnSpace = queryValue.split(" ");
-	if (splittedOnSpace.length == 1) {
-	    return distanceUtil.computeLevenstheinDistance(queryValue, cachedEntries, amount, false, false);
-	} else {
-	    Map<FinderEntity, Integer> cumulatedElements = new HashMap<>();
-	    for (int i = 0; i < splittedOnSpace.length; i++) {
-		List<FinderEntity> resultList = distanceUtil.computeLevenstheinDistance(splittedOnSpace[i],
-			cachedEntries, amount, false, false);
-		resultList.forEach(e -> {
-		    cumulatedElements.put(e, cumulatedElements.containsKey(e) ? cumulatedElements.get(e) + 1 : 1);
-		});
-	    }
-	    List<FinderEntity> resultList = cumulatedElements.entrySet().stream()
-		    .sorted((e, f) -> f.getValue().compareTo(e.getValue())).map(e -> e.getKey())
-		    .collect(Collectors.toList());
-	    Set<String> foundValue = new HashSet<>();
-	    resultList.removeIf(e -> {
-		if (!foundValue.contains(e.getPrimaryValue())) {
-		    foundValue.add(e.getPrimaryValue());
-		    return false;
+	/**
+	 * Idea: Use a Trie Data structure for every single word and match all the
+	 * different words with levenstheins distance.
+	 */
+	@Override
+	public List<FinderEntity> find(AbstractSearchEntity primaryValue, int amount)
+			throws OperationNotSupportedException, ParserConfigurationException, SAXException, IOException,
+			NotFoundException, TransformerException, InterruptedException, ExecutionException {
+		String queryValue = primaryValue.getName();
+		String[] splittedOnSpace = queryValue.split(" ");
+		if (splittedOnSpace.length == 1) {
+			return distanceUtil.computeLevenstheinDistance(queryValue, cachedEntries, amount, false, false);
+		} else {
+			Map<FinderEntity, Integer> cumulatedElements = new HashMap<>();
+			for (int i = 0; i < splittedOnSpace.length; i++) {
+				List<FinderEntity> resultList = distanceUtil.computeLevenstheinDistance(splittedOnSpace[i],
+						cachedEntries, amount, false, false);
+				resultList.forEach(e -> {
+					cumulatedElements.put(e, cumulatedElements.containsKey(e) ? cumulatedElements.get(e) + 1 : 1);
+				});
+			}
+			List<FinderEntity> resultList = cumulatedElements.entrySet().stream()
+					.sorted((e, f) -> f.getValue().compareTo(e.getValue())).map(e -> e.getKey())
+					.collect(Collectors.toList());
+			Set<String> foundValue = new HashSet<>();
+			resultList.removeIf(e -> {
+				if (!foundValue.contains(e.getPrimaryValue())) {
+					foundValue.add(e.getPrimaryValue());
+					return false;
+				}
+				return true;
+			});
+			return resultList;
 		}
-		return true;
-	    });
-	    return resultList;
 	}
-    }
 
 }

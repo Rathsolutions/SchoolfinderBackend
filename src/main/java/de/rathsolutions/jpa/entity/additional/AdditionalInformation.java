@@ -23,12 +23,17 @@ package de.rathsolutions.jpa.entity.additional;
 
 import java.util.List;
 
+import org.hibernate.annotations.Parameter;
+import org.hibernate.annotations.Type;
+import org.hibernate.usertype.UserTypeLegacyBridge;
+
 import de.rathsolutions.controller.postbody.AdditionalInformationDTO;
 import de.rathsolutions.jpa.entity.School;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
@@ -41,26 +46,27 @@ import lombok.Setter;
 
 public class AdditionalInformation {
 
-    @Id
-    @GeneratedValue
-    private int id;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private int id;
 
-    private String value;
+	@Type(value = UserTypeLegacyBridge.class, parameters = @Parameter(name = UserTypeLegacyBridge.TYPE_NAME_PARAM_KEY, value = "text"))
+	private String value;
 
-    private String homepage;
+	private String homepage;
 
-    @ManyToOne(optional = false, fetch = FetchType.EAGER, cascade = { CascadeType.PERSIST, CascadeType.PERSIST,
-	    CascadeType.REFRESH })
-    private InformationType type;
+	@ManyToOne(optional = false, fetch = FetchType.EAGER, cascade = { CascadeType.PERSIST, CascadeType.PERSIST,
+			CascadeType.REFRESH })
+	private InformationType type;
 
-    @ManyToMany(mappedBy = "additionalInformation")
-    private List<School> matchingSchools;
+	@ManyToMany(mappedBy = "additionalInformation")
+	private List<School> matchingSchools;
 
-    public AdditionalInformationDTO convertToDTO() {
-	if (homepage == null || homepage.isBlank()) {
-	    return new AdditionalInformationDTO(id, value, type.getValue());
+	public AdditionalInformationDTO convertToDTO() {
+		if (homepage == null || homepage.isBlank()) {
+			return new AdditionalInformationDTO(id, value, type.getValue());
+		}
+		return new AdditionalInformationDTO(id, value, type.getValue(), homepage);
+
 	}
-	return new AdditionalInformationDTO(id, value, type.getValue(), homepage);
-
-    }
 }

@@ -74,9 +74,6 @@ public class LevenstheinDistanceUtil {
 						f.getPrimaryValue().toLowerCase() + (computeWithSecondaryValue ? f.getSecondaryValue() : "")));
 			});
 		});
-		if (requestString.equalsIgnoreCase("Brombach")) {
-			System.out.println("Found");
-		}
 		List<Entry<FinderEntitySearchConstraint, Integer>> collect = entityDistanceMapping.entrySet().stream()
 				.sorted((e, f) -> e.getValue().compareTo(f.getValue())).collect(Collectors.toList());
 		List<Entry<FinderEntitySearchConstraint, Integer>> perfectMatch = collect.stream()
