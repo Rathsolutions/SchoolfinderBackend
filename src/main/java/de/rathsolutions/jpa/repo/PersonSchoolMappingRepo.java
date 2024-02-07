@@ -27,15 +27,15 @@ import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import de.rathsolutions.jpa.entity.Functionality;
 import de.rathsolutions.jpa.entity.Person;
 import de.rathsolutions.jpa.entity.PersonSchoolMapping;
 import de.rathsolutions.jpa.entity.School;
 
-@Repository
 public interface PersonSchoolMappingRepo extends JpaRepository<PersonSchoolMapping, Long> {
 
-    public Optional<PersonSchoolMapping> findOneBySchoolAndPersonAndFunctionality(School school, Person person,
-	    String functionality);
+	public Optional<PersonSchoolMapping> findOneBySchoolAndPersonAndFunctionalityName(School school, Person person,
+			String functionality);
 
-    public List<PersonSchoolMapping> findOneBySchoolId(long id);
+	public List<PersonSchoolMapping> findOneBySchoolId(long id);
 }

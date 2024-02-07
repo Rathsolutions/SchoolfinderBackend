@@ -27,6 +27,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.Polygon;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -49,66 +50,88 @@ import de.rathsolutions.util.GeometryUtils;
 @RequestMapping("/api/v1/area/")
 public class AreaController {
 
-    @Autowired
-    private AreaRepository repository;
+	@Autowired
+	private AreaRepository repository;
 
-    @GetMapping("/search/findByName")
-    public ResponseEntity<AreaDTO> findByName(@RequestParam(value = "name") String name) {
-	Optional<Area> areaOptional = repository.findOneByNameIgnoreCase(name);
-	if (areaOptional.isEmpty()) {
-	    return ResponseEntity.badRequest().build();
+	@GetMapping("/search/findByName")
+	public ResponseEntity<AreaDTO> findByName(@RequestParam(value = "name") String name) {
+		Optional<Area> areaOptional = repository.findOneByNameIgnoreCase(name);
+		if (areaOptional.isEmpty()) {
+			return ResponseEntity.badRequest().build();
+		}
+		return ResponseEntity.ok(areaOptional.get().convertToDTO());
 	}
-	return ResponseEntity.ok(areaOptional.get().convertToDTO());
-    }
 
-    @GetMapping("/search/findAll")
-    public ResponseEntity<List<AreaDTO>> findAll() {
-	return ResponseEntity.ok(repository.findAll().stream().map(e -> e.convertToDTO()).collect(Collectors.toList()));
-    }
-
-    @PutMapping(value = "/create")
-    public ResponseEntity<AreaDTO> create(@RequestBody AreaDTO dto) {
-	Optional<Area> areaByName = repository.findOneByNameIgnoreCase(dto.getName());
-	if (areaByName.isPresent()) {
-	    return ResponseEntity.status(HttpStatus.CONFLICT).build();
+	@GetMapping("/search/findAreaInstitutionPointById")
+	public ResponseEntity<AreaDTO> findAreaInstitutionPointById(@RequestParam(value = "id") Long id) {
+		Optional<Area> areaOptional = this.repository.findById(id);
+		if (areaOptional.isEmpty()) {
+			return ResponseEntity.badRequest().build();
+		}
+		AreaDTO area = areaOptional.get().convertToDTO();
+		area.setAreaPolygon(new ArrayList<>());
+		return ResponseEntity.ok(area);
 	}
-	Area area = new Area();
-	fillArea(dto, area);
-	return ResponseEntity.ok(repository.save(area).convertToDTO());
-    }
 
-    @PatchMapping(value = "/edit")
-    public ResponseEntity<AreaDTO> edit(@RequestBody AreaDTO dto) {
-	Optional<Area> areaByName = repository.findById(dto.getId());
-	if (areaByName.isEmpty()) {
-	    return ResponseEntity.notFound().build();
+//	@GetMapping("/search/findConcaveHull")
+//	public ResponseEntity<AreaDTO> findConcaveHull() {
+//		Optional<Polygon> concaveHull = repository.findConcaveHull();
+//		if (concaveHull.isEmpty()) {
+//			return ResponseEntity.badRequest().build();
+//		}
+//		Area body = new Area();
+//		body.setArea(concaveHull.get());
+//		return ResponseEntity.ok(body.convertToDTO());
+//	}
+
+	@GetMapping("/search/findAll")
+	public ResponseEntity<List<AreaDTO>> findAll() {
+		return ResponseEntity.ok(repository.findAll().stream().map(e -> e.convertToDTO()).collect(Collectors.toList()));
 	}
-	Area area = areaByName.get();
-	fillArea(dto, area);
-	return ResponseEntity.ok(repository.save(area).convertToDTO());
-    }
 
-    @DeleteMapping(value = "/delete/{id}")
-    public ResponseEntity<Long> delete(@PathVariable(name = "id") long id) {
-	if (!repository.existsById(id)) {
-	    return ResponseEntity.notFound().build();
+	@PutMapping(value = "/create")
+	public ResponseEntity<AreaDTO> create(@RequestBody AreaDTO dto) {
+		Optional<Area> areaByName = repository.findOneByNameIgnoreCase(dto.getName());
+		if (areaByName.isPresent()) {
+			return ResponseEntity.status(HttpStatus.CONFLICT).build();
+		}
+		Area area = new Area();
+		fillArea(dto, area);
+		return ResponseEntity.ok(repository.save(area).convertToDTO());
 	}
-	repository.deleteById(id);
-	return ResponseEntity.ok(id);
-    }
 
-    private Area fillArea(AreaDTO dto, Area area) {
-	area.setName(dto.getName());
-	area.setColor(dto.getColor());
-	org.locationtech.jts.geom.Point locationPoint = GeometryUtils.createPoint(
-		dto.getAreaInstitutionPosition().getLatitude(), dto.getAreaInstitutionPosition().getLongitude());
-	area.setAreaInstitutionPosition(locationPoint);
-	List<Coordinate> coordinates = new ArrayList<>();
-	dto.getAreaPolygon().forEach(e -> {
-	    coordinates.add(new Coordinate(e.getLatitude(), e.getLongitude()));
-	});
-	area.setArea(GeometryUtils.createPolygon(coordinates));
-	return area;
-    }
+	@PatchMapping(value = "/edit")
+	public ResponseEntity<AreaDTO> edit(@RequestBody AreaDTO dto) {
+		Optional<Area> areaByName = repository.findById(dto.getId());
+		if (areaByName.isEmpty()) {
+			return ResponseEntity.notFound().build();
+		}
+		Area area = areaByName.get();
+		fillArea(dto, area);
+		return ResponseEntity.ok(repository.save(area).convertToDTO());
+	}
+
+	@DeleteMapping(value = "/delete/{id}")
+	public ResponseEntity<Long> delete(@PathVariable(name = "id") long id) {
+		if (!repository.existsById(id)) {
+			return ResponseEntity.notFound().build();
+		}
+		repository.deleteById(id);
+		return ResponseEntity.ok(id);
+	}
+
+	private Area fillArea(AreaDTO dto, Area area) {
+		area.setName(dto.getName());
+		area.setColor(dto.getColor());
+		org.locationtech.jts.geom.Point locationPoint = GeometryUtils.createPoint(
+				dto.getAreaInstitutionPosition().getLatitude(), dto.getAreaInstitutionPosition().getLongitude());
+		area.setAreaInstitutionPosition(locationPoint);
+		List<Coordinate> coordinates = new ArrayList<>();
+		dto.getAreaPolygon().forEach(e -> {
+			coordinates.add(new Coordinate(e.getLatitude(), e.getLongitude()));
+		});
+		area.setArea(GeometryUtils.createPolygon(coordinates));
+		return area;
+	}
 
 }

@@ -404,7 +404,7 @@ public class SchoolController {
 			throw new ResourceNotFoundException(schoolId, "School could not be found");
 		}
 		Optional<PersonSchoolMapping> personSchoolMapping = personSchoolMappingRepo
-				.findOneBySchoolAndPersonAndFunctionality(school.get(), person.get(), functionality.toString());
+				.findOneBySchoolAndPersonAndFunctionalityName(school.get(), person.get(), functionality.toString());
 		if (personSchoolMapping.isEmpty()) {
 			throw new ResourceNotFoundException(person.toString(),
 					"The person has no mapping to school " + school.toString());

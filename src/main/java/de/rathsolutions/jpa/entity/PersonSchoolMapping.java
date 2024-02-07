@@ -50,10 +50,6 @@ import lombok.Setter;
 
 public class PersonSchoolMapping {
 
-//    @NonNull
-//    @EmbeddedId
-//    private PersonSchoolMappingKey id = new PersonSchoolMappingKey();
-
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
