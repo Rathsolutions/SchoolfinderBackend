@@ -36,9 +36,9 @@ import javax.xml.transform.TransformerException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.webjars.NotFoundException;
 import org.xml.sax.SAXException;
 
+import de.rathsolutions.util.exception.ResourceNotFoundException;
 import de.rathsolutions.util.finder.generic.LevenstheinDistanceUtil;
 import de.rathsolutions.util.finder.pojo.AbstractSearchEntity;
 import de.rathsolutions.util.finder.pojo.FinderEntity;
@@ -60,7 +60,7 @@ public class InstitutionFinder implements FinderService {
 	@Override
 	public List<FinderEntity> find(AbstractSearchEntity primaryValue, int amount)
 			throws OperationNotSupportedException, ParserConfigurationException, SAXException, IOException,
-			NotFoundException, TransformerException, InterruptedException, ExecutionException {
+			ResourceNotFoundException, TransformerException, InterruptedException, ExecutionException {
 		String queryValue = primaryValue.getName();
 		String[] splittedOnSpace = queryValue.split(" ");
 		if (splittedOnSpace.length == 1) {

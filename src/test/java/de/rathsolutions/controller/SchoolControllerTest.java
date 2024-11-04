@@ -52,7 +52,6 @@ import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.transaction.annotation.Transactional;
-import org.webjars.NotFoundException;
 import org.xml.sax.SAXException;
 
 import de.rathsolutions.SpringBootMain;
@@ -122,7 +121,7 @@ public class SchoolControllerTest {
 	
 	@Test
 	void testFindNotRegisteredSchoolsByNameAdminWithValidName()
-			throws ParserConfigurationException, SAXException, IOException, NotFoundException, TransformerException,
+			throws ParserConfigurationException, SAXException, IOException, ResourceNotFoundException, TransformerException,
 			InterruptedException, ExecutionException, OperationNotSupportedException {
 		List<FinderEntity> expectedReturnObject = new ArrayList<>();
 		List<FinderEntitySearchConstraint> constraints = new ArrayList<>();
@@ -136,9 +135,9 @@ public class SchoolControllerTest {
 
 	@Test
     void testFindNotRegisteredSchoolsByNameAdminWithNotValidName()
-	    throws ParserConfigurationException, SAXException, IOException, NotFoundException, TransformerException,
+	    throws ParserConfigurationException, SAXException, IOException, ResourceNotFoundException, TransformerException,
 	    InterruptedException, ExecutionException, OperationNotSupportedException {
-	when(osmParserMock.find(Mockito.any(SchoolSearchEntity.class), anyInt())).thenThrow(NotFoundException.class);
+	when(osmParserMock.find(Mockito.any(SchoolSearchEntity.class), anyInt())).thenThrow(ResourceNotFoundException.class);
 	ResponseEntity<List<FinderEntity>> notRegisteredSchoolsByName = cut
 		.findNotRegisteredSchoolsByNameAdmin("testSchool", "", 1);
 	assertEquals(HttpStatus.NOT_FOUND, notRegisteredSchoolsByName.getStatusCode());

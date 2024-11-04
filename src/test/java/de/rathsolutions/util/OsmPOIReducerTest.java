@@ -33,10 +33,10 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ContextConfiguration;
-import org.webjars.NotFoundException;
 import org.xml.sax.SAXException;
 
 import de.rathsolutions.SpringBootMain;
+import de.rathsolutions.util.exception.ResourceNotFoundException;
 import de.rathsolutions.util.finder.pojo.AbstractSearchEntity;
 import de.rathsolutions.util.finder.specific.osm.OsmPOIReducer;
 
@@ -49,7 +49,7 @@ public class OsmPOIReducerTest {
     private OsmPOIReducer cut;
 
     @Test
-    void testReducing() throws ParserConfigurationException, SAXException, IOException, NotFoundException,
+    void testReducing() throws ParserConfigurationException, SAXException, IOException, ResourceNotFoundException,
 	    TransformerException, InterruptedException, ExecutionException, OperationNotSupportedException {
 	cut.find(new AbstractSearchEntity() {
 	}, 1);

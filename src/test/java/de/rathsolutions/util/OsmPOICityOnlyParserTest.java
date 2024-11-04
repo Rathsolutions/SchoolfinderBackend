@@ -37,11 +37,12 @@ import javax.xml.transform.TransformerException;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.crossstore.ChangeSetPersister.NotFoundException;
 import org.springframework.test.context.ContextConfiguration;
-import org.webjars.NotFoundException;
 import org.xml.sax.SAXException;
 
 import de.rathsolutions.SpringBootMain;
+import de.rathsolutions.util.exception.ResourceNotFoundException;
 import de.rathsolutions.util.finder.pojo.CitySearchEntity;
 import de.rathsolutions.util.finder.pojo.FinderEntity;
 import de.rathsolutions.util.finder.pojo.FinderEntitySearchConstraint;
@@ -58,7 +59,7 @@ class OsmPOICityOnlyParserTest {
 
 	@Test
 	void testFindCorrectCitiesWithFullName()
-			throws ParserConfigurationException, SAXException, IOException, NotFoundException, TransformerException,
+			throws ParserConfigurationException, SAXException, IOException, ResourceNotFoundException, TransformerException,
 			InterruptedException, ExecutionException, OperationNotSupportedException {
 		List<FinderEntity> testObjects = OsmCityTestHelper.getInstance().getTestEntites();
 		for (FinderEntity e : testObjects) {
@@ -70,7 +71,7 @@ class OsmPOICityOnlyParserTest {
 
 	@Test
 	void testFindOnPerfectMatchMoreThanOneElement()
-			throws ParserConfigurationException, SAXException, IOException, NotFoundException, TransformerException,
+			throws ParserConfigurationException, SAXException, IOException, ResourceNotFoundException, TransformerException,
 			InterruptedException, ExecutionException, OperationNotSupportedException {
 		List<FinderEntity> testObjects = new ArrayList<>();
 		String city = "Steinbach";

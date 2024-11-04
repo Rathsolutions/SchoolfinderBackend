@@ -29,9 +29,9 @@ import javax.naming.OperationNotSupportedException;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 
-import org.webjars.NotFoundException;
 import org.xml.sax.SAXException;
 
+import de.rathsolutions.util.exception.ResourceNotFoundException;
 import de.rathsolutions.util.finder.pojo.AbstractSearchEntity;
 import de.rathsolutions.util.finder.pojo.FinderEntity;
 
@@ -39,5 +39,5 @@ public interface FinderService {
 
     public List<FinderEntity> find(AbstractSearchEntity primaryValue, int amount)
 	    throws OperationNotSupportedException, ParserConfigurationException, SAXException, IOException,
-	    NotFoundException, TransformerException, InterruptedException, ExecutionException;
+	    ResourceNotFoundException, TransformerException, InterruptedException, ExecutionException;
 }

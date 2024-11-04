@@ -30,14 +30,15 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.crossstore.ChangeSetPersister.NotFoundException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.webjars.NotFoundException;
 import org.xml.sax.SAXException;
 
+import de.rathsolutions.util.exception.ResourceNotFoundException;
 import de.rathsolutions.util.finder.pojo.CitySearchEntity;
 import de.rathsolutions.util.finder.pojo.FinderEntity;
 import de.rathsolutions.util.finder.pojo.InstitutionSearchEntity;
@@ -68,7 +69,7 @@ public class SearchController {
 		try {
 			return ResponseEntity.ok(institutionFinder.find(new InstitutionSearchEntity(query), amount));
 		} catch (OperationNotSupportedException | ParserConfigurationException | SAXException | IOException
-				| NotFoundException | TransformerException | InterruptedException | ExecutionException e) {
+				| ResourceNotFoundException | TransformerException | InterruptedException | ExecutionException e) {
 			log.error(e.getMessage());
 			return ResponseEntity.notFound().build();
 		}
@@ -82,7 +83,7 @@ public class SearchController {
 			List<FinderEntity> resultsByName = osmCityParser.find(new CitySearchEntity(name), amount);
 			return ResponseEntity.ok().header("Copyright", "This list was generated using Open Street Maps Data")
 					.body(resultsByName);
-		} catch (ParserConfigurationException | SAXException | IOException | NotFoundException | TransformerException
+		} catch (ParserConfigurationException | SAXException | IOException | ResourceNotFoundException | TransformerException
 				| InterruptedException | ExecutionException | OperationNotSupportedException e) {
 			log.error(e.getMessage());
 			return ResponseEntity.notFound().build();
@@ -98,7 +99,7 @@ public class SearchController {
 			return ResponseEntity.ok().header("Copyright", "This list was generated using Open Street Maps Data")
 					.body(osmStreetParser.find(new StreetCitySearchEntity(city, street, housenumber), amount));
 		} catch (OperationNotSupportedException | ParserConfigurationException | SAXException | IOException
-				| NotFoundException | TransformerException | InterruptedException | ExecutionException e) {
+				| ResourceNotFoundException | TransformerException | InterruptedException | ExecutionException e) {
 			log.error(e.getMessage());
 			return ResponseEntity.notFound().build();
 		}

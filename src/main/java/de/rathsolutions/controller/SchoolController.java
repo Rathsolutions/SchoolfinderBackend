@@ -34,6 +34,7 @@ import javax.xml.transform.TransformerException;
 
 import org.locationtech.jts.geom.Point;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.crossstore.ChangeSetPersister.NotFoundException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -44,7 +45,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.webjars.NotFoundException;
 import org.xml.sax.SAXException;
 
 import de.rathsolutions.controller.postbody.ProjectDTO;
@@ -133,7 +133,7 @@ public class SchoolController {
 			resultsByName = osmSchoolParser.find(new SchoolSearchEntity(name, city), amount);
 			return ResponseEntity.ok().header("Copyright", "This list was generated using Open Street Maps Data")
 					.body(resultsByName);
-		} catch (ParserConfigurationException | SAXException | IOException | NotFoundException | TransformerException
+		} catch (ParserConfigurationException | SAXException | IOException | ResourceNotFoundException | TransformerException
 				| InterruptedException | ExecutionException | OperationNotSupportedException e) {
 			return ResponseEntity.notFound().build();
 		}
@@ -450,7 +450,7 @@ public class SchoolController {
 		for (ProjectDTO e : addNewSchoolPostbody.getProjects()) {
 			Optional<Project> projectEntity = projectRepo.findById(Long.valueOf(e.getId()));
 			if (projectEntity.isEmpty()) {
-				throw new NotFoundException("One of the requested Projects could not be found!");
+				throw new ResourceNotFoundException(Project.class, e.getName());
 			}
 			allFoundProjects.add(projectEntity.get());
 		}

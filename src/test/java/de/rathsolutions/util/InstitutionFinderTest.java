@@ -21,13 +21,8 @@
  */
 package de.rathsolutions.util;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.Mockito.when;
-
 import java.io.IOException;
 import java.util.concurrent.ExecutionException;
-import java.util.stream.Stream;
 
 import javax.naming.OperationNotSupportedException;
 import javax.xml.parsers.ParserConfigurationException;
@@ -38,11 +33,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ContextConfiguration;
-import org.webjars.NotFoundException;
 import org.xml.sax.SAXException;
 
 import de.rathsolutions.SpringBootMain;
-import de.rathsolutions.util.finder.pojo.FinderEntity;
+import de.rathsolutions.util.exception.ResourceNotFoundException;
 import de.rathsolutions.util.finder.pojo.InstitutionSearchEntity;
 import de.rathsolutions.util.finder.specific.InstitutionFinder;
 import de.rathsolutions.util.structure.internalFinder.InstitutionAttributeFinderEntries;
@@ -62,7 +56,7 @@ class InstitutionFinderTest {
 	void test() {
 		try {
 			institutionFinder.find(new InstitutionSearchEntity(""), 10);
-		} catch (NotFoundException | OperationNotSupportedException | ParserConfigurationException | SAXException
+		} catch (ResourceNotFoundException | OperationNotSupportedException | ParserConfigurationException | SAXException
 				| IOException | TransformerException | InterruptedException | ExecutionException e) {
 			e.printStackTrace();
 		}

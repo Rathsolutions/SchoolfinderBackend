@@ -2,6 +2,7 @@
 .settings/
 .project
 .factorypath
+.vscode/*
 target/
 test.*
 docker-compose.yml

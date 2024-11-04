@@ -36,10 +36,10 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ContextConfiguration;
-import org.webjars.NotFoundException;
 import org.xml.sax.SAXException;
 
 import de.rathsolutions.SpringBootMain;
+import de.rathsolutions.util.exception.ResourceNotFoundException;
 import de.rathsolutions.util.finder.pojo.FinderEntity;
 import de.rathsolutions.util.finder.pojo.StreetCitySearchEntity;
 import de.rathsolutions.util.finder.specific.osm.OsmStreetParser;
@@ -55,7 +55,7 @@ class OsmStreetParserTest {
 
 	@Test
 	void testCityStreetSearch() throws OperationNotSupportedException, ParserConfigurationException, SAXException,
-			IOException, NotFoundException, TransformerException, InterruptedException, ExecutionException {
+			IOException, ResourceNotFoundException, TransformerException, InterruptedException, ExecutionException {
 		List<FinderEntity> findStreetGeocodes = cut.find(new StreetCitySearchEntity("Rastatt", "Engelstraße", "21"), 1);
 		findStreetGeocodes.stream().forEach(e -> {
 			assertEquals(48.859834600000006, e.getLatVal(), 0.0000001);

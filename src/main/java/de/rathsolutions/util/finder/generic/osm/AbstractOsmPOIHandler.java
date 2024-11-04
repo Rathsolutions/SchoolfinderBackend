@@ -41,9 +41,9 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import org.webjars.NotFoundException;
 import org.xml.sax.SAXException;
 
+import de.rathsolutions.util.exception.ResourceNotFoundException;
 import de.rathsolutions.util.finder.pojo.AbstractSearchEntity;
 import de.rathsolutions.util.finder.pojo.FinderEntity;
 import de.rathsolutions.util.finder.specific.FinderService;
@@ -58,7 +58,7 @@ public abstract class AbstractOsmPOIHandler implements FinderService {
 	@Override
 	public List<FinderEntity> find(AbstractSearchEntity primaryValue, int amount)
 			throws OperationNotSupportedException, ParserConfigurationException, SAXException, IOException,
-			NotFoundException, TransformerException, InterruptedException, ExecutionException {
+			ResourceNotFoundException, TransformerException, InterruptedException, ExecutionException {
 		if (primaryValue == null) {
 			throw new IllegalArgumentException(QUERYNAME_MUST_NOT_BE_NULL);
 		}
@@ -66,7 +66,8 @@ public abstract class AbstractOsmPOIHandler implements FinderService {
 	}
 
 	private List<FinderEntity> processOsmFileInternal(AbstractSearchEntity searchEntity, int amount)
-			throws ParserConfigurationException, SAXException, IOException, NotFoundException, TransformerException,
+			throws ParserConfigurationException, SAXException, IOException, ResourceNotFoundException,
+			TransformerException,
 			InterruptedException, ExecutionException, OperationNotSupportedException {
 		init();
 		List<FinderEntity> resultList;
@@ -80,7 +81,7 @@ public abstract class AbstractOsmPOIHandler implements FinderService {
 		if (!Objects.isNull(osmPoiInNodes)) {
 			return osmPoiInNodes;
 		}
-		throw new NotFoundException("The element is not present!");
+		throw new ResourceNotFoundException(FinderEntity.class, "Finder Entity!");
 	}
 
 	protected abstract List<FinderEntity> generateResult(List<FinderEntity> resultList,
@@ -123,17 +124,17 @@ public abstract class AbstractOsmPOIHandler implements FinderService {
 					continue;
 				}
 				switch (tagNode.getNodeName()) {
-				case "center":
-					centerTag = (Element) tagNode;
-					break;
-				case "tag":
-					if ("name".equals(tagNode.getAttributes().getNamedItem("k").getTextContent())) {
-						nameTag = (Element) tagNode;
-					}
-					break;
-				default:
-					nodeItem.removeChild(tagNode);
-					break;
+					case "center":
+						centerTag = (Element) tagNode;
+						break;
+					case "tag":
+						if ("name".equals(tagNode.getAttributes().getNamedItem("k").getTextContent())) {
+							nameTag = (Element) tagNode;
+						}
+						break;
+					default:
+						nodeItem.removeChild(tagNode);
+						break;
 				}
 			}
 			FinderEntity foundEntity = handleKeyFound(centerTag != null ? centerTag : nodeItem, nameTag, nodeItem);
