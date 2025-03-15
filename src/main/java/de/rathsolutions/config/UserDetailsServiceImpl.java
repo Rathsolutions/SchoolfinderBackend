@@ -25,7 +25,6 @@ import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 
-import org.assertj.core.util.Arrays;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -34,17 +33,29 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import de.rathsolutions.config.bruteforce.BruteforceAccessDeniedException;
+import de.rathsolutions.config.bruteforce.LoginAttemptService;
 import de.rathsolutions.jpa.entity.User;
 import de.rathsolutions.jpa.repo.UserRepo;
+import jakarta.servlet.http.HttpServletRequest;
 
 @Service
 public class UserDetailsServiceImpl implements UserDetailsService {
 
     @Autowired
+    private LoginAttemptService loginAttemptService;
+
+    @Autowired
     private UserRepo userRepo;
+
+    @Autowired
+    private HttpServletRequest request;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        if (loginAttemptService.isBlocked(IPUtils.getClientIP(request))) {
+            throw new BruteforceAccessDeniedException("User blocked due to too many attempts");
+        }
         Optional<User> userOptional = userRepo.findByUsername(username);
         if (userOptional.isEmpty()) {
             throw new UsernameNotFoundException("This user could not be found!");

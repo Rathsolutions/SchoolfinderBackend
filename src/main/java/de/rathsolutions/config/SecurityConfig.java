@@ -24,16 +24,14 @@ package de.rathsolutions.config;
 import java.util.Arrays;
 import java.util.Collections;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.authentication.AuthenticationProvider;
-import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -44,18 +42,14 @@ public class SecurityConfig {
 
 	private static final String CSRF_TOKEN = "X-XSRF-TOKEN";
 
-	private final UserDetailsService userDetailsService;
-	private final PasswordEncoder passwordEncoder;
-
-	public SecurityConfig(UserDetailsService userDetailsService, PasswordEncoder passwordEncoder) {
-		this.userDetailsService = userDetailsService;
-		this.passwordEncoder = passwordEncoder;
-	}
+	@Autowired
+	private AuthenticationEntryPoint authEntryPoint;
 
 	@Bean
 	SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 		//@formatter:off
-		http.authorizeHttpRequests(req->req.requestMatchers(
+		http
+			.authorizeHttpRequests(req->req.requestMatchers(
 				"/api/v1/finder/search/**", 
 				"/api/v1/schools/search/**", 
 				"/api/v1/schools",
@@ -68,27 +62,25 @@ public class SecurityConfig {
 					.authenticated()
 				.requestMatchers("/**")
 					.authenticated())
-					.httpBasic()
-				.and()
-				.csrf()
-					.disable()
+					.httpBasic(Customizer.withDefaults())
+				.csrf(configurer->configurer.disable())
 //					.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
 //				.and()
-					.cors()
-				.and()
-					.authenticationProvider(this.authenticationProvider());
-		http.headers().frameOptions().sameOrigin();
+				.cors(Customizer.withDefaults());
+		http.headers(headers->headers.frameOptions(fo->fo.sameOrigin()));
+		http.exceptionHandling(exHandler->exHandler.authenticationEntryPoint(authEntryPoint));
+
 		//@formatter:off
 		return http.build();
 	}
     
-	@Bean
-	AuthenticationProvider authenticationProvider() {
-		DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider();
-		authenticationProvider.setUserDetailsService(this.userDetailsService);
-		authenticationProvider.setPasswordEncoder(this.passwordEncoder);
-		return authenticationProvider;
-	}
+	// @Bean
+	// AuthenticationProvider authenticationProvider() {
+	// 	DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider();
+	// 	authenticationProvider.setUserDetailsService(this.userDetailsService);
+	// 	authenticationProvider.setPasswordEncoder(this.passwordEncoder);
+	// 	return authenticationProvider;
+	// }
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
