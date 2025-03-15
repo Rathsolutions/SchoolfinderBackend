@@ -69,7 +69,7 @@ public class Project {
     }
 
     @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(name = "school_project_mapping", joinColumns = @JoinColumn(name = "project_id"), inverseJoinColumns = @JoinColumn(name = "school_id"))
+    @JoinTable(name = "school_projects", joinColumns = @JoinColumn(name = "projects_id"), inverseJoinColumns = @JoinColumn(name = "school_id"))
     private List<School> allSchools = new ArrayList<>();
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "primaryProject")

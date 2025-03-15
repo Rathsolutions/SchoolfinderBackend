@@ -1,6 +1,5 @@
 DELETE FROM person_school_mapping;
 DELETE FROM school_criteria_mapping;
-DELETE FROM school_project_mapping;
 DELETE FROM school_projects;
 DELETE FROM criteria;
 DELETE FROM person;
