@@ -79,6 +79,7 @@ import de.rathsolutions.util.finder.pojo.SchoolSearchEntity;
 import de.rathsolutions.util.finder.specific.osm.OsmPOISchoolParser;
 import de.rathsolutions.util.structure.internalFinder.InstitutionAttributeFinderEntries;
 import io.swagger.v3.oas.annotations.Operation;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 
 @RestController
@@ -188,6 +189,10 @@ public class SchoolController {
 		List<Criteria> criterias = null;
 		if (criteriaNumbers != null && criteriaNumbers.size() > 0) {
 			criterias = criteriaRepo.findAllByIdIn(criteriaNumbers);
+		}
+		if ((criterias == null || criterias.isEmpty()) && (criteriaNumbers != null && !criteriaNumbers.isEmpty())) {
+			log.debug("Referencing deleted criteria, returning empty set");
+			return new ArrayList<>();
 		}
 		final List<Criteria> finalCriterias = criterias;
 		List<School> allSchoolsMatching;
@@ -334,9 +339,11 @@ public class SchoolController {
 		}
 		List<Criteria> allMatchingSchoolCriterias = generateMatchingSchoolCriteriasAndPersistIfNotExisting(
 				alterSchoolPostbody);
+		List<Criteria> formerCriteriasFromSchool = matchingSchool.getMatchingCriterias();
 		fillSchoolPostbodyWithAllInformation(alterSchoolPostbody, matchingSchool, allFoundProjects,
 				allMatchingSchoolCriterias);
 		School updatedSchool = schoolRepo.save(matchingSchool);
+		deleteCriteriaFromDBIfNoLongerReferenced(matchingSchool.getId(), formerCriteriasFromSchool);
 		finderEntries.clear();
 		finderEntries.buildEntryList();
 		return ResponseEntity.ok(updatedSchool.convertToDTO());
@@ -423,6 +430,13 @@ public class SchoolController {
 		var deletedSchool = schoolRepo.findById(schoolId);
 		var allMatchingCriterias = deletedSchool.get().getMatchingCriterias();
 		schoolRepo.deleteById(schoolId);
+		deleteCriteriaFromDBIfNoLongerReferenced(schoolId, allMatchingCriterias);
+		finderEntries.clear();
+		finderEntries.buildEntryList();
+		return ResponseEntity.ok().build();
+	}
+
+	private void deleteCriteriaFromDBIfNoLongerReferenced(long schoolId, @NonNull List<Criteria> allMatchingCriterias) {
 		allMatchingCriterias.forEach(criteria -> {
 			criteria.getSchoolMappings().removeIf(schoolMapping -> schoolMapping.getId().equals(schoolId));
 			if (criteria.getSchoolMappings().isEmpty()) {
@@ -430,9 +444,6 @@ public class SchoolController {
 				criteriaRepo.delete(criteria);
 			}
 		});
-		finderEntries.clear();
-		finderEntries.buildEntryList();
-		return ResponseEntity.ok().build();
 	}
 
 	private void fillPersonSchoolMappingOfSchool(SchoolDTO alterSchoolPostbody, School matchingSchool) {
