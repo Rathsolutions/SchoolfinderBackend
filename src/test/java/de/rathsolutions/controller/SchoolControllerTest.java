@@ -46,10 +46,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.transaction.annotation.Transactional;
 import org.xml.sax.SAXException;
@@ -79,6 +81,10 @@ import de.rathsolutions.util.finder.specific.osm.OsmPOISchoolParser;
 @Sql(scripts = "../../../data-init.sql")
 public class SchoolControllerTest {
 
+	private static final int SCHOOL_REAL_EXISTING_MOCK_ID = -1;
+
+	private static final int SCHOOL_WITH_SINGLE_CRITERIA_REAL_EXISTING_MOCK_ID = -3;
+
 	private static final SchoolTypeDTO SCHOOL_TYPE = new SchoolTypeDTO();
 
 	private static final int SCHOOL_MOCK_ID = -5;
@@ -102,7 +108,7 @@ public class SchoolControllerTest {
 	@Autowired
 	private SchoolRepo schoolRepo;
 
-	@MockBean
+	@MockitoBean
 	private OsmPOISchoolParser osmParserMock;
 
 	private static final ProjectDTO PRIMARY_PROJECT = new ProjectDTO();
@@ -111,17 +117,18 @@ public class SchoolControllerTest {
 
 	@BeforeAll
 	public static void init() {
-		PRIMARY_PROJECT.setId(-1);
+		PRIMARY_PROJECT.setId(SCHOOL_REAL_EXISTING_MOCK_ID);
 		DEFAULT_PROJECT_LIST.add(PRIMARY_PROJECT);
 		FUNCTIONALITY_ONE.setName("testfunc1");
 		FUNCTIONALITY_ONE.setId(-1L);
 		SCHOOL_TYPE.setSchoolTypeValue(SchoolTypeValue.GYMNASIUM.getValue());
 
 	}
-	
+
 	@Test
 	void testFindNotRegisteredSchoolsByNameAdminWithValidName()
-			throws ParserConfigurationException, SAXException, IOException, ResourceNotFoundException, TransformerException,
+			throws ParserConfigurationException, SAXException, IOException, ResourceNotFoundException,
+			TransformerException,
 			InterruptedException, ExecutionException, OperationNotSupportedException {
 		List<FinderEntity> expectedReturnObject = new ArrayList<>();
 		List<FinderEntitySearchConstraint> constraints = new ArrayList<>();
@@ -134,15 +141,17 @@ public class SchoolControllerTest {
 	}
 
 	@Test
-    void testFindNotRegisteredSchoolsByNameAdminWithNotValidName()
-	    throws ParserConfigurationException, SAXException, IOException, ResourceNotFoundException, TransformerException,
-	    InterruptedException, ExecutionException, OperationNotSupportedException {
-	when(osmParserMock.find(Mockito.any(SchoolSearchEntity.class), anyInt())).thenThrow(ResourceNotFoundException.class);
-	ResponseEntity<List<FinderEntity>> notRegisteredSchoolsByName = cut
-		.findNotRegisteredSchoolsByNameAdmin("testSchool", "", 1);
-	assertEquals(HttpStatus.NOT_FOUND, notRegisteredSchoolsByName.getStatusCode());
-	assertNull(notRegisteredSchoolsByName.getBody());
-    }
+	void testFindNotRegisteredSchoolsByNameAdminWithNotValidName()
+			throws ParserConfigurationException, SAXException, IOException, ResourceNotFoundException,
+			TransformerException,
+			InterruptedException, ExecutionException, OperationNotSupportedException {
+		when(osmParserMock.find(Mockito.any(SchoolSearchEntity.class), anyInt()))
+				.thenThrow(ResourceNotFoundException.class);
+		ResponseEntity<List<FinderEntity>> notRegisteredSchoolsByName = cut
+				.findNotRegisteredSchoolsByNameAdmin("testSchool", "", 1);
+		assertEquals(HttpStatus.NOT_FOUND, notRegisteredSchoolsByName.getStatusCode());
+		assertNull(notRegisteredSchoolsByName.getBody());
+	}
 
 	@Test
 	@Transactional
@@ -195,106 +204,122 @@ public class SchoolControllerTest {
 		assertEquals(3, allSchools.size());
 	}
 
-//    @Test
-//    void testFindAllSchoolsByInBoundsWrongCriteriaRightBounds() {
-//	List<Long> longCriterias = new ArrayList<>();
-//	longCriterias.add(1L);
-//	List<SchoolDTO> allSchoolsByInBounds = cut.findAllSchoolsByInBounds("1.110", "1.112", "2.221", "2.223",
-//		longCriterias, false);
-//	assertEquals(0, allSchoolsByInBounds.size());
-//    }
-//
-//    @Test
-//    void testFindAllSchoolsByInBoundsRightCriteriaRightBounds() {
-//	List<Long> longCriterias = new ArrayList<>();
-//	longCriterias.add(-1L);
-//	List<SchoolDTO> allSchoolsByInBounds = cut.findAllSchoolsByInBounds("1.110", "1.112", "2.221", "2.223",
-//		longCriterias, false);
-//	assertEquals(1, allSchoolsByInBounds.size());
-//	assertFirstSchool(allSchoolsByInBounds.get(0));
-//    }
-//
-//    @Test
-//    void testFindAllSchoolsByInBoundsRightCriteriaWrongBounds() {
-//	List<Long> longCriterias = new ArrayList<>();
-//	longCriterias.add(-1L);
-//	List<SchoolDTO> allSchoolsByInBounds = cut.findAllSchoolsByInBounds("2.221", "2.223", "1.110", "1.112",
-//		longCriterias, false);
-//	assertEquals(0, allSchoolsByInBounds.size());
-//    }
-//
-//    @Test
-//    void testFindAllSchoolsByInBoundsMultipleRightCriteriasOneRightBoundInclusive() {
-//	List<Long> longCriterias = new ArrayList<>();
-//	longCriterias.add(-1L);
-//	longCriterias.add(-2L);
-//	List<SchoolDTO> allSchoolsByInBounds = cut.findAllSchoolsByInBounds("1.110", "1.112", "2.221", "2.223",
-//		longCriterias, false);
-//	assertEquals(1, allSchoolsByInBounds.size());
-//	assertFirstSchool(allSchoolsByInBounds.get(0));
-//    }
-//
-//    @Test
-//    void testFindAllSchoolsByInBoundsMultipleRightCriteriasLargeRightBoundInclusive() {
-//	List<Long> longCriterias = new ArrayList<>();
-//	longCriterias.add(-1L);
-//	longCriterias.add(-2L);
-//	List<SchoolDTO> allSchoolsByInBounds = cut.findAllSchoolsByInBounds("0", "3", "0", "3", longCriterias, false);
-//	assertEquals(2, allSchoolsByInBounds.size());
-//	assertFirstSchool(allSchoolsByInBounds.get(1));
-//	assertSecondSchool(allSchoolsByInBounds.get(0));
-//    }
-//
-//    @Test
-//    void testFindAllSchoolsByInBoundsMultipleRightCriteriasOneRightBoundExclusive() {
-//	List<Long> longCriterias = new ArrayList<>();
-//	longCriterias.add(-1L);
-//	longCriterias.add(-2L);
-//	List<SchoolDTO> allSchoolsByInBounds = cut.findAllSchoolsByInBounds("3.332", "3.334", "4.443", "4.445",
-//		longCriterias, true);
-//	assertEquals(1, allSchoolsByInBounds.size());
-//	assertThirdSchool(allSchoolsByInBounds.get(0));
-//    }
-//
-//    @Test
-//    void testFindAllSchoolsByInBoundsMultipleRightCriteriasLargeRightBoundExclusive() {
-//	List<Long> longCriterias = new ArrayList<>();
-//	longCriterias.add(-1L);
-//	longCriterias.add(-2L);
-//	List<SchoolDTO> allSchoolsByInBounds = cut.findAllSchoolsByInBounds("0", "5", "0", "5", longCriterias, true);
-//	assertEquals(1, allSchoolsByInBounds.size());
-//	assertThirdSchool(allSchoolsByInBounds.get(0));
-//    }
-//
-//    @Test
-//    void testFindAllSchoolsByInBoundsNullCriteriasLargeRightBound() {
-//	List<SchoolDTO> allSchoolsByInBounds = cut.findAllSchoolsByInBounds("0", "3", "0", "3", null, false);
-//	assertEquals(2, allSchoolsByInBounds.size());
-//	assertFirstSchool(allSchoolsByInBounds.get(0));
-//	assertSecondSchool(allSchoolsByInBounds.get(1));
-//    }
-//
-//    @Test
-//    void testFindAllSchoolsByInBoundsEmptyCriteriasLargeRightBound() {
-//	List<Long> longCriterias = new ArrayList<>();
-//	List<SchoolDTO> allSchoolsByInBounds = cut.findAllSchoolsByInBounds("0", "3", "0", "3", longCriterias, false);
-//	assertEquals(2, allSchoolsByInBounds.size());
-//	assertFirstSchool(allSchoolsByInBounds.get(0));
-//	assertSecondSchool(allSchoolsByInBounds.get(1));
-//    }
-//
-//    @Test
-//    void testFindAllSchoolsByInBoundsNullCriteriasRightBounds() {
-//	List<SchoolDTO> allSchoolsByInBounds = cut.findAllSchoolsByInBounds("1.110", "1.113", "2.221", "2.223", null,
-//		false);
-//	assertEquals(1, allSchoolsByInBounds.size());
-//	assertFirstSchool(allSchoolsByInBounds.get(0));
-//    }
+	// @Test
+	// void testFindAllSchoolsByInBoundsWrongCriteriaRightBounds() {
+	// List<Long> longCriterias = new ArrayList<>();
+	// longCriterias.add(1L);
+	// List<SchoolDTO> allSchoolsByInBounds = cut.findAllSchoolsByInBounds("1.110",
+	// "1.112", "2.221", "2.223",
+	// longCriterias, false);
+	// assertEquals(0, allSchoolsByInBounds.size());
+	// }
+	//
+	// @Test
+	// void testFindAllSchoolsByInBoundsRightCriteriaRightBounds() {
+	// List<Long> longCriterias = new ArrayList<>();
+	// longCriterias.add(-1L);
+	// List<SchoolDTO> allSchoolsByInBounds = cut.findAllSchoolsByInBounds("1.110",
+	// "1.112", "2.221", "2.223",
+	// longCriterias, false);
+	// assertEquals(1, allSchoolsByInBounds.size());
+	// assertFirstSchool(allSchoolsByInBounds.get(0));
+	// }
+	//
+	// @Test
+	// void testFindAllSchoolsByInBoundsRightCriteriaWrongBounds() {
+	// List<Long> longCriterias = new ArrayList<>();
+	// longCriterias.add(-1L);
+	// List<SchoolDTO> allSchoolsByInBounds = cut.findAllSchoolsByInBounds("2.221",
+	// "2.223", "1.110", "1.112",
+	// longCriterias, false);
+	// assertEquals(0, allSchoolsByInBounds.size());
+	// }
+	//
+	// @Test
+	// void
+	// testFindAllSchoolsByInBoundsMultipleRightCriteriasOneRightBoundInclusive() {
+	// List<Long> longCriterias = new ArrayList<>();
+	// longCriterias.add(-1L);
+	// longCriterias.add(-2L);
+	// List<SchoolDTO> allSchoolsByInBounds = cut.findAllSchoolsByInBounds("1.110",
+	// "1.112", "2.221", "2.223",
+	// longCriterias, false);
+	// assertEquals(1, allSchoolsByInBounds.size());
+	// assertFirstSchool(allSchoolsByInBounds.get(0));
+	// }
+	//
+	// @Test
+	// void
+	// testFindAllSchoolsByInBoundsMultipleRightCriteriasLargeRightBoundInclusive()
+	// {
+	// List<Long> longCriterias = new ArrayList<>();
+	// longCriterias.add(-1L);
+	// longCriterias.add(-2L);
+	// List<SchoolDTO> allSchoolsByInBounds = cut.findAllSchoolsByInBounds("0", "3",
+	// "0", "3", longCriterias, false);
+	// assertEquals(2, allSchoolsByInBounds.size());
+	// assertFirstSchool(allSchoolsByInBounds.get(1));
+	// assertSecondSchool(allSchoolsByInBounds.get(0));
+	// }
+	//
+	// @Test
+	// void
+	// testFindAllSchoolsByInBoundsMultipleRightCriteriasOneRightBoundExclusive() {
+	// List<Long> longCriterias = new ArrayList<>();
+	// longCriterias.add(-1L);
+	// longCriterias.add(-2L);
+	// List<SchoolDTO> allSchoolsByInBounds = cut.findAllSchoolsByInBounds("3.332",
+	// "3.334", "4.443", "4.445",
+	// longCriterias, true);
+	// assertEquals(1, allSchoolsByInBounds.size());
+	// assertThirdSchool(allSchoolsByInBounds.get(0));
+	// }
+	//
+	// @Test
+	// void
+	// testFindAllSchoolsByInBoundsMultipleRightCriteriasLargeRightBoundExclusive()
+	// {
+	// List<Long> longCriterias = new ArrayList<>();
+	// longCriterias.add(-1L);
+	// longCriterias.add(-2L);
+	// List<SchoolDTO> allSchoolsByInBounds = cut.findAllSchoolsByInBounds("0", "5",
+	// "0", "5", longCriterias, true);
+	// assertEquals(1, allSchoolsByInBounds.size());
+	// assertThirdSchool(allSchoolsByInBounds.get(0));
+	// }
+	//
+	// @Test
+	// void testFindAllSchoolsByInBoundsNullCriteriasLargeRightBound() {
+	// List<SchoolDTO> allSchoolsByInBounds = cut.findAllSchoolsByInBounds("0", "3",
+	// "0", "3", null, false);
+	// assertEquals(2, allSchoolsByInBounds.size());
+	// assertFirstSchool(allSchoolsByInBounds.get(0));
+	// assertSecondSchool(allSchoolsByInBounds.get(1));
+	// }
+	//
+	// @Test
+	// void testFindAllSchoolsByInBoundsEmptyCriteriasLargeRightBound() {
+	// List<Long> longCriterias = new ArrayList<>();
+	// List<SchoolDTO> allSchoolsByInBounds = cut.findAllSchoolsByInBounds("0", "3",
+	// "0", "3", longCriterias, false);
+	// assertEquals(2, allSchoolsByInBounds.size());
+	// assertFirstSchool(allSchoolsByInBounds.get(0));
+	// assertSecondSchool(allSchoolsByInBounds.get(1));
+	// }
+	//
+	// @Test
+	// void testFindAllSchoolsByInBoundsNullCriteriasRightBounds() {
+	// List<SchoolDTO> allSchoolsByInBounds = cut.findAllSchoolsByInBounds("1.110",
+	// "1.113", "2.221", "2.223", null,
+	// false);
+	// assertEquals(1, allSchoolsByInBounds.size());
+	// assertFirstSchool(allSchoolsByInBounds.get(0));
+	// }
 
 	@Test
 	@Transactional
 	void testFindSchoolDetails() {
-		ResponseEntity<SchoolDTO> findFirstSchoolDetails = cut.findSchoolDetails(-1);
+		ResponseEntity<SchoolDTO> findFirstSchoolDetails = cut.findSchoolDetails(SCHOOL_REAL_EXISTING_MOCK_ID);
 		assertFirstSchool(findFirstSchoolDetails.getBody());
 	}
 
@@ -391,7 +416,8 @@ public class SchoolControllerTest {
 		List<Criteria> criterias = new ArrayList<>();
 		String testcriteria = "test5";
 		criterias.add(new Criteria(testcriteria));
-		SchoolDTO newSchool = new SchoolDTO(-1, SHORT_TESTSCHOOL, TESTSCHOOL, 21, 12, "", "", null, criterias,
+		SchoolDTO newSchool = new SchoolDTO(SCHOOL_REAL_EXISTING_MOCK_ID, SHORT_TESTSCHOOL, TESTSCHOOL, 21, 12, "", "",
+				null, criterias,
 				DEFAULT_PROJECT_LIST, PRIMARY_PROJECT, "", null, null, testcriteria, testcriteria, testcriteria,
 				testcriteria);
 		assertThrows(BadArgumentsException.class, () -> {
@@ -500,7 +526,7 @@ public class SchoolControllerTest {
 		assertThrows(BadArgumentsException.class, () -> {
 			cut.addNewSchool(newSchool);
 		});
-		newSchool.setId(-1);
+		newSchool.setId(SCHOOL_REAL_EXISTING_MOCK_ID);
 		assertThrows(BadArgumentsException.class, () -> {
 			cut.alterSchool(newSchool);
 		});
@@ -526,7 +552,7 @@ public class SchoolControllerTest {
 		assertThrows(BadArgumentsException.class, () -> {
 			cut.addNewSchool(newSchool);
 		});
-		newSchool.setId(-1);
+		newSchool.setId(SCHOOL_REAL_EXISTING_MOCK_ID);
 		assertThrows(BadArgumentsException.class, () -> {
 			cut.alterSchool(newSchool);
 		});
@@ -651,6 +677,26 @@ public class SchoolControllerTest {
 		assertFalse(allSchools.stream().anyMatch(e -> e.getSchoolName().equals(testschool)));
 	}
 
+	@Test
+	void testDeleteSchoolWithoutAnyCriteria() {
+		var critRepoCount = criteriaRepo.count();
+		var schoolToDelete = cut.deleteSchool(SCHOOL_REAL_EXISTING_MOCK_ID);
+		assertTrue(schoolToDelete.getStatusCode().equals(HttpStatusCode.valueOf(200)));
+		assertTrue(schoolRepo.findById(Long.valueOf(SCHOOL_REAL_EXISTING_MOCK_ID)).isEmpty());
+		assertEquals(critRepoCount, criteriaRepo.count());
+	}
+
+	@Test
+	void testDeleteSchoolWithCriteriaNotReferencedAnymore() {
+		var critRepoCount = criteriaRepo.count();
+		var criteriaToBeDeletedID = criteriaRepo.findByCriteriaName("test2").getId();
+		var schoolToDelete = cut.deleteSchool(SCHOOL_WITH_SINGLE_CRITERIA_REAL_EXISTING_MOCK_ID);
+		assertTrue(schoolToDelete.getStatusCode().equals(HttpStatusCode.valueOf(200)));
+		assertTrue(schoolRepo.findById(Long.valueOf(SCHOOL_WITH_SINGLE_CRITERIA_REAL_EXISTING_MOCK_ID)).isEmpty());
+		assertTrue(criteriaRepo.findById(criteriaToBeDeletedID).isEmpty());
+		assertEquals(critRepoCount - 1, criteriaRepo.count());
+	}
+
 	private Stream<School> findMatchingSchool(String testschool, List<School> allSchools) {
 		return allSchools.stream().filter(e -> (e.getSchoolName().equals(testschool)));
 	}
@@ -662,7 +708,7 @@ public class SchoolControllerTest {
 		assertEquals(2.222, school.getLongitude(), 0.001);
 		assertEquals("image1", school.getSchoolPicture());
 		assertEquals("text1", school.getAlternativePictureText());
-		assertEquals(-1, school.getPrimaryProject().getId());
+		assertEquals(SCHOOL_REAL_EXISTING_MOCK_ID, school.getPrimaryProject().getId());
 	}
 
 	private void assertSchoolEquals(SchoolDTO school, SchoolDTO postbody) {
@@ -681,7 +727,7 @@ public class SchoolControllerTest {
 		assertEquals(1.111, school.getLongitude(), 0.001);
 		assertEquals("text2", school.getAlternativePictureText());
 		assertEquals("image2", school.getSchoolPicture());
-		assertEquals(-1, school.getPrimaryProject().getId());
+		assertEquals(SCHOOL_REAL_EXISTING_MOCK_ID, school.getPrimaryProject().getId());
 
 	}
 

@@ -79,9 +79,11 @@ import de.rathsolutions.util.finder.pojo.SchoolSearchEntity;
 import de.rathsolutions.util.finder.specific.osm.OsmPOISchoolParser;
 import de.rathsolutions.util.structure.internalFinder.InstitutionAttributeFinderEntries;
 import io.swagger.v3.oas.annotations.Operation;
+import lombok.extern.slf4j.Slf4j;
 
 @RestController
 @RequestMapping("/api/v1/schools")
+@Slf4j
 public class SchoolController {
 
 	private static final String COLOR_CODE_REGEX = "^[0-9A-Fa-f]{6}$";
@@ -118,7 +120,7 @@ public class SchoolController {
 
 	@Autowired
 	private SchoolTypeRepo schoolTypeRepo;
-	
+
 	@Autowired
 	private InstitutionAttributeFinderEntries finderEntries;
 
@@ -133,7 +135,8 @@ public class SchoolController {
 			resultsByName = osmSchoolParser.find(new SchoolSearchEntity(name, city), amount);
 			return ResponseEntity.ok().header("Copyright", "This list was generated using Open Street Maps Data")
 					.body(resultsByName);
-		} catch (ParserConfigurationException | SAXException | IOException | ResourceNotFoundException | TransformerException
+		} catch (ParserConfigurationException | SAXException | IOException | ResourceNotFoundException
+				| TransformerException
 				| InterruptedException | ExecutionException | OperationNotSupportedException e) {
 			return ResponseEntity.notFound().build();
 		}
@@ -167,7 +170,8 @@ public class SchoolController {
 	@Operation(summary = "searches all school resources ordered by their name")
 	@GetMapping("/search/findAllSchoolsOrderedByName")
 	public List<SchoolDTO> findAllSchoolsOrderByName() {
-		return schoolRepo.findAllByOrderBySchoolName().stream().map(e -> e.convertToShrinkedDTO()).collect(Collectors.toList());
+		return schoolRepo.findAllByOrderBySchoolName().stream().map(e -> e.convertToShrinkedDTO())
+				.collect(Collectors.toList());
 	}
 
 	private List<School> findAllSchoolsByInBoundsInternal(String leftLatBound, String rightLatBound,
@@ -414,8 +418,18 @@ public class SchoolController {
 
 	@Operation(summary = "deletes a school resource")
 	@DeleteMapping("/delete/deleteSchool")
+	@Transactional
 	public ResponseEntity<SchoolDTO> deleteSchool(long schoolId) {
+		var deletedSchool = schoolRepo.findById(schoolId);
+		var allMatchingCriterias = deletedSchool.get().getMatchingCriterias();
 		schoolRepo.deleteById(schoolId);
+		allMatchingCriterias.forEach(criteria -> {
+			criteria.getSchoolMappings().removeIf(schoolMapping -> schoolMapping.getId().equals(schoolId));
+			if (criteria.getSchoolMappings().isEmpty()) {
+				log.debug("Criteria {} not longer referenced, deleting it", criteria.getCriteriaName());
+				criteriaRepo.delete(criteria);
+			}
+		});
 		finderEntries.clear();
 		finderEntries.buildEntryList();
 		return ResponseEntity.ok().build();

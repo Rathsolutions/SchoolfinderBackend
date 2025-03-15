@@ -1,6 +1,7 @@
 DELETE FROM person_school_mapping;
 DELETE FROM school_criteria_mapping;
 DELETE FROM school_project_mapping;
+DELETE FROM school_projects;
 DELETE FROM criteria;
 DELETE FROM person;
 DELETE FROM school;
@@ -37,13 +38,14 @@ INSERT INTO school_criteria_mapping (school_id, criteria_id) VALUES ((SELECT id 
 INSERT INTO school_criteria_mapping (school_id, criteria_id) VALUES ((SELECT id FROM School where school_name='testschool2'), (SELECT id FROM Criteria where criteria_name='test1'));
 INSERT INTO school_criteria_mapping (school_id, criteria_id) VALUES ((SELECT id FROM School where school_name='testschool3'), (SELECT id FROM Criteria where criteria_name='test'));
 INSERT INTO school_criteria_mapping (school_id, criteria_id) VALUES ((SELECT id FROM School where school_name='testschool3'), (SELECT id FROM Criteria where criteria_name='test1'));
+INSERT INTO school_criteria_mapping (school_id, criteria_id) VALUES ((SELECT id FROM School where school_name='testschool3'), (SELECT id FROM Criteria where criteria_name='test2'));
 
 INSERT INTO area (id, area, area_institution_position, color, name) VALUES (-1, 'SRID=3857;POLYGON ((891032.2520110907 6143429.787979117, 955239.3557706389 6137926.321942585, 930779.5067193825 6177673.576650876, 891032.2520110907 6143429.787979117))', 'POINT (8.004278906249999 48.230358945402884)', '0x00', 'testarea1');
 INSERT INTO area (id, area, area_institution_position, color, name) VALUES (-2, 'SRID=3857;POLYGON ((1012720.0010410914 6291411.8747392185, 1028007.4066981267 6262060.055877711, 1056136.2331070714 6287131.401155248, 1012720.0010410914 6291411.8747392185))', 'POINT (9.2402408203125 49.075859013135954)', '0xff', 'testarea2');
 
-INSERT INTO school_project_mapping (school_id ,project_id) VALUES ((SELECT id FROM School where school_name='testschool'), (SELECT id FROM Project where project_name='testproj1'));
-INSERT INTO school_project_mapping (school_id ,project_id) VALUES ((SELECT id FROM School where school_name='testschool2'), (SELECT id FROM Project where project_name='testproj1'));
-INSERT INTO school_project_mapping (school_id ,project_id) VALUES ((SELECT id FROM School where school_name='testschool3'), (SELECT id FROM Project where project_name='testproj2'));
+INSERT INTO school_projects (school_id ,projects_id) VALUES ((SELECT id FROM School where school_name='testschool'), (SELECT id FROM Project where project_name='testproj1'));
+INSERT INTO school_projects (school_id ,projects_id) VALUES ((SELECT id FROM School where school_name='testschool2'), (SELECT id FROM Project where project_name='testproj1'));
+INSERT INTO school_projects (school_id ,projects_id) VALUES ((SELECT id FROM School where school_name='testschool3'), (SELECT id FROM Project where project_name='testproj2'));
 
 ALTER SEQUENCE area_id_seq increment by 3; 
 ALTER SEQUENCE criteria_id_seq increment by 3; 
