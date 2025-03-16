@@ -32,6 +32,12 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
+import org.springframework.security.web.csrf.CsrfFilter;
+import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
+import org.springframework.security.web.csrf.CsrfTokenRequestHandler;
+import org.springframework.security.web.csrf.HttpSessionCsrfTokenRepository;
+import org.springframework.security.web.csrf.XorCsrfTokenRequestAttributeHandler;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -47,6 +53,8 @@ public class SecurityConfig {
 
 	@Bean
 	SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+		CsrfTokenRequestAttributeHandler requestHandler = new CsrfTokenRequestAttributeHandler();
+		requestHandler.setCsrfRequestAttributeName("_csrf");
 		//@formatter:off
 		http
 			.authorizeHttpRequests(req->req.requestMatchers(
@@ -63,8 +71,8 @@ public class SecurityConfig {
 				.requestMatchers("/**")
 					.authenticated())
 					.httpBasic(Customizer.withDefaults())
-				.csrf(configurer->configurer.disable())
-//					.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+				// .csrf(configurer->configurer.csrfTokenRepository(new HttpSessionCsrfTokenRepository()))
+				.csrf(configurer->configurer.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()).csrfTokenRequestHandler(requestHandler))
 //				.and()
 				.cors(Customizer.withDefaults());
 		http.headers(headers->headers.frameOptions(fo->fo.sameOrigin()));
