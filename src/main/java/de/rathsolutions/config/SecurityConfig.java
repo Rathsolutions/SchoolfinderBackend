@@ -33,11 +33,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
-import org.springframework.security.web.csrf.CsrfFilter;
 import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
-import org.springframework.security.web.csrf.CsrfTokenRequestHandler;
-import org.springframework.security.web.csrf.HttpSessionCsrfTokenRepository;
-import org.springframework.security.web.csrf.XorCsrfTokenRequestAttributeHandler;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -51,10 +47,12 @@ public class SecurityConfig {
 	@Autowired
 	private AuthenticationEntryPoint authEntryPoint;
 
+	@Autowired
+	private CookieCsrfTokenRepository csrfRepo;
+
 	@Bean
 	SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 		CsrfTokenRequestAttributeHandler requestHandler = new CsrfTokenRequestAttributeHandler();
-		requestHandler.setCsrfRequestAttributeName("_csrf");
 		//@formatter:off
 		http
 			.authorizeHttpRequests(req->req.requestMatchers(
@@ -63,6 +61,7 @@ public class SecurityConfig {
 				"/api/v1/schools",
 				"/api/v1/criterias/search/getAllAvailableCriterias/**", 
 				"/api/v1/*/search/findAll",
+				"/api/v1/persons/search/**",
 				"/api/v1/schoolType/search/**", 
 				"/api/v1/project/*")
 				.permitAll()
@@ -72,7 +71,7 @@ public class SecurityConfig {
 					.authenticated())
 					.httpBasic(Customizer.withDefaults())
 				// .csrf(configurer->configurer.csrfTokenRepository(new HttpSessionCsrfTokenRepository()))
-				.csrf(configurer->configurer.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()).csrfTokenRequestHandler(requestHandler))
+				.csrf(configurer->configurer.csrfTokenRepository(csrfRepo).csrfTokenRequestHandler(requestHandler))
 //				.and()
 				.cors(Customizer.withDefaults());
 		http.headers(headers->headers.frameOptions(fo->fo.sameOrigin()));

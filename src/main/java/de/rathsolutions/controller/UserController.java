@@ -21,26 +21,35 @@
  */
 package de.rathsolutions.controller;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import io.swagger.v3.oas.annotations.Operation;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 @RestController
 @RequestMapping("/api/v1/users")
 public class UserController {
 
+    @Autowired
+    private CookieCsrfTokenRepository csrfTokenRepository;
+
     @Operation(summary="validate user credentials by the authorization header")
     @GetMapping("/validateCredentials")
-    public ResponseEntity<?> validateCredentials(
-            @RequestHeader("Authorization") String authHeader) {
+    public void validateCredentials(
+            @RequestHeader("Authorization") String authHeader, HttpServletRequest request, HttpServletResponse response) {
         if (authHeader.isBlank()) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            response.setStatus(403);
+            return;
         }
-        return ResponseEntity.ok().build();
+        csrfTokenRepository.saveToken(csrfTokenRepository.generateToken(request), request, response);
+        response.setStatus(200);
     }
 }
