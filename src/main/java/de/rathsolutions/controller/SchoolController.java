@@ -87,8 +87,6 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class SchoolController {
 
-	private static final String COLOR_CODE_REGEX = "^[0-9A-Fa-f]{6}$";
-
 	@Autowired
 	private SchoolRepo schoolRepo;
 
@@ -221,7 +219,7 @@ public class SchoolController {
 		return allSchoolsMatching;
 	}
 
-	private boolean listConditionMet(List schoolTypes) {
+	private boolean listConditionMet(List<?> schoolTypes) {
 		return schoolTypes != null && !schoolTypes.isEmpty();
 	}
 
