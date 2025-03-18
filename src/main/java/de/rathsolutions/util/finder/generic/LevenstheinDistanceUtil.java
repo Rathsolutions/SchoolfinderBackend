@@ -77,7 +77,7 @@ public class LevenstheinDistanceUtil {
 				// Perform sliding window technique if keyword is shorter than substring
 				if (matchingString.length() > requestString.length()) {
 					var substrings = generateSubstringList(matchingString, requestString.length());
-					entityDistanceMapping.put(f, substrings.stream()
+					entityDistanceMapping.put(f, substrings.stream().parallel()
 							.mapToInt(subs -> getLevenstheinDistance(requestString.toLowerCase(),
 									subs))
 							.min()
