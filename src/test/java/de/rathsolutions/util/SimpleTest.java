@@ -21,18 +21,9 @@
  */
 package de.rathsolutions.util;
 
-import de.rathsolutions.SpringBootMain;
-import de.rathsolutions.jpa.entity.Area;
-import de.rathsolutions.jpa.entity.PersonSchoolMapping;
-import de.rathsolutions.jpa.entity.Project;
-import de.rathsolutions.jpa.repo.AreaRepository;
-import de.rathsolutions.jpa.repo.PersonSchoolMappingRepo;
-import de.rathsolutions.jpa.repo.ProjectRepo;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import lombok.extern.slf4j.Slf4j;
 
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -44,6 +35,13 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.transaction.annotation.Transactional;
+
+import de.rathsolutions.SpringBootMain;
+import de.rathsolutions.jpa.entity.Area;
+import de.rathsolutions.jpa.entity.PersonSchoolMapping;
+import de.rathsolutions.jpa.repo.AreaRepository;
+import de.rathsolutions.jpa.repo.PersonSchoolMappingRepo;
+import lombok.extern.slf4j.Slf4j;
 
 @SpringBootTest
 @ContextConfiguration(classes = SpringBootMain.class)
