@@ -24,7 +24,6 @@ package de.rathsolutions.util.finder.generic;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -69,11 +68,28 @@ public class LevenstheinDistanceUtil {
 		Map<FinderEntitySearchConstraint, FinderEntity> finderEntityDistanceMapping = new HashMap<>();
 		resultList.stream().forEach(e -> {
 			e.getQueryValues().forEach(f -> {
+				if (f.getPrimaryValue().isEmpty()) {
+					return;
+				}
 				finderEntityDistanceMapping.put(f, e);
-				entityDistanceMapping.put(f, getLevenstheinDistance(requestString.toLowerCase(),
-						f.getPrimaryValue().toLowerCase() + (computeWithSecondaryValue ? f.getSecondaryValue() : "")));
+				var matchingString = f.getPrimaryValue().toLowerCase()
+						+ (computeWithSecondaryValue ? f.getSecondaryValue() : "");
+				// Perform sliding window technique if keyword is shorter than substring
+				if (matchingString.length() > requestString.length()) {
+					var substrings = generateSubstringList(matchingString, requestString.length());
+					entityDistanceMapping.put(f, substrings.stream().parallel()
+							.mapToInt(subs -> getLevenstheinDistance(requestString.toLowerCase(),
+									subs))
+							.min()
+							.getAsInt());
+				} else {
+					entityDistanceMapping.put(f, getLevenstheinDistance(requestString.toLowerCase(),
+							matchingString));
+				}
+
 			});
 		});
+
 		List<Entry<FinderEntitySearchConstraint, Integer>> collect = entityDistanceMapping.entrySet().stream()
 				.sorted((e, f) -> e.getValue().compareTo(f.getValue())).collect(Collectors.toList());
 		List<Entry<FinderEntitySearchConstraint, Integer>> perfectMatch = collect.stream()
@@ -83,15 +99,16 @@ public class LevenstheinDistanceUtil {
 		if (!perfectMatch.isEmpty() && perfectMatch.size() == 1 && perfectMatchAllowed) {
 			return Arrays.asList(finderEntityDistanceMapping.get(perfectMatch.get(0).getKey()));
 		} else {
-			collect = collect.size() <= amount ? collect.subList(0, collect.size()) : collect.subList(0, amount);
+			var perfectMatches = collect.stream().filter(e -> e.getValue() == 0).collect(Collectors.toList());
+			collect.removeAll(perfectMatch);
+			var remainders = collect = collect.size() <= amount ? collect.subList(0, collect.size())
+					: collect.subList(0, amount);
+			collect = perfectMatches;
+			collect.addAll(remainders);
 			List<FinderEntity> toReturn = new ArrayList<>();
 			Set<String> alreadyAdded = new HashSet<>();
 			collect.stream().sorted((e, f) -> e.getValue().compareTo(f.getValue())).map(e -> e.getKey())
 					.map(e -> finderEntityDistanceMapping.get(e)).forEach(e -> {
-//						if (!alreadyAddedPrimary.contains(e.getPrimaryValue() + "#" + e.getSecondaryValue())) {
-//							toReturn.add(e);
-//							alreadyAddedPrimary.add(e.getPrimaryValue() + "#" + e.getSecondaryValue());
-//						}
 						boolean add = true;
 						for (String elementAlreadyAdded : alreadyAdded) {
 							String[] splittedLatLong = elementAlreadyAdded.split("#");
@@ -110,19 +127,39 @@ public class LevenstheinDistanceUtil {
 		}
 	}
 
-	private int getLevenstheinDistance(String requestString, String entityTwo) {
+	private List<String> generateSubstringList(String targetString, int windowSize) {
+		List<String> toReturn = new ArrayList<>();
+		for (int i = 0; i + windowSize <= targetString.length(); i++) {
+			toReturn.add(targetString.substring(i, i + windowSize));
+		}
+		return toReturn;
+	}
+
+	private int getLevenstheinDistance(String requestString, String matchinString) {
+		int formerRequestLength = requestString.length();
+		int formerMatchingLength = matchinString.length();
+		if (formerRequestLength > formerMatchingLength) {
+			for (int i = 0; i < formerRequestLength - formerMatchingLength; i++) {
+				matchinString += " ";
+			}
+		} else if (formerRequestLength < formerMatchingLength) {
+			for (int i = 0; i < formerMatchingLength - formerRequestLength; i++) {
+				requestString += " ";
+			}
+
+		}
 		requestString = " " + requestString;
-		entityTwo = " " + entityTwo;
-		int[][] levenstheinMatrix = new int[requestString.length()][entityTwo.length()];
+		matchinString = " " + matchinString;
+		int[][] levenstheinMatrix = new int[requestString.length()][matchinString.length()];
 		for (int i = 0; i < requestString.length(); i++) {
 			levenstheinMatrix[i][0] = i;
 		}
-		for (int j = 0; j < entityTwo.length(); j++) {
+		for (int j = 0; j < matchinString.length(); j++) {
 			levenstheinMatrix[0][j] = j;
 		}
 		for (int i = 1; i < requestString.length(); i++) {
-			for (int j = 1; j < entityTwo.length(); j++) {
-				if (requestString.charAt(i) == entityTwo.charAt(j)) {
+			for (int j = 1; j < matchinString.length(); j++) {
+				if (requestString.charAt(i) == matchinString.charAt(j)) {
 					levenstheinMatrix[i][j] = levenstheinMatrix[i - 1][j - 1];
 				} else {
 					int replacementVal = levenstheinMatrix[i - 1][j - 1] + 1;
@@ -132,7 +169,8 @@ public class LevenstheinDistanceUtil {
 				}
 			}
 		}
-		return levenstheinMatrix[requestString.length() - 1][entityTwo.length() - 1];
+		int returnResult = levenstheinMatrix[requestString.length() - 1][matchinString.length() - 1];
+		return returnResult;
 	}
 
 	private int smallestIntOfThree(int a, int b, int c) {

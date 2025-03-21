@@ -25,12 +25,16 @@ import java.util.List;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import de.rathsolutions.jpa.entity.Criteria;
 
 @Repository
 public interface CriteriaRepo extends JpaRepository<Criteria, Long> {
+
+    @Query("SELECT DISTINCT c, s, p FROM Criteria c JOIN c.schoolMappings s JOIN s.projects p WHERE p.id = ?1 ORDER BY c.criteriaName")
+    public List<Criteria> findAllBySchoolMappingsProjectId(long matchingProjectId);
 
     public List<Criteria> findAllByCriteriaNameIn(List<String> criteriaNameList);
 

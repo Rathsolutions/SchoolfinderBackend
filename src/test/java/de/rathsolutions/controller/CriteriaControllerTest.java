@@ -24,20 +24,20 @@ package de.rathsolutions.controller;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
-import de.rathsolutions.SpringBootMain;
-import de.rathsolutions.controller.postbody.AddNewCriteriaPostbody;
-import de.rathsolutions.jpa.entity.Criteria;
 import java.util.List;
+
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.transaction.annotation.Transactional;
+
+import de.rathsolutions.SpringBootMain;
+import de.rathsolutions.controller.postbody.AddNewCriteriaPostbody;
+import de.rathsolutions.jpa.entity.Criteria;
 
 @SpringBootTest
 @ContextConfiguration(classes = SpringBootMain.class)
@@ -45,75 +45,83 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 class CriteriaControllerTest {
 
-    @Autowired
-    private CriteriaController cut;
+	@Autowired
+	private CriteriaController cut;
 
-    @Test
-    void testGetAllAvailableCriterias() throws Exception {
-	ResponseEntity<List<Criteria>> allAvailableCriterias = cut.getAllAvailableCriterias();
-	assertEquals(3, allAvailableCriterias.getBody().size());
-	for (int i = 0; i < allAvailableCriterias.getBody().size(); i++) {
-	    String name = "test" + (i > 0 ? i : "");
-	    assertEquals(name, allAvailableCriterias.getBody().get(i).getCriteriaName());
+	@Test
+	void testGetAllAvailableCriteriasWithoutProjectId() throws Exception {
+		ResponseEntity<List<Criteria>> allAvailableCriterias = cut.getAllAvailableCriterias(null);
+		assertEquals(3, allAvailableCriterias.getBody().size());
+		assertEquals("test", allAvailableCriterias.getBody().get(0).getCriteriaName());
+		assertEquals("test1", allAvailableCriterias.getBody().get(1).getCriteriaName());
+		assertEquals("test2", allAvailableCriterias.getBody().get(2).getCriteriaName());
+
 	}
-    }
 
-    @Test
-    void testGetCriteriaRecommendationsWithOnlyTName() throws Exception {
-	ResponseEntity<List<Criteria>> criteriaRecommendations = cut.getCriteriaRecommendations("t", "10");
-	assertEquals(3, criteriaRecommendations.getBody().size());
-	for (int i = 0; i < criteriaRecommendations.getBody().size(); i++) {
-	    String name = "test" + (i > 0 ? i : "");
-	    assertEquals(name, criteriaRecommendations.getBody().get(i).getCriteriaName());
+	@Test
+	void testGetAllAvailableCriteriasWithSelectedProjectId() throws Exception {
+		ResponseEntity<List<Criteria>> allAvailableCriterias = cut.getAllAvailableCriterias(-2L);
+		assertEquals(2, allAvailableCriterias.getBody().size());
+		assertEquals("test", allAvailableCriterias.getBody().get(0).getCriteriaName());
+		assertEquals("test1", allAvailableCriterias.getBody().get(1).getCriteriaName());
 	}
-    }
 
-    @Test
-    void testGetCriteriaRecommendationsWithFullQualifiedTestName() throws Exception {
-	ResponseEntity<List<Criteria>> criteriaRecommendations = cut.getCriteriaRecommendations("test", "10");
-	assertEquals(3, criteriaRecommendations.getBody().size());
-	for (int i = 0; i < criteriaRecommendations.getBody().size(); i++) {
-	    String name = "test" + (i > 0 ? i : "");
-	    assertEquals(name, criteriaRecommendations.getBody().get(i).getCriteriaName());
+	@Test
+	void testGetCriteriaRecommendationsWithOnlyTName() throws Exception {
+		ResponseEntity<List<Criteria>> criteriaRecommendations = cut.getCriteriaRecommendations("t", "10");
+		assertEquals(3, criteriaRecommendations.getBody().size());
+		for (int i = 0; i < criteriaRecommendations.getBody().size(); i++) {
+			String name = "test" + (i > 0 ? i : "");
+			assertEquals(name, criteriaRecommendations.getBody().get(i).getCriteriaName());
+		}
 	}
-    }
 
-    @Test
-    void testGetCriteriaRecommendationsWithFullQualifiedTest1Name() throws Exception {
-	ResponseEntity<List<Criteria>> criteriaRecommendations = cut.getCriteriaRecommendations("test1", "10");
-	assertEquals(1, criteriaRecommendations.getBody().size());
-	String name = "test1";
-	assertEquals(name, criteriaRecommendations.getBody().get(0).getCriteriaName());
-    }
+	@Test
+	void testGetCriteriaRecommendationsWithFullQualifiedTestName() throws Exception {
+		ResponseEntity<List<Criteria>> criteriaRecommendations = cut.getCriteriaRecommendations("test", "10");
+		assertEquals(3, criteriaRecommendations.getBody().size());
+		for (int i = 0; i < criteriaRecommendations.getBody().size(); i++) {
+			String name = "test" + (i > 0 ? i : "");
+			assertEquals(name, criteriaRecommendations.getBody().get(i).getCriteriaName());
+		}
+	}
 
-    @Test
-    void testGetCriteriaRecommendationsWithFullQualifiedTest2Name() throws Exception {
-	ResponseEntity<List<Criteria>> criteriaRecommendations = cut.getCriteriaRecommendations("test2", "10");
-	assertEquals(1, criteriaRecommendations.getBody().size());
-	String name = "test2";
-	assertEquals(name, criteriaRecommendations.getBody().get(0).getCriteriaName());
-    }
+	@Test
+	void testGetCriteriaRecommendationsWithFullQualifiedTest1Name() throws Exception {
+		ResponseEntity<List<Criteria>> criteriaRecommendations = cut.getCriteriaRecommendations("test1", "10");
+		assertEquals(1, criteriaRecommendations.getBody().size());
+		String name = "test1";
+		assertEquals(name, criteriaRecommendations.getBody().get(0).getCriteriaName());
+	}
 
-    @Test
-    void testAddNewCriteriaEmptyPostbody() throws Exception {
-	ResponseEntity<Criteria> criteria = cut.addNewCriteria(null);
-	assertEquals(HttpStatus.NO_CONTENT, criteria.getStatusCode());
-	assertNull(criteria.getBody());
-    }
+	@Test
+	void testGetCriteriaRecommendationsWithFullQualifiedTest2Name() throws Exception {
+		ResponseEntity<List<Criteria>> criteriaRecommendations = cut.getCriteriaRecommendations("test2", "10");
+		assertEquals(1, criteriaRecommendations.getBody().size());
+		String name = "test2";
+		assertEquals(name, criteriaRecommendations.getBody().get(0).getCriteriaName());
+	}
 
-    @Test
-    void testAddNewCriteriaAlreadyExisting() throws Exception {
-	ResponseEntity<Criteria> criteria = cut.addNewCriteria(new AddNewCriteriaPostbody("test"));
-	assertEquals(HttpStatus.CONFLICT, criteria.getStatusCode());
-	assertNull(criteria.getBody());
-    }
+	@Test
+	void testAddNewCriteriaEmptyPostbody() throws Exception {
+		ResponseEntity<Criteria> criteria = cut.addNewCriteria(null);
+		assertEquals(HttpStatus.NO_CONTENT, criteria.getStatusCode());
+		assertNull(criteria.getBody());
+	}
 
-    @Test
-    void testAddNewCriteriaNewCriteria() throws Exception {
-	ResponseEntity<Criteria> criteria = cut.addNewCriteria(new AddNewCriteriaPostbody("test3"));
-	assertEquals(HttpStatus.OK, criteria.getStatusCode());
-	assertEquals("test3", criteria.getBody().getCriteriaName());
-	assertEquals(0, criteria.getBody().getSchoolMappings().size());
-    }
+	@Test
+	void testAddNewCriteriaAlreadyExisting() throws Exception {
+		ResponseEntity<Criteria> criteria = cut.addNewCriteria(new AddNewCriteriaPostbody("test"));
+		assertEquals(HttpStatus.CONFLICT, criteria.getStatusCode());
+		assertNull(criteria.getBody());
+	}
+
+	@Test
+	void testAddNewCriteriaNewCriteria() throws Exception {
+		ResponseEntity<Criteria> criteria = cut.addNewCriteria(new AddNewCriteriaPostbody("test3"));
+		assertEquals(HttpStatus.OK, criteria.getStatusCode());
+		assertEquals("test3", criteria.getBody().getCriteriaName());
+		assertEquals(0, criteria.getBody().getSchoolMappings().size());
+	}
 
 }

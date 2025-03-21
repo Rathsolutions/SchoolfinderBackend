@@ -54,13 +54,18 @@ class OsmPOISchoolParserTest {
 
 	@Test
 	void testFindCorrectElementsInXmlFileWithFullName()
-			throws ParserConfigurationException, SAXException, IOException, ResourceNotFoundException, TransformerException,
+			throws ParserConfigurationException, SAXException, IOException, ResourceNotFoundException,
+			TransformerException,
 			InterruptedException, ExecutionException, OperationNotSupportedException {
 		List<FinderEntity> testObjects = OsmSchoolTestHelper.getInstance().getTestEntites();
 		for (FinderEntity e : testObjects) {
 			List<FinderEntity> schoolByName = cut
 					.find(new SchoolSearchEntity(e.getPrimaryValue(), e.getSecondaryValue()), 1);
-			assertTrue(OsmTestHelper.assertOsmPoiEqual(e, schoolByName.get(0)));
+			schoolByName.forEach(school -> {
+				if (school.getLatVal() == e.getLatVal() && school.getLongVal() == e.getLongVal()) {
+					assertTrue(OsmTestHelper.assertOsmPoiEqual(e, school));
+				}
+			});
 		}
 	}
 

@@ -23,8 +23,10 @@ package de.rathsolutions.config;
 
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.experimental.UtilityClass;
+import lombok.extern.slf4j.Slf4j;
 
 @UtilityClass
+@Slf4j
 public class IPUtils {
 
     public static String getClientIP(HttpServletRequest request) {

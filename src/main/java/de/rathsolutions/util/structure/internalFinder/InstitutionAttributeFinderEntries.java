@@ -22,7 +22,9 @@
 package de.rathsolutions.util.structure.internalFinder;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -51,6 +53,8 @@ public class InstitutionAttributeFinderEntries extends AbstractEntries {
 	@Autowired
 	private SchoolDAOService schoolDaoService;
 
+	private Map<Long, List<FinderEntity>> finderEntityForProjectsMap = new HashMap<>();
+
 	/**
 	 * Builds the internal entry list with all searchable information from
 	 * institutions
@@ -66,20 +70,28 @@ public class InstitutionAttributeFinderEntries extends AbstractEntries {
 				return new FinderEntity(e.getSchoolName(), f, Stream.of(f).map(g -> {
 					String[] splitString = g.split(" ");
 					List<String> resultsFinal = new ArrayList<>();
-					for(String s : splitString) {
+					for (String s : splitString) {
 						String[] splittedByDash = s.split("-");
-						for(String splittedDash : splittedByDash) {
+						for (String splittedDash : splittedByDash) {
 							resultsFinal.add(splittedDash);
 						}
 						resultsFinal.add(s);
-						
+
 					}
 					String[] toReturn = new String[resultsFinal.size()];
 					toReturn = resultsFinal.toArray(toReturn);
 					return toReturn;
 				}).map(g -> Stream.of(g).map(h -> new FinderEntitySearchConstraint(h, "")).collect(Collectors.toList()))
 						.flatMap(List::stream).collect(Collectors.toList()), e.getLongitude(), e.getLatitude());
-			}).forEach(f -> this.add(f));
+			}).forEach(f -> {
+				this.add(f);
+				e.getProjects().forEach(project -> {
+					if (!this.finderEntityForProjectsMap.containsKey(project.getId())) {
+						this.finderEntityForProjectsMap.put(project.getId(), new ArrayList<>());
+					}
+					this.finderEntityForProjectsMap.get(project.getId()).add(f);
+				});
+			});
 		});
 
 	}
@@ -98,6 +110,13 @@ public class InstitutionAttributeFinderEntries extends AbstractEntries {
 			this.buildEntryList();
 		}
 		return super.get(index);
+	}
+
+	public List<FinderEntity> sublistOfProjectId(long projectId){
+		if (this.isEmpty()) {
+			this.buildEntryList();
+		}
+		return this.finderEntityForProjectsMap.get(projectId);
 	}
 
 }
