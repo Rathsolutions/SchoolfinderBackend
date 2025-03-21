@@ -22,6 +22,8 @@
 package de.rathsolutions.jpa.repo;
 
 import de.rathsolutions.jpa.entity.Project;
+
+import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
@@ -30,5 +32,7 @@ import org.springframework.stereotype.Repository;
 public interface ProjectRepo extends JpaRepository<Project, Long> {
 
     public Optional<Project> findOneByProjectName(String name);
+
+    public List<Project> findAllByAllSchoolsIsNotEmpty();
 
 }

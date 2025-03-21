@@ -59,6 +59,7 @@ public class SecurityConfig {
 				"/api/v1/schools",
 				"/api/v1/criterias/search/getAllAvailableCriterias/**", 
 				"/api/v1/*/search/findAll",
+				"/api/v1/*/search/findAllActiveProjects",
 				"/api/v1/persons/search/**",
 				"/api/v1/schoolType/search/**", 
 				"/api/v1/project/*")

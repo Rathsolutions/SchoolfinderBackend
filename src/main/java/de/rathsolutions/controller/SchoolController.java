@@ -274,20 +274,27 @@ public class SchoolController {
 	@Transactional(readOnly = true)
 	public ResponseEntity<List<SchoolDTO>> findAllSchoolsInBoundsHavingCriteriasAndProjectWithoutProjectIconInResponse(
 			String leftLatBound, String rightLatBound, String topLongBound, String bottomLongBound,
-			@RequestParam(value = "projectId", required = false) Long projectId,
+			@RequestParam(value = "projectIds", required = false) List<Long> projectIds,
 			@RequestParam(value = "criteriaNumbers", required = false) List<Long> criteriaNumbers,
 			@RequestParam(value = "schoolTypeIds", required = false) List<Integer> schoolTypeIds,
 			@RequestParam(value = "exclusiveSearch", required = false, defaultValue = "false") boolean exclusiveSearch) {
-		ResponseEntity<List<SchoolDTO>> findAllSchoolsInBoundsHavingCriteriasAndProject = findAllSchoolsInBoundsHavingCriteriasAndProject(
-				leftLatBound, rightLatBound, topLongBound, bottomLongBound, projectId, criteriaNumbers, schoolTypeIds,
-				exclusiveSearch);
-		List<SchoolDTO> schoolDtoBody = findAllSchoolsInBoundsHavingCriteriasAndProject.getBody();
-		schoolDtoBody.forEach(e -> {
+		List<School> matchingSchools = this.findAllSchoolsByInBoundsInternal(leftLatBound, rightLatBound, topLongBound,
+				bottomLongBound, criteriaNumbers, schoolTypeIds, exclusiveSearch);
+		List<SchoolDTO> intermediateResult;
+		if (projectIds == null || projectIds.isEmpty()) {
+			intermediateResult = matchingSchools.stream().map(e -> e.convertToShrinkedDTO())
+					.collect(Collectors.toList());
+		} else {
+			intermediateResult = matchingSchools.stream()
+					.filter(e -> e.getProjects().stream().anyMatch(f -> projectIds.contains(f.getId())))
+					.map(e -> e.convertToShrinkedDTO()).collect(Collectors.toList());
+		}
+		intermediateResult.forEach(e -> {
 			e.setPrimaryProject(e.getPrimaryProject().convertToShrinkedDto());
 			e.setProjects(e.getProjects().stream().map(project -> project.convertToShrinkedDto())
 					.collect(Collectors.toList()));
 		});
-		return findAllSchoolsInBoundsHavingCriteriasAndProject;
+		return ResponseEntity.ok(intermediateResult);
 	}
 
 	@Operation(summary = "searches a school resource by id with all details")

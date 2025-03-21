@@ -45,77 +45,86 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/v1/project")
 public class ProjectController {
 
-    @Autowired
-    private ProjectRepo projectRepo;
+	@Autowired
+	private ProjectRepo projectRepo;
 
-    @GetMapping(value = "/{id}")
-    public ResponseEntity<ProjectDTO> findById(@PathVariable(value = "id") long id) {
-	Optional<Project> findById = projectRepo.findById(id);
-	if (findById.isEmpty()) {
-	    return ResponseEntity.notFound().build();
+	@GetMapping(value = "/{id}")
+	public ResponseEntity<ProjectDTO> findById(@PathVariable(value = "id") long id) {
+		Optional<Project> findById = projectRepo.findById(id);
+		if (findById.isEmpty()) {
+			return ResponseEntity.notFound().build();
+		}
+		return ResponseEntity.ok(findById.get().convertToDto());
 	}
-	return ResponseEntity.ok(findById.get().convertToDto());
-    }
 
-    @GetMapping(value = "/search/findAll")
-    public ResponseEntity<List<ProjectDTO>> findAll() {
-	List<ProjectDTO> allProjects = new ArrayList<>();
-	projectRepo.findAll().forEach(e -> {
-	    allProjects.add(e.convertToDto());
-	});
-	return ResponseEntity.ok(allProjects);
-    }
-
-    @GetMapping("/search/getProjectByName/{name}")
-    public ResponseEntity<ProjectDTO> getProjectByName(@PathVariable(name = "name", required = true) String name) {
-	Optional<Project> projectByName = projectRepo.findOneByProjectName(name);
-	if (projectByName.isEmpty()) {
-	    return ResponseEntity.notFound().build();
+	@GetMapping(value = "/search/findAll")
+	public ResponseEntity<List<ProjectDTO>> findAll() {
+		List<ProjectDTO> allProjects = new ArrayList<>();
+		projectRepo.findAll().forEach(e -> {
+			allProjects.add(e.convertToDto());
+		});
+		return ResponseEntity.ok(allProjects);
 	}
-	return ResponseEntity.ok(projectByName.get().convertToDto());
-    }
 
-    @GetMapping(value = "/search/getAllSchoolsForProjectWithId")
-    public ResponseEntity<List<School>> getAllSchoolsForProjectWithId(@RequestParam Long id) {
-	Optional<Project> projectByName = projectRepo.findById(id);
-	if (projectByName.isEmpty()) {
-	    return ResponseEntity.notFound().build();
+	@GetMapping(value = "/search/findAllActiveProjects")
+	public ResponseEntity<List<ProjectDTO>> findAllActiveProjects() {
+		List<ProjectDTO> allProjects = new ArrayList<>();
+		projectRepo.findAllByAllSchoolsIsNotEmpty().forEach(e -> {
+			allProjects.add(e.convertToDto());
+		});
+		return ResponseEntity.ok(allProjects);
 	}
-	return ResponseEntity.ok(projectByName.get().getAllSchools());
-    }
 
-    @GetMapping("/search/getAllSchoolsForProjectWithName")
-    public ResponseEntity<List<School>> getAllSchoolsForProjectWithName(
-	    @PathVariable(name = "name", required = true) String name) {
-	Optional<Project> projectByName = projectRepo.findOneByProjectName(name);
-	if (projectByName.isEmpty()) {
-	    return ResponseEntity.notFound().build();
+	@GetMapping("/search/getProjectByName/{name}")
+	public ResponseEntity<ProjectDTO> getProjectByName(@PathVariable(name = "name", required = true) String name) {
+		Optional<Project> projectByName = projectRepo.findOneByProjectName(name);
+		if (projectByName.isEmpty()) {
+			return ResponseEntity.notFound().build();
+		}
+		return ResponseEntity.ok(projectByName.get().convertToDto());
 	}
-	return ResponseEntity.ok(projectByName.get().getAllSchools());
-    }
 
-    @PutMapping("/create")
-    public ResponseEntity<ProjectDTO> createProject(@RequestBody ProjectDTO projectToCreate) {
-	if (projectRepo.findOneByProjectName(projectToCreate.getName()).isPresent()) {
-	    return ResponseEntity.status(HttpStatus.CONFLICT).build();
+	@GetMapping(value = "/search/getAllSchoolsForProjectWithId")
+	public ResponseEntity<List<School>> getAllSchoolsForProjectWithId(@RequestParam Long id) {
+		Optional<Project> projectByName = projectRepo.findById(id);
+		if (projectByName.isEmpty()) {
+			return ResponseEntity.notFound().build();
+		}
+		return ResponseEntity.ok(projectByName.get().getAllSchools());
 	}
-	Project projectEntity = new Project(projectToCreate.getName(), projectToCreate.getIcon().getBytes(),
-		projectToCreate.getScaling());
-	return ResponseEntity.ok(projectRepo.save(projectEntity).convertToDto());
-    }
 
-    @PatchMapping("/edit")
-    @Transactional
-    public ResponseEntity<ProjectDTO> editProject(@RequestBody ProjectDTO projectToCreate) {
-	Optional<Project> projectEntityOptional = projectRepo.findById(Long.valueOf(projectToCreate.getId()));
-	if (projectEntityOptional.isEmpty()) {
-	    return ResponseEntity.notFound().build();
+	@GetMapping("/search/getAllSchoolsForProjectWithName")
+	public ResponseEntity<List<School>> getAllSchoolsForProjectWithName(
+			@PathVariable(name = "name", required = true) String name) {
+		Optional<Project> projectByName = projectRepo.findOneByProjectName(name);
+		if (projectByName.isEmpty()) {
+			return ResponseEntity.notFound().build();
+		}
+		return ResponseEntity.ok(projectByName.get().getAllSchools());
 	}
-	Project projectEntity = projectEntityOptional.get();
-	projectEntity.setProjectName(projectToCreate.getName());
-	projectEntity.setDefaultIcon(projectToCreate.getIcon().getBytes());
-	projectEntity.setScaling(projectToCreate.getScaling());
-	return ResponseEntity.ok(projectRepo.save(projectEntity).convertToDto());
-    }
+
+	@PutMapping("/create")
+	public ResponseEntity<ProjectDTO> createProject(@RequestBody ProjectDTO projectToCreate) {
+		if (projectRepo.findOneByProjectName(projectToCreate.getName()).isPresent()) {
+			return ResponseEntity.status(HttpStatus.CONFLICT).build();
+		}
+		Project projectEntity = new Project(projectToCreate.getName(), projectToCreate.getIcon().getBytes(),
+				projectToCreate.getScaling());
+		return ResponseEntity.ok(projectRepo.save(projectEntity).convertToDto());
+	}
+
+	@PatchMapping("/edit")
+	@Transactional
+	public ResponseEntity<ProjectDTO> editProject(@RequestBody ProjectDTO projectToCreate) {
+		Optional<Project> projectEntityOptional = projectRepo.findById(Long.valueOf(projectToCreate.getId()));
+		if (projectEntityOptional.isEmpty()) {
+			return ResponseEntity.notFound().build();
+		}
+		Project projectEntity = projectEntityOptional.get();
+		projectEntity.setProjectName(projectToCreate.getName());
+		projectEntity.setDefaultIcon(projectToCreate.getIcon().getBytes());
+		projectEntity.setScaling(projectToCreate.getScaling());
+		return ResponseEntity.ok(projectRepo.save(projectEntity).convertToDto());
+	}
 
 }
