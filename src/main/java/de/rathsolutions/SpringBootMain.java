@@ -21,6 +21,7 @@
  */
 package de.rathsolutions;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
@@ -29,13 +30,26 @@ import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 
 @SpringBootApplication
 @EnableAsync
 public class SpringBootMain {
 
+    @Value("${de.rathsolutions.domain}")
+    private String csrfDomain;
+
     public static void main(String[] args) {
         SpringApplication.run(SpringBootMain.class, args);
+    }
+
+    @Bean
+    public CookieCsrfTokenRepository csrfTokenRepo(){
+        var csrfRepo = CookieCsrfTokenRepository.withHttpOnlyFalse();
+		csrfRepo.setCookieCustomizer(customizer->{
+			customizer.domain(csrfDomain);
+		});
+        return csrfRepo;
     }
 
     @Bean

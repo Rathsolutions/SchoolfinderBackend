@@ -35,39 +35,45 @@ public abstract class AbstractSearchEntity {
 
     protected String housenumber;
 
+    protected Long projectId = null;
+
     /**
      * @return the name
      */
     public String getName() throws OperationNotSupportedException {
-	return name;
+        return name;
     }
 
     /**
      * @return the city
      */
     public String getCity() throws OperationNotSupportedException {
-	return city;
+        return city;
     }
 
     /**
      * @return the street
      */
     public String getStreet() throws OperationNotSupportedException {
-	return street;
+        return street;
     }
 
     /**
      * @return the housenumber
      */
     public String getHousenumber() throws OperationNotSupportedException {
-	return housenumber;
+        return housenumber;
     }
 
     /**
      * @return the district
      */
     public String getDistrict() throws OperationNotSupportedException {
-	return district;
+        return district;
+    }
+
+    public Long getProjectId(){
+        return projectId;
     }
 
 }

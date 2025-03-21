@@ -87,8 +87,6 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class SchoolController {
 
-	private static final String COLOR_CODE_REGEX = "^[0-9A-Fa-f]{6}$";
-
 	@Autowired
 	private SchoolRepo schoolRepo;
 
@@ -170,9 +168,19 @@ public class SchoolController {
 
 	@Operation(summary = "searches all school resources ordered by their name")
 	@GetMapping("/search/findAllSchoolsOrderedByName")
-	public List<SchoolDTO> findAllSchoolsOrderByName() {
-		return schoolRepo.findAllByOrderBySchoolName().stream().map(e -> e.convertToShrinkedDTO())
-				.collect(Collectors.toList());
+	public List<SchoolDTO> findAllSchoolsOrderByName(
+			@RequestParam(required = false, defaultValue = "-1") long projectId) {
+		if (projectId == -1) {
+			return schoolRepo.findAllByOrderBySchoolName().stream()
+					.map(e -> e.convertToShrinkedDTO())
+					.collect(Collectors.toList());
+
+		} else {
+			return schoolRepo.findAllByProjectsIdOrderBySchoolName(projectId).stream()
+					.map(e -> e.convertToShrinkedDTO())
+					.collect(Collectors.toList());
+
+		}
 	}
 
 	private List<School> findAllSchoolsByInBoundsInternal(String leftLatBound, String rightLatBound,
@@ -221,7 +229,7 @@ public class SchoolController {
 		return allSchoolsMatching;
 	}
 
-	private boolean listConditionMet(List schoolTypes) {
+	private boolean listConditionMet(List<?> schoolTypes) {
 		return schoolTypes != null && !schoolTypes.isEmpty();
 	}
 

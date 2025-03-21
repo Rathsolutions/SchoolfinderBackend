@@ -1,3 +1,6 @@
+DELETE FROM additional_information_mapping;
+DELETE FROM additional_information;
+DELETE FROM information_type;
 DELETE FROM person_school_mapping;
 DELETE FROM school_criteria_mapping;
 DELETE FROM school_projects;
@@ -29,15 +32,26 @@ INSERT INTO school (id, short_school_name, school_name, latitude, longitude, sch
 INSERT INTO functionality (id, name) VALUES (-1, 'testfunc1');
 INSERT INTO functionality (id, name) VALUES (-2, 'testfunc2');
 
+INSERT INTO information_type (id, value) VALUES (-1, 'infotype1');
+INSERT INTO information_type (id, value) VALUES (-2, 'infotype2');
+
+INSERT INTO additional_information (id, value, type_id) VALUES (-1, 'additional_info1', -1);
+INSERT INTO additional_information (id, value, type_id) VALUES (-2, 'additional_info2', -1);
+INSERT INTO additional_information (id, value, type_id) VALUES (-3, 'additional_info3', -2);
+
+INSERT INTO additional_information_mapping (school_id, additional_information_id) VALUES (-1, -1);
+INSERT INTO additional_information_mapping (school_id, additional_information_id) VALUES (-2, -2);
+INSERT INTO additional_information_mapping (school_id, additional_information_id) VALUES (-3, -3);
+
 INSERT INTO person_school_mapping (id,person_id, school_id, functionality_id) VALUES (0,(SELECT id FROM Person where prename='karl'),(SELECT id FROM School where school_name='testschool'), -1);
 INSERT INTO person_school_mapping (id,person_id, school_id, functionality_id) VALUES (-1,(SELECT id FROM Person where prename='karl2'),(SELECT id FROM School where school_name='testschool2'), -2);
 INSERT INTO person_school_mapping (id,person_id, school_id, functionality_id) VALUES (-2,(SELECT id FROM Person where prename='karl'),(SELECT id FROM School where school_name='testschool3'), -1);
 
 INSERT INTO school_criteria_mapping (school_id, criteria_id) VALUES ((SELECT id FROM School where school_name='testschool'), (SELECT id FROM Criteria where criteria_name='test'));
 INSERT INTO school_criteria_mapping (school_id, criteria_id) VALUES ((SELECT id FROM School where school_name='testschool2'), (SELECT id FROM Criteria where criteria_name='test1'));
+INSERT INTO school_criteria_mapping (school_id, criteria_id) VALUES ((SELECT id FROM School where school_name='testschool2'), (SELECT id FROM Criteria where criteria_name='test2'));
 INSERT INTO school_criteria_mapping (school_id, criteria_id) VALUES ((SELECT id FROM School where school_name='testschool3'), (SELECT id FROM Criteria where criteria_name='test'));
 INSERT INTO school_criteria_mapping (school_id, criteria_id) VALUES ((SELECT id FROM School where school_name='testschool3'), (SELECT id FROM Criteria where criteria_name='test1'));
-INSERT INTO school_criteria_mapping (school_id, criteria_id) VALUES ((SELECT id FROM School where school_name='testschool3'), (SELECT id FROM Criteria where criteria_name='test2'));
 
 INSERT INTO area (id, area, area_institution_position, color, name) VALUES (-1, 'SRID=3857;POLYGON ((891032.2520110907 6143429.787979117, 955239.3557706389 6137926.321942585, 930779.5067193825 6177673.576650876, 891032.2520110907 6143429.787979117))', 'POINT (8.004278906249999 48.230358945402884)', '0x00', 'testarea1');
 INSERT INTO area (id, area, area_institution_position, color, name) VALUES (-2, 'SRID=3857;POLYGON ((1012720.0010410914 6291411.8747392185, 1028007.4066981267 6262060.055877711, 1056136.2331070714 6287131.401155248, 1012720.0010410914 6291411.8747392185))', 'POINT (9.2402408203125 49.075859013135954)', '0xff', 'testarea2');
@@ -52,4 +66,6 @@ ALTER SEQUENCE functionality_id_seq increment by 3;
 ALTER SEQUENCE person_id_seq increment by 3; 
 ALTER SEQUENCE person_school_mapping_id_seq increment by 3; 
 ALTER SEQUENCE school_id_seq increment by 3; 
+ALTER SEQUENCE information_type_seq increment by 3; 
+-- ALTER SEQUENCE additional_information_seq increment by 3; 
 

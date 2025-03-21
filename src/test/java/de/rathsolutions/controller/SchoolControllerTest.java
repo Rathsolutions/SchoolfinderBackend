@@ -83,7 +83,7 @@ public class SchoolControllerTest {
 
 	private static final int SCHOOL_REAL_EXISTING_MOCK_ID = -1;
 
-	private static final int SCHOOL_WITH_SINGLE_CRITERIA_REAL_EXISTING_MOCK_ID = -3;
+	private static final int SCHOOL_WITH_SINGLE_CRITERIA_REAL_EXISTING_MOCK_ID = -2;
 
 	private static final SchoolTypeDTO SCHOOL_TYPE = new SchoolTypeDTO();
 

@@ -31,6 +31,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import de.rathsolutions.controller.postbody.AddNewCriteriaPostbody;
@@ -46,8 +47,14 @@ public class CriteriaController {
 
     @Operation(summary = "queries for all available filter criterias in the database")
     @GetMapping("/search/getAllAvailableCriterias")
-    public ResponseEntity<List<Criteria>> getAllAvailableCriterias() {
-        return ResponseEntity.ok(criteriaRepo.findAll());
+    public ResponseEntity<List<Criteria>> getAllAvailableCriterias(
+            @RequestParam(required = false, defaultValue = "-1") Long projectId) {
+        if (projectId == null || projectId == -1) {
+            return ResponseEntity.ok(criteriaRepo.findAll());
+        } else {
+            return ResponseEntity.ok(criteriaRepo.findAllBySchoolMappingsProjectId(projectId));
+
+        }
     }
 
     @Operation(summary = "queries for criteria recommendations by a substring of an already existing criteria")

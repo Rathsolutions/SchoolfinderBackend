@@ -26,7 +26,7 @@ import java.util.List;
 import lombok.Data;
 
 @Data
-public class FinderEntity {
+public class FinderEntity implements Comparable<FinderEntity> {
 
     private final String primaryValue;
 
@@ -37,4 +37,12 @@ public class FinderEntity {
     private final double latVal;
 
     private final double longVal;
+
+    @Override
+    public int compareTo(FinderEntity o) {
+        if (this.primaryValue.equalsIgnoreCase(o.getPrimaryValue())) {
+            return this.secondaryValue.compareTo(o.getSecondaryValue());
+        }
+        return this.primaryValue.compareTo(o.getPrimaryValue());
+    }
 }

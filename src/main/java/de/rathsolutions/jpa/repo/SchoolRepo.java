@@ -37,19 +37,21 @@ public interface SchoolRepo extends JpaRepository<School, Long> {
     public List<School> findDistinctByMatchingCriteriasIn(List<Criteria> criteriaName);
 
     public List<School> findAllByLatitudeBetweenAndLongitudeBetween(double leftLatBound, double rightLatBound,
-	    double topLongBound, double bottomLongBound);
+            double topLongBound, double bottomLongBound);
 
     public List<School> findAllByOrderBySchoolName();
 
+    public List<School> findAllByProjectsIdOrderBySchoolName(long projectId);
+
     public List<School> findDistinctByLatitudeBetweenAndLongitudeBetweenAndMatchingCriteriasIn(double leftLatBound,
-	    double rightLatBound, double topLongBound, double bottomLongBound, List<Criteria> criterias);
+            double rightLatBound, double topLongBound, double bottomLongBound, List<Criteria> criterias);
 
     public List<School> findDistinctByLatitudeBetweenAndLongitudeBetweenAndMatchingCriteriasInAndTypeIn(
-	    double leftLatBound, double rightLatBound, double topLongBound, double bottomLongBound,
-	    List<Criteria> criterias, List<SchoolType> schoolTypes);
+            double leftLatBound, double rightLatBound, double topLongBound, double bottomLongBound,
+            List<Criteria> criterias, List<SchoolType> schoolTypes);
 
     public List<School> findDistinctByLatitudeBetweenAndLongitudeBetweenAndTypeIn(double leftLatBound,
-	    double rightLatBound, double topLongBound, double bottomLongBound, List<SchoolType> schoolTypes);
+            double rightLatBound, double topLongBound, double bottomLongBound, List<SchoolType> schoolTypes);
 
     public Optional<School> findOneBySchoolName(String schoolName);
 
