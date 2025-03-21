@@ -65,9 +65,14 @@ public class SearchController {
 	@Operation(summary = "searches institutions by their content in database")
 	@GetMapping("/search/findGeneralInstitutionContentInDatabase")
 	public ResponseEntity<List<FinderEntity>> findGeneralInstitutionContentInDatabase(
-			@RequestParam(defaultValue = "") String query, @RequestParam(defaultValue = "1") int amount) {
+			@RequestParam(defaultValue = "") String query, @RequestParam(defaultValue = "1") int amount,
+			@RequestParam(required = false, defaultValue = "-1") Long projectId) {
 		try {
-			return ResponseEntity.ok(institutionFinder.find(new InstitutionSearchEntity(query), amount));
+			InstitutionSearchEntity searchValue = new InstitutionSearchEntity(query);
+			if (projectId != null && projectId != -1) {
+				searchValue = new InstitutionSearchEntity(query, projectId);
+			}
+			return ResponseEntity.ok(institutionFinder.find(searchValue, amount));
 		} catch (OperationNotSupportedException | ParserConfigurationException | SAXException | IOException
 				| ResourceNotFoundException | TransformerException | InterruptedException | ExecutionException e) {
 			log.error(e.getMessage());
@@ -83,7 +88,8 @@ public class SearchController {
 			List<FinderEntity> resultsByName = osmCityParser.find(new CitySearchEntity(name), amount);
 			return ResponseEntity.ok().header("Copyright", "This list was generated using Open Street Maps Data")
 					.body(resultsByName);
-		} catch (ParserConfigurationException | SAXException | IOException | ResourceNotFoundException | TransformerException
+		} catch (ParserConfigurationException | SAXException | IOException | ResourceNotFoundException
+				| TransformerException
 				| InterruptedException | ExecutionException | OperationNotSupportedException e) {
 			log.error(e.getMessage());
 			return ResponseEntity.notFound().build();

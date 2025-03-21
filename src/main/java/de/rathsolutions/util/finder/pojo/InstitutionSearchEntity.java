@@ -27,21 +27,27 @@ public class InstitutionSearchEntity extends AbstractSearchEntity {
     private static final String A_INSTITUTION_SEARCH_ENTITY_CANNOT_HAVE_A = "A InstitutionSearchEntity cannot have a ";
 
     public InstitutionSearchEntity(String name) {
-	this.name = name;
+        this.name = name;
+        this.projectId = null;
+    }
+
+    public InstitutionSearchEntity(String name, long projectId) {
+        this.name = name;
+        this.projectId = projectId;
     }
 
     @Override
     public String getHousenumber() throws OperationNotSupportedException {
-	throw new OperationNotSupportedException(A_INSTITUTION_SEARCH_ENTITY_CANNOT_HAVE_A + "housenumber!");
+        throw new OperationNotSupportedException(A_INSTITUTION_SEARCH_ENTITY_CANNOT_HAVE_A + "housenumber!");
     }
 
     @Override
     public String getCity() throws OperationNotSupportedException {
-	throw new OperationNotSupportedException(A_INSTITUTION_SEARCH_ENTITY_CANNOT_HAVE_A + "name!");
+        throw new OperationNotSupportedException(A_INSTITUTION_SEARCH_ENTITY_CANNOT_HAVE_A + "name!");
     }
 
     @Override
     public String getStreet() throws OperationNotSupportedException {
-	throw new OperationNotSupportedException(A_INSTITUTION_SEARCH_ENTITY_CANNOT_HAVE_A + "street!");
+        throw new OperationNotSupportedException(A_INSTITUTION_SEARCH_ENTITY_CANNOT_HAVE_A + "street!");
     }
 }

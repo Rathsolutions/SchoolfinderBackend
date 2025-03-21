@@ -21,8 +21,6 @@
  */
 package de.rathsolutions.util;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -40,7 +38,8 @@ class PasswordHasher {
 
 	@Test
 	void test() {
-		String encodedPassword = encoder.encode("!vwP2B");
+		
+		String encodedPassword = encoder.encode("");
 		System.out.println(encodedPassword);
 	}
 

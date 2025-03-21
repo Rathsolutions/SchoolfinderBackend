@@ -63,13 +63,18 @@ public class InstitutionFinder implements FinderService {
 			ResourceNotFoundException, TransformerException, InterruptedException, ExecutionException {
 		String queryValue = primaryValue.getName();
 		String[] splittedOnSpace = queryValue.split(" ");
+		List<FinderEntity> cachedEntriesToUse = cachedEntries;
+		if (primaryValue.getProjectId() != null) {
+			cachedEntriesToUse = cachedEntries.sublistOfProjectId(primaryValue.getProjectId().longValue());
+
+		}
 		if (splittedOnSpace.length == 1) {
-			return distanceUtil.computeLevenstheinDistance(queryValue, cachedEntries, amount, false, false);
+			return distanceUtil.computeLevenstheinDistance(queryValue, cachedEntriesToUse, amount, false, false);
 		} else {
 			Map<FinderEntity, Integer> cumulatedElements = new HashMap<>();
 			for (int i = 0; i < splittedOnSpace.length; i++) {
 				List<FinderEntity> resultList = distanceUtil.computeLevenstheinDistance(splittedOnSpace[i],
-						cachedEntries, amount, false, false);
+						cachedEntriesToUse, amount, false, false);
 				resultList.forEach(e -> {
 					cumulatedElements.put(e, cumulatedElements.containsKey(e) ? cumulatedElements.get(e) + 1 : 1);
 				});
