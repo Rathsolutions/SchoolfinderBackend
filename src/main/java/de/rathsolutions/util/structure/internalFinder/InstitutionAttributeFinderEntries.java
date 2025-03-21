@@ -97,6 +97,12 @@ public class InstitutionAttributeFinderEntries extends AbstractEntries {
 	}
 
 	@Override
+	public void clear() {
+		super.clear();
+		this.finderEntityForProjectsMap.clear();
+	}
+
+	@Override
 	public Stream<FinderEntity> stream() {
 		if (this.isEmpty()) {
 			this.buildEntryList();

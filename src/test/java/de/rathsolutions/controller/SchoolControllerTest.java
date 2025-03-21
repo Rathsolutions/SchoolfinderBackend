@@ -33,6 +33,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javax.naming.OperationNotSupportedException;
@@ -580,6 +581,51 @@ public class SchoolControllerTest {
 		assertEquals(1, schoolInDB.count());
 		schoolInDB = findMatchingSchool(testschool, allSchools);
 		School schoolObject = schoolInDB.findFirst().get();
+		assertEquals(1, schoolObject.getMatchingCriterias().size());
+		assertEquals(testcriteria, schoolObject.getMatchingCriterias().get(0).getCriteriaName());
+		assertEquals(-1L, schoolObject.getPersonSchoolMapping().get(0).getPerson().getId().longValue());
+		assertEquals(FUNCTIONALITY_ONE.getId(),
+				schoolObject.getPersonSchoolMapping().get(0).getFunctionality().getId());
+		assertEquals(testschool, schoolObject.getSchoolName());
+		assertEquals(3.333, schoolObject.getLatitude().doubleValue(), 0.000001);
+		assertEquals(4.444, schoolObject.getLongitude().doubleValue(), 0.000001);
+		assertEquals("1", new String(schoolObject.getSchoolPicture()));
+		assertEquals(SHORT_TESTSCHOOL, schoolObject.getShortSchoolName());
+	}
+
+	@Test
+	@Transactional
+	void testAlterSchoolNotNullExistingPersonAndAlreadyAddedPersonNotEmptyFunctionalityNotNullCriteriasKeepingSomeFormerCriteria() {
+		List<PersonFunctionalityDTO> personFuncList = new ArrayList<>();
+		List<Criteria> criterias = new ArrayList<>();
+		String testcriteria = "test";
+		String testcriteriaOne = "test1";
+		String testcriteriaFive = "test5";
+		criterias.add(new Criteria(testcriteria));
+		criterias.add(new Criteria(testcriteriaOne));
+		criterias.add(new Criteria(testcriteriaFive));
+		String testschool = TESTSCHOOL5;
+		PersonFunctionalityDTO personFunctionalityEntity = new PersonFunctionalityDTO();
+		Person person = new Person();
+		person.setId(-1L);
+		personFunctionalityEntity.setPerson(person);
+		personFunctionalityEntity.setFunctionality(FUNCTIONALITY_ONE);
+		personFuncList.add(personFunctionalityEntity);
+		SchoolDTO newSchool = new SchoolDTO(-3, SHORT_TESTSCHOOL, testschool, 1, 2, "1", "", personFuncList, criterias,
+				DEFAULT_PROJECT_LIST, PRIMARY_PROJECT, "", null, SCHOOL_TYPE, testschool, testschool, testschool,
+				testschool);
+		ResponseEntity<SchoolDTO> responseEntity = cut.alterSchool(newSchool);
+		List<Criteria> allCriterias = criteriaRepo.findAll();
+		List<School> allSchools = schoolRepo.findAll();
+		assertTrue(allCriterias.stream().anyMatch(e -> e.getCriteriaName().equals(testcriteria)));
+		Stream<School> schoolInDB = findMatchingSchool(testschool, allSchools);
+		assertEquals(1, schoolInDB.count());
+		schoolInDB = findMatchingSchool(testschool, allSchools);
+		School schoolObject = schoolInDB.findFirst().get();
+		assertEquals(3, schoolObject.getMatchingCriterias().size());
+		assertEquals(testcriteria, schoolObject.getMatchingCriterias().get(0).getCriteriaName());
+		assertEquals(testcriteriaOne, schoolObject.getMatchingCriterias().get(1).getCriteriaName());
+		assertEquals(testcriteriaFive, schoolObject.getMatchingCriterias().get(2).getCriteriaName());
 		assertEquals(-1L, schoolObject.getPersonSchoolMapping().get(0).getPerson().getId().longValue());
 		assertEquals(FUNCTIONALITY_ONE.getId(),
 				schoolObject.getPersonSchoolMapping().get(0).getFunctionality().getId());

@@ -354,7 +354,10 @@ public class SchoolController {
 		}
 		List<Criteria> allMatchingSchoolCriterias = generateMatchingSchoolCriteriasAndPersistIfNotExisting(
 				alterSchoolPostbody);
-		List<Criteria> formerCriteriasFromSchool = matchingSchool.getMatchingCriterias();
+
+		//Filtering important as this would break former relationships to already existing criterias!
+		List<Criteria> formerCriteriasFromSchool = matchingSchool.getMatchingCriterias().stream()
+		.filter(e -> !allMatchingSchoolCriterias.contains(e)).collect(Collectors.toList());
 		fillSchoolPostbodyWithAllInformation(alterSchoolPostbody, matchingSchool, allFoundProjects,
 				allMatchingSchoolCriterias);
 		School updatedSchool = schoolRepo.save(matchingSchool);
