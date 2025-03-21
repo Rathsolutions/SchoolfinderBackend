@@ -42,8 +42,6 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 @EnableWebSecurity
 public class SecurityConfig {
 
-	private static final String CSRF_TOKEN = "X-XSRF-TOKEN";
-
 	@Autowired
 	private AuthenticationEntryPoint authEntryPoint;
 

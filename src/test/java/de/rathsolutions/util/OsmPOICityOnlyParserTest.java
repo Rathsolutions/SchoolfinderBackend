@@ -37,7 +37,6 @@ import javax.xml.transform.TransformerException;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.crossstore.ChangeSetPersister.NotFoundException;
 import org.springframework.test.context.ContextConfiguration;
 import org.xml.sax.SAXException;
 

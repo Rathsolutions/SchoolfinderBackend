@@ -26,21 +26,21 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-import de.rathsolutions.SpringBootMain;
-import de.rathsolutions.controller.postbody.AreaDTO;
-import de.rathsolutions.controller.postbody.Position;
-import de.rathsolutions.jpa.repo.AreaRepository;
 import java.util.List;
+
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.transaction.annotation.Transactional;
+
+import de.rathsolutions.SpringBootMain;
+import de.rathsolutions.controller.postbody.AreaDTO;
+import de.rathsolutions.controller.postbody.Position;
+import de.rathsolutions.jpa.repo.AreaRepository;
 
 @SpringBootTest
 @ContextConfiguration(classes = SpringBootMain.class)
