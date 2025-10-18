@@ -22,6 +22,7 @@
 package de.rathsolutions.controller;
 
 import de.rathsolutions.controller.postbody.ProjectDTO;
+import de.rathsolutions.controller.postbody.SchoolDTO;
 import de.rathsolutions.jpa.entity.Project;
 import de.rathsolutions.jpa.entity.School;
 import de.rathsolutions.jpa.repo.ProjectRepo;
@@ -85,12 +86,13 @@ public class ProjectController {
 	}
 
 	@GetMapping(value = "/search/getAllSchoolsForProjectWithId")
-	public ResponseEntity<List<School>> getAllSchoolsForProjectWithId(@RequestParam Long id) {
+	public ResponseEntity<List<SchoolDTO>> getAllSchoolsForProjectWithId(@RequestParam Long id) {
 		Optional<Project> projectByName = projectRepo.findById(id);
 		if (projectByName.isEmpty()) {
 			return ResponseEntity.notFound().build();
 		}
-		return ResponseEntity.ok(projectByName.get().getAllSchools());
+		return ResponseEntity
+				.ok(projectByName.get().getAllSchools().stream().map(school -> school.convertToDTO()).toList());
 	}
 
 	@GetMapping("/search/getAllSchoolsForProjectWithName")

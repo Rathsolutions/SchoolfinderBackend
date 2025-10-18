@@ -32,8 +32,11 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 
+import lombok.extern.slf4j.Slf4j;
+
 @SpringBootApplication
 @EnableAsync
+@Slf4j
 public class SpringBootMain {
 
     @Value("${de.rathsolutions.domain}")
@@ -46,6 +49,7 @@ public class SpringBootMain {
     @Bean
     public CookieCsrfTokenRepository csrfTokenRepo(){
         var csrfRepo = CookieCsrfTokenRepository.withHttpOnlyFalse();
+        log.info("Setting csrf domain to {}", csrfDomain);
 		csrfRepo.setCookieCustomizer(customizer->{
 			customizer.domain(csrfDomain);
 		});

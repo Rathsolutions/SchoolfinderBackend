@@ -27,6 +27,7 @@ import java.util.Collections;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -53,15 +54,16 @@ public class SecurityConfig {
 		CsrfTokenRequestAttributeHandler requestHandler = new CsrfTokenRequestAttributeHandler();
 		//@formatter:off
 		http
-			.authorizeHttpRequests(req->req.requestMatchers(
+			.authorizeHttpRequests(req->req.requestMatchers(HttpMethod.GET,
 				"/api/v1/finder/search/**", 
 				"/api/v1/schools/search/**", 
-				"/api/v1/schools",
+				// "/api/v1/schools",
 				"/api/v1/criterias/search/getAllAvailableCriterias/**", 
 				"/api/v1/*/search/findAll",
 				"/api/v1/*/search/findAllActiveProjects",
 				"/api/v1/persons/search/**",
 				"/api/v1/schoolType/search/**", 
+				"/api/v1/project/search/getAllSchoolsForProjectWithId",
 				"/api/v1/project/*")
 				.permitAll()
 				.requestMatchers("/actuator/**")
@@ -88,11 +90,12 @@ public class SecurityConfig {
 	// 	return authenticationProvider;
 	// }
 
+	//When needing local test, add "http://localhost:4200" to the allowed origin list
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
 	final CorsConfiguration configuration = new CorsConfiguration();
 	configuration.setAllowedOrigins(
-		Arrays.asList("https://schoolfindernew.rathsolutions.de", "http://localhost:4200", "https://schoolfinder.rathsolutions.de"));
+		Arrays.asList("https://schoolfindernew.rathsolutions.de", "https://schoolfinder.rathsolutions.de"));
 	configuration.setAllowedHeaders(Collections.singletonList("*"));
 	configuration.addExposedHeader("Authorization");
 	configuration.setAllowCredentials(true);

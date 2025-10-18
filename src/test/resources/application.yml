@@ -2,12 +2,16 @@ spring:
   datasource:
     url: jdbc:postgresql://localhost:5432/postgres
     username: postgres
-    password: postgres
+    password: rootpasswd
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
       ddl-auto: create-drop
+    show-sql: true
     defer-datasource-initialization: true
   sql:
     init:
       mode: always
+de:
+  rathsolutions:
+    domain: localhost
