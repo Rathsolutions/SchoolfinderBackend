@@ -172,23 +172,6 @@ public class SchoolController {
 		return allSchools;
 	}
 
-	@Operation(summary = "searches all school resources ordered by their name")
-	@GetMapping("/search/findAllSchoolsOrderedByName")
-	public List<SchoolDTO> findAllSchoolsOrderByName(
-			@RequestParam(required = false, defaultValue = "-1") long projectId) {
-		if (projectId == -1) {
-			return schoolRepo.findAllByOrderBySchoolName().stream()
-					.map(e -> e.convertToShrinkedDTO())
-					.collect(Collectors.toList());
-
-		} else {
-			return schoolRepo.findAllByProjectsIdOrderBySchoolName(projectId).stream()
-					.map(e -> e.convertToShrinkedDTO())
-					.collect(Collectors.toList());
-
-		}
-	}
-
 	private List<School> findAllSchoolsByInBoundsInternal(String leftLatBound, String rightLatBound,
 			String topLongBound, String bottomLongBound, List<Long> criteriaNumbers, List<Integer> schoolTypeIds,
 			boolean exclusiveSearch) {
