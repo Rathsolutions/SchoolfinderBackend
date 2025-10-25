@@ -243,7 +243,7 @@ public class SchoolController {
 	@GetMapping("/search/findFilteredSchoolsOrderedByName")
 	@Transactional(readOnly = true)
 	public ResponseEntity<List<SchoolDTO>> findFilteredSchoolsOrderedByNameWithActiveFilter(
-			@RequestParam(value = "projectIds", required = false) List<Long> projectIds,
+			@RequestParam(value = "projectId", required = false) List<Long> projectIds,
 			@RequestParam(value = "criteriaNumbers", required = false) List<Long> criteriaNumbers,
 			@RequestParam(value = "schoolTypeIds", required = false) List<Integer> schoolTypeIds,
 			@RequestParam(value = "exclusiveSearch", required = false, defaultValue = "false") boolean exclusiveSearch) {
