@@ -158,8 +158,8 @@ public class SchoolControllerTest {
 		criterias.add(new Criteria("test"));
 		List<SchoolDTO> schoolsByCriteria = cut.findSchoolsByCriteria(criterias);
 		assertEquals(2, schoolsByCriteria.size());
-		assertFirstSchool(schoolsByCriteria.get(1));
-		assertThirdSchool(schoolsByCriteria.get(0));
+		assertFirstSchool(schoolsByCriteria.get(1), true);
+		assertThirdSchool(schoolsByCriteria.get(0), true);
 	}
 
 	@Test
@@ -178,9 +178,9 @@ public class SchoolControllerTest {
 		criterias.add(new Criteria("test1"));
 		List<SchoolDTO> schoolsByCriteria = cut.findSchoolsByCriteria(criterias);
 		assertEquals(3, schoolsByCriteria.size());
-		assertFirstSchool(schoolsByCriteria.get(2));
-		assertSecondSchool(schoolsByCriteria.get(1));
-		assertThirdSchool(schoolsByCriteria.get(0));
+		assertFirstSchool(schoolsByCriteria.get(2), true);
+		assertSecondSchool(schoolsByCriteria.get(1), true);
+		assertThirdSchool(schoolsByCriteria.get(0), true);
 	}
 
 	@Test
@@ -191,15 +191,69 @@ public class SchoolControllerTest {
 		criterias.add(new Criteria("test12"));
 		List<SchoolDTO> schoolsByCriteria = cut.findSchoolsByCriteria(criterias);
 		assertEquals(2, schoolsByCriteria.size());
-		assertFirstSchool(schoolsByCriteria.get(1));
-		assertThirdSchool(schoolsByCriteria.get(0));
+		assertFirstSchool(schoolsByCriteria.get(1), true);
+		assertThirdSchool(schoolsByCriteria.get(0), true);
 	}
 
 	@Test
 	@Transactional
 	void testFindAllSchools() {
 		List<SchoolDTO> allSchools = cut.findAllSchools();
-		assertEquals(3, allSchools.size());
+		assertEquals(4, allSchools.size());
+		assertFirstSchool(allSchools.get(0), true);
+		assertSecondSchool(allSchools.get(1), true);
+
+		assertThirdSchool(allSchools.get(2), true);
+		assertFourthSchool(allSchools.get(3), true);
+
+	}
+
+	@Test
+	@Transactional
+	void testFindFilteredSchoolsOrderedByNameWithNoMatchingFilters() {
+		var filteredResult = cut.findFilteredSchoolsOrderedByNameWithActiveFilter(List.of(-1L), List.of(-1L),
+				List.of(-2), false);
+		assertEquals(0, filteredResult.getBody().size());
+	}
+
+	@Test
+	@Transactional
+	void testFindFilteredSchoolsOrderedByNameWithProjectAndCriteriaAndSchoolFilter() {
+		var filteredResult = cut.findFilteredSchoolsOrderedByNameWithActiveFilter(List.of(-1L), List.of(-1L),
+				List.of(-1), false);
+		assertEquals(1, filteredResult.getBody().size());
+		assertFirstSchool(filteredResult.getBody().get(0), false);
+	}
+
+	@Test
+	@Transactional
+	void testFindFilteredSchoolsOrderedByNameWithOnlyCriteria() {
+		var filteredResult = cut.findFilteredSchoolsOrderedByNameWithActiveFilter(new ArrayList<>(), List.of(-1L),
+				new ArrayList<>(), false);
+		assertEquals(2, filteredResult.getBody().size());
+		assertFirstSchool(filteredResult.getBody().get(0), false);
+		assertThirdSchool(filteredResult.getBody().get(1), false);
+	}
+
+	@Test
+	@Transactional
+	void testFindFilteredSchoolsOrderedByNameWithOnlySchoolType() {
+		var filteredResult = cut.findFilteredSchoolsOrderedByNameWithActiveFilter(new ArrayList<>(), new ArrayList<>(),
+				List.of(-1), false);
+		assertEquals(3, filteredResult.getBody().size());
+		assertFirstSchool(filteredResult.getBody().get(0), false);
+		assertSecondSchool(filteredResult.getBody().get(1), false);
+		assertThirdSchool(filteredResult.getBody().get(2), false);
+	}
+
+	@Test
+	@Transactional
+	void testFindFilteredSchoolsOrderedByNameWithOnlyProject() {
+		var filteredResult = cut.findFilteredSchoolsOrderedByNameWithActiveFilter(List.of(-1L), new ArrayList<>(),
+				new ArrayList<>(), false);
+		assertEquals(2, filteredResult.getBody().size());
+		assertFirstSchool(filteredResult.getBody().get(0), false);
+		assertSecondSchool(filteredResult.getBody().get(1), false);
 	}
 
 	// @Test
@@ -318,7 +372,7 @@ public class SchoolControllerTest {
 	@Transactional
 	void testFindSchoolDetails() {
 		ResponseEntity<SchoolDTO> findFirstSchoolDetails = cut.findSchoolDetails(SCHOOL_REAL_EXISTING_MOCK_ID);
-		assertFirstSchool(findFirstSchoolDetails.getBody());
+		assertFirstSchool(findFirstSchoolDetails.getBody(), true);
 	}
 
 	@Test
@@ -336,7 +390,7 @@ public class SchoolControllerTest {
 		assertThrows(ResourceAlreadyExistingException.class, () -> {
 			cut.addNewSchool(newSchool);
 		});
-		assertFirstSchool(schoolRepo.getOne(-1L).convertToDTO());
+		assertFirstSchool(schoolRepo.getReferenceById(-1L).convertToDTO(), true);
 	}
 
 	@Test
@@ -347,7 +401,7 @@ public class SchoolControllerTest {
 		assertThrows(ResourceNotFoundException.class, () -> {
 			cut.alterSchool(newSchool);
 		});
-		assertFirstSchool(schoolRepo.getOne(-1L).convertToDTO());
+		assertFirstSchool(schoolRepo.getReferenceById(-1L).convertToDTO(), true);
 	}
 
 	@Test
@@ -501,7 +555,7 @@ public class SchoolControllerTest {
 		assertEquals(-1L, schoolObject.getPersonSchoolMapping().get(0).getPerson().getId().longValue());
 		assertEquals(FUNCTIONALITY_ONE.getId(),
 				schoolObject.getPersonSchoolMapping().get(0).getFunctionality().getId());
-		assertSchoolEquals(responseEntity.getBody(), newSchool);
+		assertSchoolEquals(responseEntity.getBody(), newSchool, true);
 	}
 
 	@Test
@@ -744,44 +798,80 @@ public class SchoolControllerTest {
 		return allSchools.stream().filter(e -> (e.getSchoolName().equals(testschool)));
 	}
 
-	private void assertFirstSchool(SchoolDTO school) {
+	private void assertFirstSchool(SchoolDTO school, boolean withImage) {
 		assertEquals(TESTSCHOOL, school.getSchoolName());
 		assertEquals(SHORT_TESTSCHOOL, school.getShortSchoolName());
 		assertEquals(1.111, school.getLatitude(), 0.001);
 		assertEquals(2.222, school.getLongitude(), 0.001);
-		assertEquals("image1", school.getSchoolPicture());
+		if (withImage) {
+			assertEquals("image1", school.getSchoolPicture());
+		} else {
+			assertNull(school.getSchoolPicture());
+		}
 		assertEquals("text1", school.getAlternativePictureText());
+		assertEquals(-1, school.getSchoolType().getId());
 		assertEquals(SCHOOL_REAL_EXISTING_MOCK_ID, school.getPrimaryProject().getId());
 	}
 
-	private void assertSchoolEquals(SchoolDTO school, SchoolDTO postbody) {
+	private void assertSchoolEquals(SchoolDTO school, SchoolDTO postbody, boolean withImage) {
 		assertEquals(postbody.getSchoolName(), school.getSchoolName());
 		assertEquals(postbody.getShortSchoolName(), school.getShortSchoolName());
 		assertEquals(postbody.getLatitude(), school.getLatitude(), 0.001);
 		assertEquals(postbody.getLongitude(), school.getLongitude(), 0.001);
-		assertEquals(postbody.getSchoolPicture(), school.getSchoolPicture());
+		if (withImage) {
+			assertEquals(postbody.getSchoolPicture(), school.getSchoolPicture());
+		} else {
+			assertNull(school.getSchoolPicture());
+		}
 		assertEquals(postbody.getAlternativePictureText(), school.getAlternativePictureText());
 	}
 
-	private void assertSecondSchool(SchoolDTO school) {
+	private void assertSecondSchool(SchoolDTO school, boolean withImage) {
 		assertEquals("testschool2", school.getSchoolName());
 		assertEquals("shortTestschool2", school.getShortSchoolName());
 		assertEquals(2.222, school.getLatitude(), 0.001);
 		assertEquals(1.111, school.getLongitude(), 0.001);
 		assertEquals("text2", school.getAlternativePictureText());
-		assertEquals("image2", school.getSchoolPicture());
+		if (withImage) {
+			assertEquals("image2", school.getSchoolPicture());
+		} else {
+			assertNull(school.getSchoolPicture());
+		}
+		assertEquals(-1, school.getSchoolType().getId());
+
 		assertEquals(SCHOOL_REAL_EXISTING_MOCK_ID, school.getPrimaryProject().getId());
 
 	}
 
-	private void assertThirdSchool(SchoolDTO school) {
+	private void assertThirdSchool(SchoolDTO school, boolean withImage) {
 		assertEquals("testschool3", school.getSchoolName());
 		assertEquals("shortTestschool3", school.getShortSchoolName());
 		assertEquals(3.333, school.getLatitude(), 0.001);
 		assertEquals(4.444, school.getLongitude(), 0.001);
-		assertEquals("image3", school.getSchoolPicture());
+		if (withImage) {
+			assertEquals("image3", school.getSchoolPicture());
+		} else {
+			assertNull(school.getSchoolPicture());
+		}
+		assertEquals(-1, school.getSchoolType().getId());
 		assertEquals("text3", school.getAlternativePictureText());
 		assertEquals(-2, school.getPrimaryProject().getId());
 
 	}
+
+	private void assertFourthSchool(SchoolDTO school, boolean withImage) {
+		assertEquals("testschool4", school.getSchoolName());
+		assertEquals("shortTestschool4", school.getShortSchoolName());
+		assertEquals(4.444, school.getLatitude(), 0.001);
+		assertEquals(5.555, school.getLongitude(), 0.001);
+		if (withImage) {
+			assertEquals("image4", school.getSchoolPicture());
+		} else {
+			assertNull(school.getSchoolPicture());
+		}
+		assertEquals("text4", school.getAlternativePictureText());
+		assertEquals(-2, school.getSchoolType().getId());
+		assertEquals(-3, school.getPrimaryProject().getId());
+	}
+
 }

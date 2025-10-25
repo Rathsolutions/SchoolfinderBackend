@@ -87,6 +87,12 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class SchoolController {
 
+	private static final long MIN_LAT = -90;
+	private static final long MAX_LAT = 90;
+
+	private static final long MIN_LONG = -180;
+	private static final long MAX_LONG = 180;
+
 	@Autowired
 	private SchoolRepo schoolRepo;
 
@@ -233,6 +239,23 @@ public class SchoolController {
 		return schoolTypes != null && !schoolTypes.isEmpty();
 	}
 
+	@Operation(summary = "searches all school resources, orderes them by name, and filters them accordingly")
+	@GetMapping("/search/findFilteredSchoolsOrderedByName")
+	@Transactional(readOnly = true)
+	public ResponseEntity<List<SchoolDTO>> findFilteredSchoolsOrderedByNameWithActiveFilter(
+			@RequestParam(value = "projectIds", required = false) List<Long> projectIds,
+			@RequestParam(value = "criteriaNumbers", required = false) List<Long> criteriaNumbers,
+			@RequestParam(value = "schoolTypeIds", required = false) List<Integer> schoolTypeIds,
+			@RequestParam(value = "exclusiveSearch", required = false, defaultValue = "false") boolean exclusiveSearch) {
+		List<School> matchingSchools = this.findAllSchoolsByInBoundsInternal(String.valueOf(MIN_LAT),
+				String.valueOf(MAX_LAT), String.valueOf(MIN_LONG),
+				String.valueOf(MAX_LONG), criteriaNumbers, schoolTypeIds, exclusiveSearch).stream()
+				.sorted((s1, s2) -> s1.getSchoolName().compareTo(s2.getSchoolName())).toList();
+		List<SchoolDTO> intermediateResult = buildSchoolResultListWithoutIcons(matchingSchools, projectIds);
+		return ResponseEntity.ok(intermediateResult);
+
+	}
+
 	@Operation(summary = "searches all school resources within latlong boundaries")
 	@GetMapping("/search/findAllSchoolsInBoundsHavingCriteriasAndProject")
 	@Transactional(readOnly = true)
@@ -280,6 +303,11 @@ public class SchoolController {
 			@RequestParam(value = "exclusiveSearch", required = false, defaultValue = "false") boolean exclusiveSearch) {
 		List<School> matchingSchools = this.findAllSchoolsByInBoundsInternal(leftLatBound, rightLatBound, topLongBound,
 				bottomLongBound, criteriaNumbers, schoolTypeIds, exclusiveSearch);
+		List<SchoolDTO> intermediateResult = buildSchoolResultListWithoutIcons(matchingSchools, projectIds);
+		return ResponseEntity.ok(intermediateResult);
+	}
+
+	private List<SchoolDTO> buildSchoolResultListWithoutIcons(List<School> matchingSchools, List<Long> projectIds) {
 		List<SchoolDTO> intermediateResult;
 		if (projectIds == null || projectIds.isEmpty()) {
 			intermediateResult = matchingSchools.stream().map(e -> e.convertToShrinkedDTO())
@@ -294,7 +322,7 @@ public class SchoolController {
 			e.setProjects(e.getProjects().stream().map(project -> project.convertToShrinkedDto())
 					.collect(Collectors.toList()));
 		});
-		return ResponseEntity.ok(intermediateResult);
+		return intermediateResult;
 	}
 
 	@Operation(summary = "searches a school resource by id with all details")
@@ -355,9 +383,10 @@ public class SchoolController {
 		List<Criteria> allMatchingSchoolCriterias = generateMatchingSchoolCriteriasAndPersistIfNotExisting(
 				alterSchoolPostbody);
 
-		//Filtering important as this would break former relationships to already existing criterias!
+		// Filtering important as this would break former relationships to already
+		// existing criterias!
 		List<Criteria> formerCriteriasFromSchool = matchingSchool.getMatchingCriterias().stream()
-		.filter(e -> !allMatchingSchoolCriterias.contains(e)).collect(Collectors.toList());
+				.filter(e -> !allMatchingSchoolCriterias.contains(e)).collect(Collectors.toList());
 		fillSchoolPostbodyWithAllInformation(alterSchoolPostbody, matchingSchool, allFoundProjects,
 				allMatchingSchoolCriterias);
 		School updatedSchool = schoolRepo.save(matchingSchool);

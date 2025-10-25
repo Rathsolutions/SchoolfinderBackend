@@ -48,11 +48,12 @@ public class SearchControllerTest {
         var searchEntries = searchController.findGeneralInstitutionContentInDatabase("additional_info", 10, null);
         var sortedResult = searchEntries.getBody().stream().sorted().collect(Collectors.toList());
         
-        assertEquals(3, sortedResult.size());
+        assertEquals(4, sortedResult.size());
 
         assertEquals("testschool", sortedResult.get(0).getPrimaryValue());
         assertEquals("testschool" + 2, sortedResult.get(1).getPrimaryValue());
         assertEquals("testschool" + 3, sortedResult.get(2).getPrimaryValue());
+        assertEquals("testschool" + 4, sortedResult.get(3).getPrimaryValue());
 
         assertEquals("additional_info" + 1, sortedResult.get(0).getSecondaryValue());
         assertEquals("additional_info" + 2, sortedResult.get(1).getSecondaryValue());
@@ -65,9 +66,10 @@ public class SearchControllerTest {
         var searchEntries = searchController.findGeneralInstitutionContentInDatabase("additional_info", 10, -2L);
         var sortedResult = searchEntries.getBody().stream().sorted().collect(Collectors.toList());
         
-        assertEquals(1, sortedResult.size());
+        assertEquals(2, sortedResult.size());
 
         assertEquals("testschool" + 3, sortedResult.get(0).getPrimaryValue());
+        assertEquals("testschool" + 4, sortedResult.get(1).getPrimaryValue());
 
         assertEquals("additional_info" + 3, sortedResult.get(0).getSecondaryValue());
 

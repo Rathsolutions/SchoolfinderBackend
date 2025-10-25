@@ -18,16 +18,20 @@ INSERT INTO criteria (id,criteria_name) VALUES (-2,'test1');
 INSERT INTO criteria (id,criteria_name) VALUES (-3,'test2');
 
 INSERT INTO school_type(id, color, school_type_value) VALUES (-1, 255, 0);
+INSERT INTO school_type(id, color, school_type_value) VALUES (-2, 255, 1);
 
 INSERT INTO person (id,prename,lastname,email,phone_number) VALUES (-1,'karl','test','karl@test.de','0815');
 INSERT INTO person (id,prename,lastname,email,phone_number) VALUES (-2,'karl2','test','karl2@test.de','0816');
 
 INSERT INTO project (id, default_icon, project_name, scaling) VALUES (-1, '0x00', 'testproj1', 1.0);
 INSERT INTO project (id, default_icon, project_name, scaling) VALUES (-2, '0xff', 'testproj2', 1.5);
+INSERT INTO project (id, default_icon, project_name, scaling) VALUES (-3, '0xee', 'testproj3', 2.0);
 
 INSERT INTO school (id, short_school_name, school_name, latitude, longitude, school_picture, alternative_picture_text,primary_project_id, type_id) VALUES (-1,'shortTestschool','testschool','1.111','2.222','image1', 'text1', -1, -1);
 INSERT INTO school (id, short_school_name, school_name, latitude, longitude, school_picture, alternative_picture_text,primary_project_id, type_id) VALUES (-2,'shortTestschool2','testschool2','2.222','1.111','image2', 'text2', -1, -1);
 INSERT INTO school (id, short_school_name, school_name, latitude, longitude, school_picture, alternative_picture_text,primary_project_id, type_id) VALUES (-3,'shortTestschool3','testschool3','3.333','4.444','image3', 'text3', -2, -1);
+INSERT INTO school (id, short_school_name, school_name, latitude, longitude, school_picture, alternative_picture_text,primary_project_id, type_id) VALUES (-4,'shortTestschool4','testschool4','4.444','5.555','image4', 'text4', -3, -2);
+
 
 INSERT INTO functionality (id, name) VALUES (-1, 'testfunc1');
 INSERT INTO functionality (id, name) VALUES (-2, 'testfunc2');
@@ -59,6 +63,8 @@ INSERT INTO area (id, area, area_institution_position, color, name) VALUES (-2, 
 INSERT INTO school_projects (school_id ,projects_id) VALUES ((SELECT id FROM School where school_name='testschool'), (SELECT id FROM Project where project_name='testproj1'));
 INSERT INTO school_projects (school_id ,projects_id) VALUES ((SELECT id FROM School where school_name='testschool2'), (SELECT id FROM Project where project_name='testproj1'));
 INSERT INTO school_projects (school_id ,projects_id) VALUES ((SELECT id FROM School where school_name='testschool3'), (SELECT id FROM Project where project_name='testproj2'));
+INSERT INTO school_projects (school_id ,projects_id) VALUES ((SELECT id FROM School where school_name='testschool4'), (SELECT id FROM Project where project_name='testproj2'));
+INSERT INTO school_projects (school_id ,projects_id) VALUES ((SELECT id FROM School where school_name='testschool4'), (SELECT id FROM Project where project_name='testproj3'));
 
 ALTER SEQUENCE area_id_seq increment by 3; 
 ALTER SEQUENCE criteria_id_seq increment by 3; 
