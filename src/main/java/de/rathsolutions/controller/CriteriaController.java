@@ -37,7 +37,6 @@ import org.springframework.web.bind.annotation.RestController;
 import de.rathsolutions.controller.postbody.AddNewCriteriaPostbody;
 import de.rathsolutions.jpa.entity.Criteria;
 import de.rathsolutions.jpa.repo.CriteriaRepo;
-import io.swagger.v3.oas.annotations.Operation;
 
 @RestController
 @RequestMapping("/api/v1/criterias")
@@ -45,7 +44,8 @@ public class CriteriaController {
     @Autowired
     private CriteriaRepo criteriaRepo;
 
-    @Operation(summary = "queries for all available filter criterias in the database")
+    // @Operation(summary = "queries for all available filter criterias in the
+    // database")
     @GetMapping("/search/getAllAvailableCriterias")
     public ResponseEntity<List<Criteria>> getAllAvailableCriterias(
             @RequestParam(required = false, defaultValue = "-1") Long projectId) {
@@ -57,7 +57,8 @@ public class CriteriaController {
         }
     }
 
-    @Operation(summary = "queries for criteria recommendations by a substring of an already existing criteria")
+    // @Operation(summary = "queries for criteria recommendations by a substring of
+    // an already existing criteria")
     @GetMapping("/search/getCriteriaRecommendations")
     public ResponseEntity<List<Criteria>> getCriteriaRecommendations(String criteria,
             String amount) {
@@ -65,7 +66,7 @@ public class CriteriaController {
         return ResponseEntity.ok(criteriaRepo.findAllByCriteriaNameContaining(criteria, page));
     }
 
-    @Operation(summary = "creates a new criteria resource in the database")
+    // @Operation(summary = "creates a new criteria resource in the database")
     @PutMapping("/create/addNewCriteria")
     public ResponseEntity<Criteria> addNewCriteria(AddNewCriteriaPostbody addNewCriteriaPostbody) {
         if (Objects.isNull(addNewCriteriaPostbody)) {

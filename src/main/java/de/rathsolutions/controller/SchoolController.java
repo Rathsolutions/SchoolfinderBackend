@@ -78,7 +78,6 @@ import de.rathsolutions.util.finder.pojo.FinderEntity;
 import de.rathsolutions.util.finder.pojo.SchoolSearchEntity;
 import de.rathsolutions.util.finder.specific.osm.OsmPOISchoolParser;
 import de.rathsolutions.util.structure.internalFinder.InstitutionAttributeFinderEntries;
-import io.swagger.v3.oas.annotations.Operation;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 
@@ -129,7 +128,7 @@ public class SchoolController {
 	@Autowired
 	private InstitutionAttributeFinderEntries finderEntries;
 
-	@Operation(summary = "searches non-registered school resources by their name in an osm document. This schools must not be registered within the application")
+	// @Operation(summary = "searches non-registered school resources by their name in an osm document. This schools must not be registered within the application")
 	@GetMapping("/search/findNotRegisteredSchoolsByName")
 	public ResponseEntity<List<FinderEntity>> findNotRegisteredSchoolsByNameAdmin(
 			@RequestParam(defaultValue = "") String name, @RequestParam(defaultValue = "") String city,
@@ -147,7 +146,7 @@ public class SchoolController {
 		}
 	}
 
-	@Operation(summary = "searches registered school resources by a list of criterias in the database")
+	// @Operation(summary = "searches registered school resources by a list of criterias in the database")
 	@GetMapping("/search/findSchoolsByCriteria")
 	public List<SchoolDTO> findSchoolsByCriteria(List<Criteria> criterias) {
 		List<Criteria> criteriasFromDb = new ArrayList<>();
@@ -156,7 +155,7 @@ public class SchoolController {
 				.collect(Collectors.toList());
 	}
 
-	@Operation(summary = "searches all school resources")
+	// @Operation(summary = "searches all school resources")
 	@GetMapping("/search/findAllSchools")
 	public List<SchoolDTO> findAllSchools() {
 		List<SchoolDTO> allSchools = schoolRepo.findAll().stream().map(e -> e.convertToDTO())
@@ -222,7 +221,7 @@ public class SchoolController {
 		return schoolTypes != null && !schoolTypes.isEmpty();
 	}
 
-	@Operation(summary = "searches all school resources, orderes them by name, and filters them accordingly")
+	// @Operation(summary = "searches all school resources, orderes them by name, and filters them accordingly")
 	@GetMapping("/search/findFilteredSchoolsOrderedByName")
 	@Transactional(readOnly = true)
 	public ResponseEntity<List<SchoolDTO>> findFilteredSchoolsOrderedByNameWithActiveFilter(
@@ -239,7 +238,7 @@ public class SchoolController {
 
 	}
 
-	@Operation(summary = "searches all school resources within latlong boundaries")
+	// @Operation(summary = "searches all school resources within latlong boundaries")
 	@GetMapping("/search/findAllSchoolsInBoundsHavingCriteriasAndProject")
 	@Transactional(readOnly = true)
 	public ResponseEntity<List<SchoolDTO>> findAllSchoolsInBoundsHavingCriteriasAndProject(String leftLatBound,
@@ -275,7 +274,7 @@ public class SchoolController {
 	 * @param exclusiveSearch
 	 * @return
 	 */
-	@Operation(summary = "searches all school resources within latlong boundaries")
+	// @Operation(summary = "searches all school resources within latlong boundaries")
 	@GetMapping("/search/findAllSchoolsInBoundsHavingCriteriasAndProjectWithoutProjectIconInResponse")
 	@Transactional(readOnly = true)
 	public ResponseEntity<List<SchoolDTO>> findAllSchoolsInBoundsHavingCriteriasAndProjectWithoutProjectIconInResponse(
@@ -308,7 +307,7 @@ public class SchoolController {
 		return intermediateResult;
 	}
 
-	@Operation(summary = "searches a school resource by id with all details")
+	// @Operation(summary = "searches a school resource by id with all details")
 	@GetMapping("/search/findSchoolDetails")
 	public ResponseEntity<SchoolDTO> findSchoolDetails(long id) {
 		Optional<School> schoolByIdOptional = schoolRepo.findById(id);
@@ -319,7 +318,7 @@ public class SchoolController {
 		return ResponseEntity.ok(schoolById.convertToDTO());
 	}
 
-	@Operation(summary = "creates a new school resource")
+	// @Operation(summary = "creates a new school resource")
 	@PutMapping("/create/addNewSchool")
 	@Transactional
 	public ResponseEntity<SchoolDTO> addNewSchool(@RequestBody SchoolDTO addNewSchoolPostbody) {
@@ -347,7 +346,7 @@ public class SchoolController {
 		return ResponseEntity.ok(savedSchool.convertToDTO());
 	}
 
-	@Operation(summary = "alterates an already existing school resource")
+	// @Operation(summary = "alterates an already existing school resource")
 	@PatchMapping("/edit/alterSchool")
 	@Transactional
 	public ResponseEntity<SchoolDTO> alterSchool(@RequestBody SchoolDTO alterSchoolPostbody) {
@@ -453,7 +452,7 @@ public class SchoolController {
 		return ResponseEntity.ok(personSchoolMapping.get().getId());
 	}
 
-	@Operation(summary = "deletes a school resource")
+	// @Operation(summary = "deletes a school resource")
 	@DeleteMapping("/delete/deleteSchool")
 	@Transactional
 	public ResponseEntity<SchoolDTO> deleteSchool(long schoolId) {

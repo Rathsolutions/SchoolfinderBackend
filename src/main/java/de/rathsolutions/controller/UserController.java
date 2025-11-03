@@ -28,7 +28,6 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import io.swagger.v3.oas.annotations.Operation;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
@@ -39,7 +38,7 @@ public class UserController {
     @Autowired
     private CookieCsrfTokenRepository csrfTokenRepository;
 
-    @Operation(summary="validate user credentials by the authorization header")
+    // @Operation(summary="validate user credentials by the authorization header")
     @GetMapping("/validateCredentials")
     public void validateCredentials(
             @RequestHeader("Authorization") String authHeader, HttpServletRequest request, HttpServletResponse response) {

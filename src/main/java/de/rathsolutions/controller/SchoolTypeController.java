@@ -39,7 +39,6 @@ import de.rathsolutions.controller.postbody.SchoolTypeDTO;
 import de.rathsolutions.jpa.entity.SchoolType;
 import de.rathsolutions.jpa.entity.SchoolTypeValue;
 import de.rathsolutions.jpa.repo.SchoolTypeRepo;
-import io.swagger.v3.oas.annotations.Operation;
 
 @RestController()
 @RequestMapping("/api/v1/schoolType")
@@ -69,21 +68,21 @@ public class SchoolTypeController {
 	return ResponseEntity.ok(schoolTypeRepo.save(type));
     }
 
-    @Operation(summary = "retrieves all known school types")
+    // @Operation(summary = "retrieves all known school types")
     @GetMapping("/search/findAll")
     public ResponseEntity<List<SchoolTypeDTO>> getAllTypes() {
 	return ResponseEntity
 		.ok(schoolTypeRepo.findAll().stream().map(e -> e.convertToDto()).collect(Collectors.toList()));
     }
 
-    @Operation(summary = "retrieves all known school types")
+    // @Operation(summary = "retrieves all known school types")
     @GetMapping("/search/findAllTypesUsedAtLeastOnce")
     public ResponseEntity<List<SchoolTypeDTO>> getAllTypesUsedAtLeastOnce() {
 	return ResponseEntity.ok(schoolTypeRepo.findAllByAllSchoolsNotEmpty().stream().map(e -> e.convertToDto())
 		.collect(Collectors.toList()));
     }
 
-    @Operation(summary = "retrieves all known school types for the given project")
+    // @Operation(summary = "retrieves all known school types for the given project")
     @GetMapping("/search/findAllUsedTypesInProject")
     public ResponseEntity<List<SchoolTypeDTO>> getAllUsedTypesInProject(long projectId) {
 	return ResponseEntity.ok(schoolTypeRepo.findAllByAllSchoolsProjectsId(projectId).stream().distinct()

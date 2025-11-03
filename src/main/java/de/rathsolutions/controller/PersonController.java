@@ -21,15 +21,9 @@
  */
 package de.rathsolutions.controller;
 
-import de.rathsolutions.controller.postbody.AddNewPersonPostbody;
-import de.rathsolutions.jpa.entity.Person;
-import de.rathsolutions.jpa.entity.PersonSchoolMapping;
-import de.rathsolutions.jpa.repo.PersonRepo;
-import de.rathsolutions.jpa.repo.PersonSchoolMappingRepo;
-import de.rathsolutions.util.exception.ResourceNotFoundException;
-import io.swagger.v3.oas.annotations.Operation;
 import java.util.List;
 import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
@@ -39,6 +33,13 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import de.rathsolutions.controller.postbody.AddNewPersonPostbody;
+import de.rathsolutions.jpa.entity.Person;
+import de.rathsolutions.jpa.entity.PersonSchoolMapping;
+import de.rathsolutions.jpa.repo.PersonRepo;
+import de.rathsolutions.jpa.repo.PersonSchoolMappingRepo;
+import de.rathsolutions.util.exception.ResourceNotFoundException;
 
 @RestController
 @RequestMapping("/api/v1/persons")
@@ -51,14 +52,14 @@ public class PersonController {
     @Autowired
     private PersonSchoolMappingRepo personSchoolMappingRepo;
 
-    @Operation(summary = "checks if a person already exists")
+    // @Operation(summary = "checks if a person already exists")
     @GetMapping("/search/existsPerson")
     public ResponseEntity<Boolean> existsPerson(String prename, String lastname, String email, String phonenumber) {
 	return ResponseEntity
 		.ok(personRepo.existsByPrenameAndLastnameAndEmailAndPhoneNumber(prename, lastname, email, phonenumber));
     }
 
-    @Operation(summary = "queries for all persons according to a school id")
+    // @Operation(summary = "queries for all persons according to a school id")
     @GetMapping("/search/getPersonsForSchool")
     public ResponseEntity<List<PersonSchoolMapping>> getPersonsForSchool(long id) {
 	List<PersonSchoolMapping> personBySchoolId = personSchoolMappingRepo.findOneBySchoolId(id);
@@ -68,7 +69,7 @@ public class PersonController {
 	return ResponseEntity.ok(personBySchoolId);
     }
 
-    @Operation(summary = "queries for a database-saved person resource")
+    // @Operation(summary = "queries for a database-saved person resource")
     @GetMapping("/search/getPerson")
     public ResponseEntity<?> getPerson(String prename, String lastname, String email, String phoneNumber) {
 	if (prename.isBlank() && lastname.isBlank() && email.isBlank()
@@ -111,7 +112,7 @@ public class PersonController {
 	return ResponseEntity.notFound().build();
     }
 
-    @Operation(summary = "queries for email address recommendations by specific person criterias")
+    // @Operation(summary = "queries for email address recommendations by specific person criterias")
     @GetMapping("/search/getEmailRecommendations")
     public ResponseEntity<List<Person>> getEmailRecommendations(String prename, String lastname, String email,
 	    String amount) {
@@ -119,7 +120,7 @@ public class PersonController {
 	return ResponseEntity.ok(personRepo.findByPrenameAndLastnameAndEmailContaining(prename, lastname, email, page));
     }
 
-    @Operation(summary = "creates a new person resource in the database")
+    // @Operation(summary = "creates a new person resource in the database")
     @PutMapping("/create/addNewPerson")
     public ResponseEntity<Person> addNewPerson(@RequestBody AddNewPersonPostbody addNewPersonPostbody) {
 	if (personRepo.findByPrenameAndLastnameAndEmailAndPhoneNumber(addNewPersonPostbody.getPrename(),

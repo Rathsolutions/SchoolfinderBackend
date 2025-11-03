@@ -45,7 +45,6 @@ import de.rathsolutions.util.finder.pojo.StreetCitySearchEntity;
 import de.rathsolutions.util.finder.specific.InstitutionFinder;
 import de.rathsolutions.util.finder.specific.osm.OsmPOICityOnlyParser;
 import de.rathsolutions.util.finder.specific.osm.OsmStreetParser;
-import io.swagger.v3.oas.annotations.Operation;
 import lombok.extern.slf4j.Slf4j;
 
 @RestController
@@ -61,7 +60,7 @@ public class SearchController {
 	@Autowired
 	private InstitutionFinder institutionFinder;
 
-	@Operation(summary = "searches institutions by their content in database")
+	// @Operation(summary = "searches institutions by their content in database")
 	@GetMapping("/search/findGeneralInstitutionContentInDatabase")
 	public ResponseEntity<List<FinderEntity>> findGeneralInstitutionContentInDatabase(
 			@RequestParam(defaultValue = "") String query, @RequestParam(defaultValue = "1") int amount,
@@ -79,7 +78,7 @@ public class SearchController {
 		}
 	}
 
-	@Operation(summary = "searches cities by their names")
+	// @Operation(summary = "searches cities by their names")
 	@GetMapping("/search/findCityByName")
 	public ResponseEntity<List<FinderEntity>> findCityByName(@RequestParam(defaultValue = "") String name,
 			@RequestParam(defaultValue = "1") int amount) {
@@ -95,7 +94,7 @@ public class SearchController {
 		}
 	}
 
-	@Operation(summary = "searches for streets in cities by their names")
+	// @Operation(summary = "searches for streets in cities by their names")
 	@GetMapping("/search/findCityStreetPositionByName")
 	public ResponseEntity<List<FinderEntity>> findCityStreetPositionByName(@RequestParam(defaultValue = "") String city,
 			@RequestParam(defaultValue = "") String street, @RequestParam(required = false) String housenumber,
