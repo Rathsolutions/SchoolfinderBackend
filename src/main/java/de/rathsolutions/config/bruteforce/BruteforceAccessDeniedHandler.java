@@ -46,7 +46,7 @@ public class BruteforceAccessDeniedHandler implements AuthenticationEntryPoint {
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response,
             AuthenticationException authException) throws IOException, ServletException {
-        log.info("Invoked access denied handler");
+        log.debug("Invoked access denied handler");
         if (loginAttemptService.isBlocked(IPUtils.getClientIP(request))) {
             response.setStatus(429);
             return;
