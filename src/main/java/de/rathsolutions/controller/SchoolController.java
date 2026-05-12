@@ -77,7 +77,6 @@ import de.rathsolutions.util.exception.ResourceNotFoundException;
 import de.rathsolutions.util.finder.pojo.FinderEntity;
 import de.rathsolutions.util.finder.pojo.SchoolSearchEntity;
 import de.rathsolutions.util.finder.specific.osm.OsmPOISchoolParser;
-import de.rathsolutions.util.structure.internalFinder.InstitutionAttributeFinderEntries;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 
@@ -124,9 +123,6 @@ public class SchoolController {
 
 	@Autowired
 	private SchoolTypeRepo schoolTypeRepo;
-
-	@Autowired
-	private InstitutionAttributeFinderEntries finderEntries;
 
 	// @Operation(summary = "searches non-registered school resources by their name in an osm document. This schools must not be registered within the application")
 	@GetMapping("/search/findNotRegisteredSchoolsByName")
@@ -341,8 +337,6 @@ public class SchoolController {
 		fillSchoolPostbodyWithAllInformation(addNewSchoolPostbody, school, allFoundProjects,
 				allMatchingSchoolCriterias);
 		School savedSchool = schoolRepo.save(school);
-		finderEntries.clear();
-		finderEntries.buildEntryList();
 		return ResponseEntity.ok(savedSchool.convertToDTO());
 	}
 
@@ -373,8 +367,6 @@ public class SchoolController {
 				allMatchingSchoolCriterias);
 		School updatedSchool = schoolRepo.save(matchingSchool);
 		deleteCriteriaFromDBIfNoLongerReferenced(matchingSchool.getId(), formerCriteriasFromSchool);
-		finderEntries.clear();
-		finderEntries.buildEntryList();
 		return ResponseEntity.ok(updatedSchool.convertToDTO());
 	}
 
@@ -460,8 +452,6 @@ public class SchoolController {
 		var allMatchingCriterias = deletedSchool.get().getMatchingCriterias();
 		schoolRepo.deleteById(schoolId);
 		deleteCriteriaFromDBIfNoLongerReferenced(schoolId, allMatchingCriterias);
-		finderEntries.clear();
-		finderEntries.buildEntryList();
 		return ResponseEntity.ok().build();
 	}
 

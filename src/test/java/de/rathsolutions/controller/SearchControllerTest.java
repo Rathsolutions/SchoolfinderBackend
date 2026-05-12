@@ -47,7 +47,7 @@ public class SearchControllerTest {
     public void searchForValuesInAllProjects() {
         var searchEntries = searchController.findGeneralInstitutionContentInDatabase("additional_info", 10, null);
         var sortedResult = searchEntries.getBody().stream().sorted().collect(Collectors.toList());
-        
+
         assertEquals(4, sortedResult.size());
 
         assertEquals("testschool", sortedResult.get(0).getPrimaryValue());
@@ -65,7 +65,7 @@ public class SearchControllerTest {
     public void searchForValuesInOneProjects() {
         var searchEntries = searchController.findGeneralInstitutionContentInDatabase("additional_info", 10, -2L);
         var sortedResult = searchEntries.getBody().stream().sorted().collect(Collectors.toList());
-        
+
         assertEquals(2, sortedResult.size());
 
         assertEquals("testschool" + 3, sortedResult.get(0).getPrimaryValue());

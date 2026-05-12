@@ -55,4 +55,6 @@ public interface SchoolRepo extends JpaRepository<School, Long> {
 
     public Optional<School> findOneBySchoolName(String schoolName);
 
+    public School findTopByLastUpdatedOnNotNullOrderByLastUpdatedOnDesc();
+
 }

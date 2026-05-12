@@ -21,11 +21,13 @@
  */
 package de.rathsolutions.jpa.entity;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.hibernate.annotations.Parameter;
 import org.hibernate.annotations.Type;
+import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.usertype.UserTypeLegacyBridge;
 
 import de.rathsolutions.controller.postbody.SchoolDTO;
@@ -98,6 +100,9 @@ public class School {
 
 	private String homepage;
 
+	@UpdateTimestamp
+	private Instant lastUpdatedOn;
+
 	public School(String shortSchoolName, String schoolName, Double latitude, Double longitude,
 			List<Criteria> matchingCriterias) {
 		this.shortSchoolName = shortSchoolName;
@@ -138,7 +143,7 @@ public class School {
 		}
 		return dto;
 	}
-	
+
 	public SchoolDTO convertToShrinkedDTO() {
 		SchoolDTO fullDto = this.convertToDTO();
 		fullDto.setSchoolPicture(null);
